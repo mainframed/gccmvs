@@ -1,0 +1,1416 @@
+This is gcj.info, produced by makeinfo version 4.5 from gcj.texi.
+
+INFO-DIR-SECTION Programming
+START-INFO-DIR-ENTRY
+* Gcj: (gcj).               Ahead-of-time compiler for the Java language
+END-INFO-DIR-ENTRY
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* gcjh: (gcj)Invoking gcjh.
+                            Generate header files from Java class files
+* jv-scan: (gcj)Invoking jv-scan.
+                            Print information about Java source files
+* jcf-dump: (gcj)Invoking jcf-dump.
+                            Print information about Java class files
+* gij: (gcj)Invoking gij.   GNU interpreter for Java bytecode
+* jv-convert: (gcj)Invoking jv-convert.
+                            Convert file from one encoding to another
+* rmic: (gcj)Invoking rmic.
+                            Generate stubs for Remote Method Invocation.
+* rmiregistry: (gcj)Invoking rmiregistry.
+                            The remote object registry.
+END-INFO-DIR-ENTRY
+
+   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+
+   Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "GNU General Public License", the Front-Cover
+texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+   (a) The FSF's Front-Cover Text is:
+
+   A GNU Manual
+
+   (b) The FSF's Back-Cover Text is:
+
+   You have freedom to copy and modify this GNU Manual, like GNU
+software.  Copies published by the Free Software Foundation raise
+funds for GNU development.
+
+
+File: gcj.info,  Node: Code Generation,  Next: Configure-time Options,  Prev: Warnings,  Up: Invoking gcj
+
+Code Generation
+===============
+
+   In addition to the many `gcc' options controlling code generation,
+`gcj' has several options specific to itself.
+
+`--main=CLASSNAME'
+     This option is used when linking to specify the name of the class
+     whose `main' method should be invoked when the resulting
+     executable is run.  (1)
+
+`-DNAME[=VALUE]'
+     This option can only be used with `--main'.  It defines a system
+     property named NAME with value VALUE.  If VALUE is not specified
+     then it defaults to the empty string.  These system properties are
+     initialized at the program's startup and can be retrieved at
+     runtime using the `java.lang.System.getProperty' method.
+
+`-C'
+     This option is used to tell `gcj' to generate bytecode (`.class'
+     files) rather than object code.
+
+`--resource RESOURCE-NAME'
+     This option is used to tell `gcj' to compile the contents of a
+     given file to object code so it may be accessed at runtime with
+     the core protocol handler as `core:/RESOURCE-NAME'.  Note that
+     RESOURCE-NAME is the name of the resource as found at runtime; for
+     instance, it could be used in a call to `ResourceBundle.getBundle'.
+     The actual file name to be compiled this way must be specified
+     separately.
+
+`-d DIRECTORY'
+     When used with `-C', this causes all generated `.class' files to
+     be put in the appropriate subdirectory of DIRECTORY.  By default
+     they will be put in subdirectories of the current working
+     directory.
+
+`-fno-bounds-check'
+     By default, `gcj' generates code which checks the bounds of all
+     array indexing operations.  With this option, these checks are
+     omitted, which can improve performance for code that uses arrays
+     extensively.  Note that this can result in unpredictable behavior
+     if the code in question actually does violate array bounds
+     constraints.  It is safe to use this option if you are sure that
+     your code will never throw an `ArrayIndexOutOfBoundsException'.
+
+`-fno-store-check'
+     Don't generate array store checks.  When storing objects into
+     arrays, a runtime check is normally generated in order to ensure
+     that the object is assignment compatible with the component type
+     of the array (which may not be known at compile-time).  With this
+     option, these checks are omitted.  This can improve performance
+     for code which stores objects into arrays frequently.  It is safe
+     to use this option if you are sure your code will never throw an
+     `ArrayStoreException'.
+
+`-fjni'
+     With `gcj' there are two options for writing native methods: CNI
+     and JNI.  By default `gcj' assumes you are using CNI.  If you are
+     compiling a class with native methods, and these methods are
+     implemented using JNI, then you must use `-fjni'.  This option
+     causes `gcj' to generate stubs which will invoke the underlying JNI
+     methods.
+
+`-fno-optimize-static-class-initialization'
+     When the optimization level is greather or equal to `-O2', `gcj'
+     will try to optimize the way calls into the runtime are made to
+     initialize static classes upon their first use (this optimization
+     isn't carried out if `-C' was specified.) When compiling to native
+     code, `-fno-optimize-static-class-initialization' will turn this
+     optimization off, regardless of the optimization level in use.
+
+   ---------- Footnotes ----------
+
+   (1) The linker by default looks for a global function named `main'.
+Since Java does not have global functions, and a collection of Java
+classes may have more than one class with a `main' method, you need to
+let the linker know which of those `main' methods it should invoke when
+starting the application.
+
+
+File: gcj.info,  Node: Configure-time Options,  Prev: Code Generation,  Up: Invoking gcj
+
+Configure-time Options
+======================
+
+   Some `gcj' code generations options affect the resulting ABI, and so
+can only be meaningfully given when `libgcj', the runtime package, is
+configured.  `libgcj' puts the appropriate options from this group into
+a `spec' file which is read by `gcj'.  These options are listed here
+for completeness; if you are using `libgcj' then you won't want to
+touch these options.
+
+`-fuse-boehm-gc'
+     This enables the use of the Boehm GC bitmap marking code.  In
+     particular this causes `gcj' to put an object marking descriptor
+     into each vtable.
+
+`-fhash-synchronization'
+     By default, synchronization data (the data used for `synchronize',
+     `wait', and `notify') is pointed to by a word in each object.
+     With this option `gcj' assumes that this information is stored in a
+     hash table and not in the object itself.
+
+`-fuse-divide-subroutine'
+     On some systems, a library routine is called to perform integer
+     division.  This is required to get exception handling correct when
+     dividing by zero.
+
+`-fcheck-references'
+     On some systems it's necessary to insert inline checks whenever
+     accessing an object via a reference.  On other systems you won't
+     need this because null pointer accesses are caught automatically
+     by the processor.
+
+
+File: gcj.info,  Node: Compatibility,  Next: Invoking gcjh,  Prev: Invoking gcj,  Up: Top
+
+Compatibility with the Java Platform
+************************************
+
+   As we believe it is important that the Java platform not be
+fragmented, `gcj' and `libgcj' try to conform to the relevant Java
+specifications.  However, limited manpower and incomplete and unclear
+documentation work against us.  So, there are caveats to using `gcj'.
+
+   This list of compatibility issues is by no means complete.
+
+   * `gcj' implements the JDK 1.1 language.  It supports inner classes,
+     though these are known to still be buggy.  It does not yet support
+     the Java 2 `strictfp' keyword (it recognizes the keyword but
+     ignores it).
+
+   * `libgcj' is largely compatible with the JDK 1.2 libraries.
+     However, `libgcj' is missing many packages, most notably
+     `java.awt'.  There are also individual missing classes and methods.
+     We currently do not have a list showing differences between
+     `libgcj' and the Java 2 platform.
+
+   * Sometimes the `libgcj' implementation of a method or class differs
+     from the JDK implementation.  This is not always a bug.  Still, if
+     it affects you, it probably makes sense to report it so that we
+     can discuss the appropriate response.
+
+
+File: gcj.info,  Node: Invoking gcjh,  Next: Invoking jv-scan,  Prev: Compatibility,  Up: Top
+
+Invoking gcjh
+*************
+
+   The `gcjh' program is used to generate header files from class
+files.  It can generate both CNI and JNI header files, as well as stub
+implementation files which can be used as a basis for implementing the
+required native methods.
+
+`-stubs'
+     This causes `gcjh' to generate stub files instead of header files.
+     By default the stub file will be named after the class, with a
+     suffix of `.cc'.  In JNI mode, the default output file will have
+     the suffix `.c'.
+
+`-jni'
+     This tells `gcjh' to generate a JNI header or stub.  By default,
+     CNI headers are generated.
+
+`-add TEXT'
+     Inserts TEXT into the class body.  This is ignored in JNI mode.
+
+`-append TEXT'
+     Inserts TEXT into the header file after the class declaration.
+     This is ignored in JNI mode.
+
+`-friend TEXT'
+     Inserts TEXT into the class as a `friend' declaration.  This is
+     ignored in JNI mode.
+
+`-prepend TEXT'
+     Inserts TEXT into the header file before the class declaration.
+     This is ignored in JNI mode.
+
+`--classpath=PATH'
+`--CLASSPATH=PATH'
+`-IDIRECTORY'
+`-d DIRECTORY'
+`-o FILE'
+     These options are all identical to the corresponding `gcj' options.
+
+`-o FILE'
+     Sets the output file name.  This cannot be used if there is more
+     than one class on the command line.
+
+`-td DIRECTORY'
+     Sets the name of the directory to use for temporary files.
+
+`-M'
+     Print all dependencies to stdout; suppress ordinary output.
+
+`-MM'
+     Print non-system dependencies to stdout; suppress ordinary output.
+
+`-MD'
+     Print all dependencies to stdout.
+
+`-MMD'
+     Print non-system dependencies to stdout.
+
+`--help'
+     Print help about `gcjh' and exit.  No further processing is done.
+
+`--version'
+     Print version information for `gcjh' and exit.  No further
+     processing is done.
+
+`-v, --verbose'
+     Print extra information while running.
+
+   All remaining options are considered to be names of classes.
+
+
+File: gcj.info,  Node: Invoking jv-scan,  Next: Invoking jcf-dump,  Prev: Invoking gcjh,  Up: Top
+
+Invoking jv-scan
+****************
+
+   The `jv-scan' program can be used to print information about a Java
+source file (`.java' file).
+
+`--complexity'
+     This prints a complexity measure, related to cyclomatic
+     complexity, for each input file.
+
+`--encoding=NAME'
+     This works like the corresponding `gcj' option.
+
+`--print-main'
+     This prints the name of the class in this file containing a `main'
+     method.
+
+`--list-class'
+     This lists the names of all classes defined in the input files.
+
+`--list-filename'
+     If `--list-class' is given, this option causes `jv-scan' to also
+     print the name of the file in which each class was found.
+
+`-o FILE'
+     Print output to the named file.
+
+`--help'
+     Print help, then exit.
+
+`--version'
+     Print version number, then exit.
+
+
+File: gcj.info,  Node: Invoking jcf-dump,  Next: Invoking gij,  Prev: Invoking jv-scan,  Up: Top
+
+Invoking jcf-dump
+*****************
+
+   This is a class file examiner, similar to `javap'.  It will print
+information about a number of classes, which are specifed by class name
+or file name.
+
+`-c'
+     Disassemble method bodies.  By default method bodies are not
+     printed.
+
+`--javap'
+     Generate output in `javap' format.  The implementation of this
+     feature is very incomplete.
+
+`--classpath=PATH'
+`--CLASSPATH=PATH'
+`-IDIRECTORY'
+`-o FILE'
+     These options as the same as the corresponding `gcj' options.
+
+`--help'
+     Print help, then exit.
+
+`--version'
+     Print version number, then exit.
+
+`-v, --verbose'
+     Print extra information while running.
+
+
+File: gcj.info,  Node: Invoking gij,  Next: Invoking jv-convert,  Prev: Invoking jcf-dump,  Up: Top
+
+Invoking gij
+************
+
+   `gij' is a Java bytecode interpreter included with `libgcj'.  `gij'
+is not available on every platform; porting it requires a small amount
+of assembly programming which has not been done for all the targets
+supported by `gcj'.
+
+   The primary argument to `gij' is the name of a class or, with
+`-jar', a jar file.  Options before this argument are interpreted by
+`gij'; remaining options are passed to the interpreted program.
+
+   If a class name is specified and this class does not have a `main'
+method with the appropriate signature (a `static void' method with a
+`String[]' as its sole argument), then `gij' will print an error and
+exit.
+
+   If a jar file is specified then `gij' will use information in it to
+determine which class' `main' method will be invoked.
+
+   `gij' will invoke the `main' method with all the remaining
+command-line options.
+
+   Note that `gij' is not limited to interpreting code.  Because
+`libgcj' includes a class loader which can dynamically load shared
+objects, it is possible to give `gij' the name of a class which has
+been compiled and put into a shared library on the class path.
+
+`-DNAME[=VALUE]'
+     This defines a system property named NAME with value VALUE.  If
+     VALUE is not specified then it defaults to the empty string.
+     These system properties are initialized at the program's startup
+     and can be retrieved at runtime using the
+     `java.lang.System.getProperty' method.
+
+`-ms=NUMBER'
+     This sets the initial heap size.
+
+`-mx=NUMBER'
+     This sets the maximum heap size.
+
+`-jar'
+     This indicates that the name passed to `gij' should be interpreted
+     as the name of a jar file, not a class.
+
+`--help'
+     Print help, then exit.
+
+`--version'
+     Print version number, then exit.
+
+
+File: gcj.info,  Node: Invoking jv-convert,  Next: Invoking rmic,  Prev: Invoking gij,  Up: Top
+
+Invoking jv-convert
+*******************
+
+   `jv-convert' [`OPTION'] ... [INPUTFILE [OUTPUTFILE]]
+
+   `jv-convert' is a utility included with `libgcj' which converts a
+file from one encoding to another.  It is similar to the Unix `iconv'
+utility.
+
+   The encodings supported by `jv-convert' are platform-dependent.
+Currently there is no way to get a list of all supported encodings.
+
+`--encoding NAME'
+`--from NAME'
+     Use NAME as the input encoding.  The default is the current
+     locale's encoding.
+
+`--to NAME'
+     Use NAME as the output encoding.  The default is the `JavaSrc'
+     encoding; this is ASCII with `\u' escapes for non-ASCII characters.
+
+`-i FILE'
+     Read from FILE.  The default is to read from standard input.
+
+`-o FILE'
+     Write to FILE.  The default is to write to standard output.
+
+`--reverse'
+     Swap the input and output encodings.
+
+`--help'
+     Print a help message, then exit.
+
+`--version'
+     Print version information, then exit.
+
+
+File: gcj.info,  Node: Invoking rmic,  Next: Invoking rmiregistry,  Prev: Invoking jv-convert,  Up: Top
+
+Invoking rmic
+*************
+
+   `rmic' [`OPTION'] ... CLASS ...
+
+   `rmic' is a utility included with `libgcj' which generates stubs for
+remote objects.
+
+   Note that this program isn't yet fully compatible with the JDK
+`rmic'.  Some options, such as `-classpath', are recognized but
+currently ignored.  We have left these options undocumented for now.
+
+   Long options can also be given with a GNU-style leading `--'.  For
+instance, `--help' is accepted.
+
+`-keep'
+`-keepgenerated'
+     By default, `rmic' deletes intermediate files.  Either of these
+     options causes it not to delete such files.
+
+`-v1.1'
+     Cause `rmic' to create stubs and skeletons for the 1.1 protocol
+     version.
+
+`-vcompat'
+     Cause `rmic' to create stubs and skeletons compatible with both
+     the 1.1 and 1.2 protocol versions.  This is the default.
+
+`-v1.2'
+     Cause `rmic' to create stubs and skeletons for the 1.2 protocol
+     version.
+
+`-nocompile'
+     Don't compile the generated files.
+
+`-verbose'
+     Print information about what `rmic' is doing.
+
+`-d DIRECTORY'
+     Put output files in DIRECTORY.  By default the files are put in
+     the current working directory.
+
+`-help'
+     Print a help message, then exit.
+
+`-version'
+     Print version information, then exit.
+
+
+File: gcj.info,  Node: Invoking rmiregistry,  Next: About CNI,  Prev: Invoking rmic,  Up: Top
+
+Invoking rmiregistry
+********************
+
+   `rmiregistry' [`OPTION'] ... [PORT]
+
+   `rmiregistry' starts a remote object registry on the current host.
+If no port number is specified, then port 1099 is used.
+
+`--help'
+     Print a help message, then exit.
+
+`--version'
+     Print version information, then exit.
+
+
+File: gcj.info,  Node: About CNI,  Next: Resources,  Prev: Invoking rmiregistry,  Up: Top
+
+About CNI
+*********
+
+   This documents CNI, the Cygnus Native Interface, which is is a
+convenient way to write Java native methods using C++.  This is a more
+efficient, more convenient, but less portable alternative to the
+standard JNI (Java Native Interface).
+
+* Menu:
+
+* Basic concepts::              Introduction to using CNI.
+* Packages::                    How packages are mapped to C++.
+* Primitive types::             Handling Java types in C++.
+* Interfaces::                  How Java interfaces map to C++.
+* Objects and Classes::         C++ and Java classes.
+* Class Initialization::        How objects are initialized.
+* Object allocation::           How to create Java objects in C++.
+* Arrays::                      Dealing with Java arrays in C++.
+* Methods::                     Java methods in C++.
+* Strings::                     Information about Java Strings.
+* Mixing with C++::             How CNI can interoperate with C++.
+* Exception Handling::          How exceptions are handled.
+* Synchronization::             Synchronizing between Java and C++.
+* Invocation::			Starting the Java runtime from C++.
+* Reflection::                  Using reflection from C++.
+
+
+File: gcj.info,  Node: Basic concepts,  Next: Packages,  Up: About CNI
+
+Basic concepts
+==============
+
+   In terms of languages features, Java is mostly a subset of C++.
+Java has a few important extensions, plus a powerful standard class
+library, but on the whole that does not change the basic similarity.
+Java is a hybrid object-oriented language, with a few native types, in
+addition to class types.  It is class-based, where a class may have
+static as well as per-object fields, and static as well as instance
+methods.  Non-static methods may be virtual, and may be overloaded.
+Overloading is resolved at compile time by matching the actual argument
+types against the parameter types.  Virtual methods are implemented
+using indirect calls through a dispatch table (virtual function table).
+Objects are allocated on the heap, and initialized using a constructor
+method.  Classes are organized in a package hierarchy.
+
+   All of the listed attributes are also true of C++, though C++ has
+extra features (for example in C++ objects may be allocated not just on
+the heap, but also statically or in a local stack frame).  Because
+`gcj' uses the same compiler technology as G++ (the GNU C++ compiler),
+it is possible to make the intersection of the two languages use the
+same ABI (object representation and calling conventions).  The key idea
+in CNI is that Java objects are C++ objects, and all Java classes are
+C++ classes (but not the other way around).  So the most important task
+in integrating Java and C++ is to remove gratuitous incompatibilities.
+
+   You write CNI code as a regular C++ source file.  (You do have to use
+a Java/CNI-aware C++ compiler, specifically a recent version of G++.)
+
+A CNI C++ source file must have:
+
+     #include <gcj/cni.h>
+
+and then must include one header file for each Java class it uses, e.g.:
+
+     #include <java/lang/Character.h>
+     #include <java/util/Date.h>
+     #include <java/lang/IndexOutOfBoundsException.h>
+
+These header files are automatically generated by `gcjh'.
+
+   CNI provides some functions and macros to make using Java objects and
+primitive types from C++ easier.  In general, these CNI functions and
+macros start with the `Jv' prefix, for example the function
+`JvNewObjectArray'.  This convention is used to avoid conflicts with
+other libraries.  Internal functions in CNI start with the prefix
+`_Jv_'.  You should not call these; if you find a need to, let us know
+and we will try to come up with an alternate solution.  (This manual
+lists `_Jv_AllocBytes' as an example; CNI should instead provide a
+`JvAllocBytes' function.)
+
+Limitations
+-----------
+
+   Whilst a Java class is just a C++ class that doesn't mean that you
+are freed from the shackles of Java, a CNI C++ class must adhere to the
+rules of the Java programming language.
+
+   For example: it is not possible to declare a method in a CNI class
+that will take a C string (`char*') as an argument, or to declare a
+member variable of some non-Java datatype.
+
+
+File: gcj.info,  Node: Packages,  Next: Primitive types,  Prev: Basic concepts,  Up: About CNI
+
+Packages
+========
+
+   The only global names in Java are class names, and packages.  A
+"package" can contain zero or more classes, and also zero or more
+sub-packages.  Every class belongs to either an unnamed package or a
+package that has a hierarchical and globally unique name.
+
+   A Java package is mapped to a C++ "namespace".  The Java class
+`java.lang.String' is in the package `java.lang', which is a
+sub-package of `java'.  The C++ equivalent is the class
+`java::lang::String', which is in the namespace `java::lang' which is
+in the namespace `java'.
+
+Here is how you could express this:
+
+     (// Declare the class(es), possibly in a header file:
+     namespace java {
+       namespace lang {
+         class Object;
+         class String;
+         ...
+       }
+     }
+     
+     class java::lang::String : public java::lang::Object
+     {
+       ...
+     };
+
+The `gcjh' tool automatically generates the nessary namespace
+declarations.
+
+Leaving out package names
+-------------------------
+
+   Always using the fully-qualified name of a java class can be
+tiresomely verbose.  Using the full qualified name also ties the code
+to a single package making code changes necessary should the class move
+from one package to another.  The Java `package' declaration specifies
+that the following class declarations are in the named package, without
+having to explicitly name the full package qualifiers.  The `package'
+declaration can be followed by zero or more `import' declarations, which
+allows either a single class or all the classes in a package to be
+named by a simple identifier.  C++ provides something similar with the
+`using' declaration and directive.
+
+In Java:
+
+     import PACKAGE-NAME.CLASS-NAME;
+
+allows the program text to refer to CLASS-NAME as a shorthand for the
+fully qualified name: `PACKAGE-NAME.CLASS-NAME'.
+
+To achieve the same effect C++, you have to do this:
+
+     using PACKAGE-NAME::CLASS-NAME;
+
+Java can also cause imports on demand, like this:
+
+     import PACKAGE-NAME.*;
+
+Doing this allows any class from the package PACKAGE-NAME to be refered
+to only by its class-name within the program text.
+
+The same effect can be achieved in C++ like this:
+
+     using namespace PACKAGE-NAME;
+
+
+File: gcj.info,  Node: Primitive types,  Next: Interfaces,  Prev: Packages,  Up: About CNI
+
+Primitive types
+===============
+
+   Java provides 8 "primitives" types which represent integers, floats,
+characters and booleans (and also the void type).  C++ has its own very
+similar concrete types.  Such types in C++ however are not always
+implemented in the same way (an int might be 16, 32 or 64 bits for
+example) so CNI provides a special C++ type for each primitive Java
+type:
+
+*Java type*    *C/C++ typename*   *Description*
+`char'         `jchar'            16 bit Unicode character
+`boolean'      `jboolean'         logical (true or false) values
+`byte'         `jbyte'            8-bit signed integer
+`short'        `jshort'           16 bit signed integer
+`int'          `jint'             32 bit signed integer
+`long'         `jlong'            64 bit signed integer
+`float'        `jfloat'           32 bit IEEE floating point number
+`double'       `jdouble'          64 bit IEEE floating point number
+`void'         `void'             no value
+
+   When refering to a Java type You should always use these C++
+typenames (e.g.: `jint') to avoid disappointment.
+
+Reference types associated with primitive types
+-----------------------------------------------
+
+   In Java each primitive type has an associated reference type, e.g.:
+`boolean' has an associated `java.lang.Boolean' class.  In order to
+make working with such classes easier GCJ provides the macro
+`JvPrimClass':
+
+ - macro: JvPrimClass type
+     Return a pointer to the `Class' object corresponding to the type
+     supplied.
+
+          JvPrimClass(void) => java.lang.Void.TYPE
+
+
+
+File: gcj.info,  Node: Interfaces,  Next: Objects and Classes,  Prev: Primitive types,  Up: About CNI
+
+Interfaces
+==========
+
+   A Java class can "implement" zero or more "interfaces", in addition
+to inheriting from a single base class.
+
+   CNI allows CNI code to implement methods of interfaces.  You can
+also call methods through interface references, with some limitations.
+
+   CNI doesn't understand interface inheritance at all yet.  So, you
+can only call an interface method when the declared type of the field
+being called matches the interface which declares that method.  The
+workaround is to cast the interface reference to the right
+superinterface.
+
+   For example if you have:
+
+     interface A
+     {
+       void a();
+     }
+     
+     interface B extends A
+     {
+       void b();
+     }
+
+   and declare a variable of type `B' in C++, you can't call `a()'
+unless you cast it to an `A' first.
+
+
+File: gcj.info,  Node: Objects and Classes,  Next: Class Initialization,  Prev: Interfaces,  Up: About CNI
+
+Objects and Classes
+===================
+
+Classes
+-------
+
+   All Java classes are derived from `java.lang.Object'.  C++ does not
+have a unique root class, but we use the C++ class `java::lang::Object'
+as the C++ version of the `java.lang.Object' Java class.  All other
+Java classes are mapped into corresponding C++ classes derived from
+`java::lang::Object'.
+
+   Interface inheritance (the `implements' keyword) is currently not
+reflected in the C++ mapping.
+
+Object fields
+-------------
+
+   Each object contains an object header, followed by the instance
+fields of the class, in order.  The object header consists of a single
+pointer to a dispatch or virtual function table.  (There may be extra
+fields _in front of_ the object, for example for memory management, but
+this is invisible to the application, and the reference to the object
+points to the dispatch table pointer.)
+
+   The fields are laid out in the same order, alignment, and size as in
+C++.  Specifically, 8-bite and 16-bit native types (`byte', `short',
+`char', and `boolean') are _not_ widened to 32 bits.  Note that the
+Java VM does extend 8-bit and 16-bit types to 32 bits when on the VM
+stack or temporary registers.
+
+   If you include the `gcjh'-generated header for a class, you can
+access fields of Java classes in the _natural_ way.  For example, given
+the following Java class:
+
+     public class Int
+     {
+       public int i;
+       public Integer (int i) { this.i = i; }
+       public static zero = new Integer(0);
+     }
+
+   you can write:
+
+     #include <gcj/cni.h>;
+     #include <Int>;
+     
+     Int*
+     mult (Int *p, jint k)
+     {
+       if (k == 0)
+         return Int::zero;  // Static member access.
+       return new Int(p->i * k);
+     }
+
+Access specifiers
+-----------------
+
+   CNI does not strictly enforce the Java access specifiers, because
+Java permissions cannot be directly mapped into C++ permission.
+Private Java fields and methods are mapped to private C++ fields and
+methods, but other fields and methods are mapped to public fields and
+methods.
+
+
+File: gcj.info,  Node: Class Initialization,  Next: Object allocation,  Prev: Objects and Classes,  Up: About CNI
+
+Class Initialization
+====================
+
+   Java requires that each class be automatically initialized at the
+time of the first active use.  Initializing a class involves
+initializing the static fields, running code in class initializer
+methods, and initializing base classes.  There may also be some
+implementation specific actions, such as allocating `String' objects
+corresponding to string literals in the code.
+
+   The GCJ compiler inserts calls to `JvInitClass' at appropriate
+places to ensure that a class is initialized when required.  The C++
+compiler does not insert these calls automatically--it is the
+programmer's responsibility to make sure classes are initialized.
+However, this is fairly painless because of the conventions assumed by
+the Java system.
+
+   First, `libgcj' will make sure a class is initialized before an
+instance of that object is created.  This is one of the
+responsibilities of the `new' operation.  This is taken care of both in
+Java code, and in C++ code.  (When the G++ compiler sees a `new' of a
+Java class, it will call a routine in `libgcj' to allocate the object,
+and that routine will take care of initializing the class.)  It follows
+that you can access an instance field, or call an instance (non-static)
+method and be safe in the knowledge that the class and all of its base
+classes have been initialized.
+
+   Invoking a static method is also safe.  This is because the Java
+compiler adds code to the start of a static method to make sure the
+class is initialized.  However, the C++ compiler does not add this
+extra code.  Hence, if you write a native static method using CNI, you
+are responsible for calling `JvInitClass' before doing anything else in
+the method (unless you are sure it is safe to leave it out).
+
+   Accessing a static field also requires the class of the field to be
+initialized.  The Java compiler will generate code to call
+`Jv_InitClass' before getting or setting the field.  However, the C++
+compiler will not generate this extra code, so it is your
+responsibility to make sure the class is initialized before you access
+a static field from C++.
+
+
+File: gcj.info,  Node: Object allocation,  Next: Arrays,  Prev: Class Initialization,  Up: About CNI
+
+Object allocation
+=================
+
+   New Java objects are allocated using a "class instance creation
+expression", e.g.:
+
+     new TYPE ( ... )
+
+   The same syntax is used in C++.  The main difference is that C++
+objects have to be explicitly deleted; in Java they are automatically
+deleted by the garbage collector.  Using CNI, you can allocate a new
+Java object using standard C++ syntax and the C++ compiler will allocate
+memory from the garbage collector.  If you have overloaded
+constructors, the compiler will choose the correct one using standard
+C++ overload resolution rules.
+
+For example:
+
+     java::util::Hashtable *ht = new java::util::Hashtable(120);
+
+ - Function: void* _Jv_AllocBytes (jsize SIZE)
+     Allocates SIZE bytes from the heap.  The memory is not scanned by
+     the garbage collector but it freed if no references to it are
+     discovered.
+
+
+File: gcj.info,  Node: Arrays,  Next: Methods,  Prev: Object allocation,  Up: About CNI
+
+Arrays
+======
+
+   While in many ways Java is similar to C and C++, it is quite
+different in its treatment of arrays.  C arrays are based on the idea
+of pointer arithmetic, which would be incompatible with Java's security
+requirements.  Java arrays are true objects (array types inherit from
+`java.lang.Object').  An array-valued variable is one that contains a
+reference (pointer) to an array object.
+
+   Referencing a Java array in C++ code is done using the `JArray'
+template, which as defined as follows:
+
+     class __JArray : public java::lang::Object
+     {
+     public:
+       int length;
+     };
+     
+     template<class T>
+     class JArray : public __JArray
+     {
+       T data[0];
+     public:
+       T& operator[](jint i) { return data[i]; }
+     };
+
+   There are a number of `typedef's which correspond to `typedef's from
+the JNI.  Each is the type of an array holding objects of the relevant
+type:
+
+     typedef __JArray *jarray;
+     typedef JArray<jobject> *jobjectArray;
+     typedef JArray<jboolean> *jbooleanArray;
+     typedef JArray<jbyte> *jbyteArray;
+     typedef JArray<jchar> *jcharArray;
+     typedef JArray<jshort> *jshortArray;
+     typedef JArray<jint> *jintArray;
+     typedef JArray<jlong> *jlongArray;
+     typedef JArray<jfloat> *jfloatArray;
+     typedef JArray<jdouble> *jdoubleArray;
+
+ - Method on template<class T>: T* elements (JArray<T> ARRAY)
+     This template function can be used to get a pointer to the
+     elements of the `array'.  For instance, you can fetch a pointer to
+     the integers that make up an `int[]' like so:
+
+          extern jintArray foo;
+          jint *intp = elements (foo);
+
+     The name of this function may change in the future.
+
+ - Function: jobjectArray JvNewObjectArray (jsize LENGTH, jclass KLASS,
+          jobject INIT)
+     Here `klass' is the type of elements of the array and `init' is
+     the initial value put into every slot in the array.
+
+Creating arrays
+---------------
+
+   For each primitive type there is a function which can be used to
+create a new array of that type.  The name of the function is of the
+form:
+
+     JvNewTYPEArray
+
+For example:
+
+     JvNewBooleanArray
+
+can be used to create an array of Java primitive boolean types.
+
+The following function definition is the template for all such
+functions:
+
+ - Function: jbooleanArray JvNewBooleanArray (jint LENGTH)
+     Create's an array LENGTH indices long.
+
+ - Function: jsize JvGetArrayLength (jarray ARRAY)
+     Returns the length of the ARRAY.
+
+
+File: gcj.info,  Node: Methods,  Next: Strings,  Prev: Arrays,  Up: About CNI
+
+Methods
+=======
+
+   Java methods are mapped directly into C++ methods.  The header files
+generated by `gcjh' include the appropriate method definitions.
+Basically, the generated methods have the same names and
+_corresponding_ types as the Java methods, and are called in the
+natural manner.
+
+Overloading
+-----------
+
+   Both Java and C++ provide method overloading, where multiple methods
+in a class have the same name, and the correct one is chosen (at
+compile time) depending on the argument types.  The rules for choosing
+the correct method are (as expected) more complicated in C++ than in
+Java, but given a set of overloaded methods generated by `gcjh' the C++
+compiler will choose the expected one.
+
+   Common assemblers and linkers are not aware of C++ overloading, so
+the standard implementation strategy is to encode the parameter types
+of a method into its assembly-level name.  This encoding is called
+"mangling", and the encoded name is the "mangled name".  The same
+mechanism is used to implement Java overloading.  For C++/Java
+interoperability, it is important that both the Java and C++ compilers
+use the _same_ encoding scheme.
+
+Static methods
+--------------
+
+   Static Java methods are invoked in CNI using the standard C++
+syntax, using the `::' operator rather than the `.' operator.
+
+For example:
+
+     jint i = java::lang::Math::round((jfloat) 2.3);
+
+C++ method definition syntax is used to define a static native method.
+For example:
+
+     #include <java/lang/Integer>
+     java::lang::Integer*
+     java::lang::Integer::getInteger(jstring str)
+     {
+       ...
+     }
+
+Object Constructors
+-------------------
+
+   Constructors are called implicitly as part of object allocation
+using the `new' operator.
+
+For example:
+
+     java::lang::Integer *x = new java::lang::Integer(234);
+
+   Java does not allow a constructor to be a native method.  This
+limitation can be coded round however because a constructor can _call_
+a native method.
+
+Instance methods
+----------------
+
+   Calling a Java instance method from a C++ CNI method is done using
+the standard C++ syntax, e.g.:
+
+     // First create the Java object.
+     java::lang::Integer *x = new java::lang::Integer(234);
+     // Now call a method.
+     jint prim_value = x->intValue();
+     if (x->longValue == 0)
+       ...
+
+Defining a Java native instance method is also done the natural way:
+
+     #include <java/lang/Integer.h>
+     
+     jdouble
+     java::lang:Integer::doubleValue()
+     {
+       return (jdouble) value;
+     }
+
+Interface methods
+-----------------
+
+   In Java you can call a method using an interface reference.  This is
+supported, but not completly.  *Note Interfaces::.
+
+
+File: gcj.info,  Node: Strings,  Next: Mixing with C++,  Prev: Methods,  Up: About CNI
+
+Strings
+=======
+
+   CNI provides a number of utility functions for working with Java
+Java `String' objects.  The names and interfaces are analogous to those
+of JNI.
+
+ - Function: jstring JvNewString (const char* CHARS, jsize LEN)
+     Returns a Java `String' object with characters from the C string
+     CHARS up to the index LEN in that array.
+
+ - Function: jstring JvNewStringLatin1 (const char* BYTES, jsize LEN)
+     Returns a Java `String' made up of LEN bytes from BYTES.
+
+ - Function: jstring JvNewStringLatin1 (const char* BYTES)
+     As above but the length of the `String' is `strlen(BYTES)'.
+
+ - Function: jstring JvNewStringUTF (const char* BYTES)
+     Returns a `String' which is made up of the UTF encoded characters
+     present in the C string BYTES.
+
+ - Function: jchar* JvGetStringChars (jstring STR)
+     Returns a pointer to an array of characters making up the `String'
+     STR.
+
+ - Function: int JvGetStringUTFLength (jstring STR)
+     Returns the number of bytes required to encode the contents of the
+     `String' STR in UTF-8.
+
+ - Function: jsize JvGetStringUTFRegion (jstring STR, jsize START,
+          jsize LEN, char* BUF)
+     Puts the UTF-8 encoding of a region of the `String' STR into the
+     buffer `buf'.  The region to fetch is marked by START and LEN.
+
+     Note that BUF is a buffer, not a C string.  It is _not_ null
+     terminated.
+
+
+File: gcj.info,  Node: Mixing with C++,  Next: Exception Handling,  Prev: Strings,  Up: About CNI
+
+Interoperating with C/C++
+=========================
+
+   Because CNI is designed to represent Java classes and methods it
+cannot be mixed readily with C/C++ types.
+
+   One important restriction is that Java classes cannot have non-Java
+type instance or static variables and cannot have methods which take
+non-Java types as arguments or return non-Java types.
+
+None of the following is possible with CNI:
+
+
+     class ::MyClass : public java::lang::Object
+     {
+        char* variable;  // char* is not a valid Java type.
+     }
+     
+     
+     uint
+     ::SomeClass::someMethod (char *arg)
+     {
+       .
+       .
+       .
+     }   // `uint' is not a valid Java type, neither is `char*'
+
+Of course, it is ok to use C/C++ types within the scope of a method:
+
+     jint
+     ::SomeClass::otherMethod (jstring str)
+     {
+        char *arg = ...
+        .
+        .
+        .
+     }
+
+   But this restriction can cause a problem so CNI includes the
+`gnu.gcj.RawData' class.  The `RawData' class is a "non-scanned
+reference" type.  In other words variables declared of type `RawData'
+can contain any data and are not checked by the compiler in any way.
+
+   This means that you can put C/C++ data structures (including classes)
+in your CNI classes, as long as you use the appropriate cast.
+
+Here are some examples:
+
+
+     class ::MyClass : public java::lang::Object
+     {
+        gnu.gcj.RawData string;
+     
+        MyClass ();
+        gnu.gcj.RawData getText ();
+        void printText ();
+     }
+     
+     ::MyClass::MyClass ()
+     {
+        char* text = ...
+        string = text;
+     }
+     
+     gnu.gcj.RawData
+     ::MyClass::getText ()
+     {
+        return string;
+     }
+     
+     void
+     ::MyClass::printText ()
+     {
+       printf("%s\n", (char*) string);
+     }
+
+
+File: gcj.info,  Node: Exception Handling,  Next: Synchronization,  Prev: Mixing with C++,  Up: About CNI
+
+Exception Handling
+==================
+
+   While C++ and Java share a common exception handling framework,
+things are not yet perfectly integrated.  The main issue is that the
+run-time type information facilities of the two languages are not
+integrated.
+
+   Still, things work fairly well.  You can throw a Java exception from
+C++ using the ordinary `throw' construct, and this exception can be
+caught by Java code.  Similarly, you can catch an exception thrown from
+Java using the C++ `catch' construct.
+
+Here is an example:
+
+     if (i >= count)
+        throw new java::lang::IndexOutOfBoundsException();
+
+   Normally, G++ will automatically detect when you are writing C++
+code that uses Java exceptions, and handle them appropriately.
+However, if C++ code only needs to execute destructors when Java
+exceptions are thrown through it, GCC will guess incorrectly.  Sample
+problematic code:
+
+     struct S { ~S(); };
+     
+     extern void bar();    // Is implemented in Java and may throw exceptions.
+     
+     void foo()
+     {
+       S s;
+       bar();
+     }
+
+   The usual effect of an incorrect guess is a link failure,
+complaining of a missing routine called `__gxx_personality_v0'.
+
+   You can inform the compiler that Java exceptions are to be used in a
+translation unit, irrespective of what it might think, by writing
+`#pragma GCC java_exceptions' at the head of the file.  This `#pragma'
+must appear before any functions that throw or catch exceptions, or run
+destructors when exceptions are thrown through them.
+
+
+File: gcj.info,  Node: Synchronization,  Next: Invocation,  Prev: Exception Handling,  Up: About CNI
+
+Synchronization
+===============
+
+   Each Java object has an implicit monitor.  The Java VM uses the
+instruction `monitorenter' to acquire and lock a monitor, and
+`monitorexit' to release it.
+
+   The corresponding CNI macros are `JvMonitorEnter' and
+`JvMonitorExit' (JNI has similar  methods `MonitorEnter' and
+`MonitorExit').
+
+   The Java source language does not provide direct access to these
+primitives.  Instead, there is a `synchronized' statement that does an
+implicit `monitorenter' before entry to the block, and does a
+`monitorexit' on exit from the block.  Note that the lock has to be
+released even when the block is abnormally terminated by an exception,
+which means there is an implicit `try finally' surrounding
+synchronization locks.
+
+   From C++, it makes sense to use a destructor to release a lock.  CNI
+defines the following utility class:
+
+     class JvSynchronize() {
+       jobject obj;
+       JvSynchronize(jobject o) { obj = o; JvMonitorEnter(o); }
+       ~JvSynchronize() { JvMonitorExit(obj); }
+     };
+
+   So this Java code:
+
+     synchronized (OBJ)
+     {
+        CODE
+     }
+
+might become this C++ code:
+
+     {
+        JvSynchronize dummy (OBJ);
+        CODE;
+     }
+
+   Java also has methods with the `synchronized' attribute.  This is
+equivalent to wrapping the entire method body in a `synchronized'
+statement.  (Alternatively, an implementation could require the caller
+to do the synchronization.  This is not practical for a compiler,
+because each virtual method call would have to test at run-time if
+synchronization is needed.)  Since in `gcj' the `synchronized'
+attribute is handled by the method implementation, it is up to the
+programmer of a synchronized native method to handle the synchronization
+(in the C++ implementation of the method).  In otherwords, you need to
+manually add `JvSynchronize' in a `native synchornized' method.
+
+
+File: gcj.info,  Node: Invocation,  Next: Reflection,  Prev: Synchronization,  Up: About CNI
+
+Invocation
+==========
+
+   CNI permits C++ applications to make calls into Java classes, in
+addition to allowing Java code to call into C++. Several functions,
+known as the "invocation API", are provided to support this.
+
+ - Function: jint JvCreateJavaVM (void* VM_ARGS)
+     Initializes the Java runtime. This function performs essential
+     initialization of the threads interface, garbage collector,
+     exception handling and other key aspects of the runtime. It must
+     be called once by an application with a non-Java `main()'
+     function, before any other Java or CNI calls are made.  It is
+     safe, but not recommended, to call `JvCreateJavaVM()' more than
+     once provided it is only called from a single thread.  The VMARGS
+     parameter can be used to specify initialization parameters for the
+     Java runtime. It may be `NULL'.  This function returns `0' upon
+     success, or `-1' if the runtime is already initialized.
+
+     _Note:_ In GCJ 3.1, the `vm_args' parameter is ignored. It may be
+     used in a future release.
+
+ - Function: java::lang::Thread* JvAttachCurrentThread (jstring NAME,
+          java::lang::ThreadGroup* GROUP)
+     Registers an existing thread with the Java runtime.  This must be
+     called once from each thread, before that thread makes any other
+     Java or CNI calls. It must be called after `JvCreateJavaVM'.  NAME
+     specifies a name for the thread. It may be `NULL', in which case a
+     name will be generated.  GROUP is the ThreadGroup in which this
+     thread will be a member. If it is `NULL', the thread will be a
+     member of the main thread group.  The return value is the Java
+     `Thread' object that represents the thread.  It is safe to call
+     `JvAttachCurrentThread()' more than once from the same thread. If
+     the thread is already attached, the call is ignored and the current
+     thread object is returned.
+
+ - Function: jint JvDetachCurrentThread ()
+     Unregisters a thread from the Java runtime. This should be called
+     by threads that were attached using `JvAttachCurrentThread()',
+     after they have finished making calls to Java code. This ensures
+     that any resources associated with the thread become eligible for
+     garbage collection.  This function returns `0' upon success, or
+     `-1' if the current thread is not attached.
+
+Handling uncaught exceptions
+----------------------------
+
+   If an exception is thrown from Java code called using the invocation
+API, and no handler for the exception can be found, the runtime will
+abort the application. In order to make the application more robust, it
+is recommended that code which uses the invocation API be wrapped by a
+top-level try/catch block that catches all Java exceptions.
+
+Example
+-------
+
+   The following code demonstrates the use of the invocation API. In
+this example, the C++ application initializes the Java runtime and
+attaches itself. The `java.lang.System' class is initialized in order to
+access its `out' field, and a Java string is printed. Finally, the
+thread is detached from the runtime once it has finished making Java
+calls. Everything is wrapped with a try/catch block to provide a
+default handler for any uncaught exceptions.
+
+   The example can be compiled with `c++ test.cc -lgcj'.
+
+     // test.cc
+     #include <gcj/cni.h>
+     #include <java/lang/System.h>
+     #include <java/io/PrintStream.h>
+     #include <java/lang/Throwable.h>
+     
+     int main(int argc, char *argv)
+     {
+       using namespace java::lang;
+     
+       try
+       {
+         JvCreateJavaVM(NULL);
+         JvAttachCurrentThread(NULL, NULL);
+     
+         String *message = JvNewStringLatin1("Hello from C++");
+         JvInitClass(&System.class$);
+         System::out->println(message);
+     
+         JvDetachCurrentThread();
+       }
+       catch (Throwable *t)
+       {
+         System::err->println(JvNewStringLatin1("Unhandled Java exception:"));
+         t->printStackTrace();
+       }
+     }
+
+
+File: gcj.info,  Node: Reflection,  Prev: Invocation,  Up: About CNI
+
+Reflection
+==========
+
+   Reflection is possible with CNI code, it functions similarly to how
+it functions with JNI.
+
+   The types `jfieldID' and `jmethodID' are as in JNI.
+
+The functions:
+
+   * `JvFromReflectedField',
+
+   * `JvFromReflectedMethod',
+
+   * `JvToReflectedField'
+
+   * `JvToFromReflectedMethod'
+
+will be added shortly, as will other functions corresponding to JNI.
+
+
+File: gcj.info,  Node: Resources,  Prev: About CNI,  Up: Top
+
+Resources
+*********
+
+   While writing `gcj' and `libgcj' we have, of course, relied heavily
+on documentation from Sun Microsystems.  In particular we have used The
+Java Language Specification (both first and second editions), the Java
+Class Libraries (volumes one and two), and the Java Virtual Machine
+Specification.  In addition we've used the online documentation at
+`http://java.sun.com/'.
+
+   The current `gcj' home page is `http://gcc.gnu.org/java/'.
+
+   For more information on gcc, see `http://gcc.gnu.org/'.
+
+   Some `libgcj' testing is done using the Mauve test suite.  This is a
+free software Java class library test suite which is being written
+because the JCK is not free.  See `http://sources.redhat.com/mauve/'
+for more information.
+
+

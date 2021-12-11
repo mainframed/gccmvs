@@ -1,0 +1,89 @@
+This is gcj.info, produced by makeinfo version 4.5 from gcj.texi.
+
+INFO-DIR-SECTION Programming
+START-INFO-DIR-ENTRY
+* Gcj: (gcj).               Ahead-of-time compiler for the Java language
+END-INFO-DIR-ENTRY
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* gcjh: (gcj)Invoking gcjh.
+                            Generate header files from Java class files
+* jv-scan: (gcj)Invoking jv-scan.
+                            Print information about Java source files
+* jcf-dump: (gcj)Invoking jcf-dump.
+                            Print information about Java class files
+* gij: (gcj)Invoking gij.   GNU interpreter for Java bytecode
+* jv-convert: (gcj)Invoking jv-convert.
+                            Convert file from one encoding to another
+* rmic: (gcj)Invoking rmic.
+                            Generate stubs for Remote Method Invocation.
+* rmiregistry: (gcj)Invoking rmiregistry.
+                            The remote object registry.
+END-INFO-DIR-ENTRY
+
+   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+
+   Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "GNU General Public License", the Front-Cover
+texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+   (a) The FSF's Front-Cover Text is:
+
+   A GNU Manual
+
+   (b) The FSF's Back-Cover Text is:
+
+   You have freedom to copy and modify this GNU Manual, like GNU
+software.  Copies published by the Free Software Foundation raise
+funds for GNU development.
+
+
+Indirect:
+gcj.info-1: 1742
+gcj.info-2: 49300
+
+Tag Table:
+(Indirect)
+Node: Top1742
+Node: Copying2826
+Node: GNU Free Documentation License22029
+Node: Invoking gcj41913
+Node: Input and output files42564
+Node: Input Options43927
+Node: Encodings47068
+Node: Warnings48269
+Node: Code Generation49300
+Ref: Code Generation-Footnote-152820
+Node: Configure-time Options53129
+Node: Compatibility54547
+Node: Invoking gcjh55839
+Node: Invoking jv-scan57895
+Node: Invoking jcf-dump58793
+Node: Invoking gij59564
+Node: Invoking jv-convert61446
+Node: Invoking rmic62516
+Node: Invoking rmiregistry63891
+Node: About CNI64302
+Node: Basic concepts65585
+Node: Packages68568
+Node: Primitive types70880
+Node: Interfaces72528
+Node: Objects and Classes73437
+Node: Class Initialization75598
+Node: Object allocation77832
+Node: Arrays78807
+Node: Methods81394
+Node: Strings84145
+Node: Mixing with C++85613
+Node: Exception Handling87496
+Node: Synchronization89131
+Node: Invocation91111
+Node: Reflection95180
+Node: Resources95632
+
+End Tag Table
