@@ -75,8 +75,13 @@ struct search_path
   unsigned int len;
   /* We use these to tell if the directory mentioned here is a duplicate
      of an earlier directory on the search path.  */
+#ifdef HAVE_STAT
   ino_t ino;
   dev_t dev;
+#else
+  int ino;
+  int dev;
+#endif
   /* Non-zero if it is a system include directory.  */
   int sysp;
   /* Mapping of file names for this directory.  Only used on MS-DOS

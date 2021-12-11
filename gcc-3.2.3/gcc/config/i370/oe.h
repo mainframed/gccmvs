@@ -20,14 +20,22 @@ along with GNU CC; see the file COPYING.  If not, write to
 the Free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
-#define TARGET_VERSION printf (" (370/OpenEdition)");
+#define TARGET_VERSION fprintf (stderr, " (370/OpenEdition)");
 
-/* Specify that we're generating code for the Language Environment */
+/* Specify that we're generating code for OpenEdition.  */
 
-#define LE370 1
-#define LONGEXTERNAL 1
-#define TARGET_EBCDIC 1
+#define TARGET_OE 1
 #define TARGET_HLASM 1
+#define TARGET_EBCDIC 1
+#define TARGET_ALIASES 1
+
+/* Specify that we're using the Language Environment runtime.  */
+
+#define TARGET_LE 1
+
+/* Specify that we're using macro prolog/epilog.  */
+
+/*#define TARGET_MACROS 1*/
 
 /* Options for the preprocessor for this target machine.  */
 
@@ -41,9 +49,5 @@ Boston, MA 02111-1307, USA.  */
 
 /* Names to predefine in the preprocessor for this target machine.  */
 
-#define CPP_PREDEFINES "-DGCC -Dgcc -DUNIX -Dunix -Dopenedition -D__i370__ -Asystem=openedition -Asystem=unix -Acpu=i370 -Amachine=i370"
-
-/* Include system common definitions */
-
-#include "config/i370/i370.h"
+#define CPP_PREDEFINES "-DGCC -Dgcc -DUNIX -Dunix -Dopenedition -D__i370__ -DLE370 -Asystem=openedition -Asystem=unix -Acpu=i370 -Amachine=i370"
 

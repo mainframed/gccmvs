@@ -314,8 +314,8 @@ struct undo
 {
   struct undo *next;
   int is_int;
-  union {rtx r; unsigned int i;} old_contents;
-  union {rtx *r; unsigned int *i;} where;
+  union {rtx r; int i;} old_contents;
+  union {rtx *r; int *i;} where;
 };
 
 /* Record a bunch of changes to be undone, up to MAX_UNDO of them.
@@ -339,8 +339,8 @@ static struct undobuf undobuf;
 static int n_occurrences;
 
 static void do_SUBST			PARAMS ((rtx *, rtx));
-static void do_SUBST_INT		PARAMS ((unsigned int *,
-						 unsigned int));
+static void do_SUBST_INT		PARAMS ((int *,
+						 int));
 static void init_reg_last_arrays	PARAMS ((void));
 static void setup_incoming_promotions   PARAMS ((void));
 static void set_nonzero_bits_and_sign_copies  PARAMS ((rtx, rtx, void *));
@@ -472,10 +472,10 @@ do_SUBST (into, newval)
 
 static void
 do_SUBST_INT (into, newval)
-     unsigned int *into, newval;
+     int *into, newval;
 {
   struct undo *buf;
-  unsigned int oldval = *into;
+  int oldval = *into;
 
   if (oldval == newval)
     return;

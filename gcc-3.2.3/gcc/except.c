@@ -2765,7 +2765,7 @@ for_each_eh_label (callback)
      void (*callback) PARAMS ((rtx));
 {
   htab_traverse (exception_handler_label_map, for_each_eh_label_1,
-		 (void *)callback);
+		 (void *)&callback);
 }
 
 static int
@@ -2774,7 +2774,7 @@ for_each_eh_label_1 (pentry, data)
      PTR data;
 {
   struct ehl_map_entry *entry = *(struct ehl_map_entry **)pentry;
-  void (*callback) PARAMS ((rtx)) = (void (*) PARAMS ((rtx))) data;
+  void (*callback) PARAMS ((rtx)) = *(void (**) PARAMS ((rtx))) data;
 
   (*callback) (entry->label);
   return 1;

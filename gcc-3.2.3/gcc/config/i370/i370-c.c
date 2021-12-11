@@ -47,17 +47,82 @@ i370_pr_map (pfile)
   if (c_lex (&x)        == CPP_OPEN_PAREN
       && c_lex (&name)  == CPP_NAME
       && c_lex (&x)     == CPP_COMMA
-      && c_lex (&alias) == CPP_NAME
+      && c_lex (&alias) == CPP_STRING
       && c_lex (&x)     == CPP_CLOSE_PAREN)
     {
+      const char *cp = TREE_STRING_POINTER(alias);
+
       if (c_lex (&x) != CPP_EOF)
 	warning ("junk at end of #pragma map");
 
-      mvs_add_alias (IDENTIFIER_POINTER (name), IDENTIFIER_POINTER (alias), 1);
+      mvs_add_alias (IDENTIFIER_POINTER (name), cp, 1);
       return;
     }
 
   warning ("malformed #pragma map, ignored");
+}
+
+/* #pragma linkage (name, mode) -
+   In this implementation both name and alias are required to be
+   identifiers.  The older code seemed to be more permissive.  Can
+   anyone clarify?  */
+
+void
+i370_pr_linkage (pfile)
+     cpp_reader *pfile ATTRIBUTE_UNUSED;
+{
+  tree name, mode, x;
+
+  if (c_lex (&x)        == CPP_OPEN_PAREN
+      && c_lex (&name)  == CPP_NAME
+      && c_lex (&x)     == CPP_COMMA
+      && c_lex (&mode)  == CPP_NAME
+      && c_lex (&x)     == CPP_CLOSE_PAREN)
+    {
+      if (c_lex (&x) != CPP_EOF)
+	warning ("junk at end of #pragma linkage");
+
+      return;
+    }
+
+  warning ("malformed #pragma linkage, ignored");
+}
+
+/* #pragma checkout (mode) -
+   In this implementation both name and alias are required to be
+   identifiers.  The older code seemed to be more permissive.  Can
+   anyone clarify?  */
+
+void
+i370_pr_checkout (pfile)
+     cpp_reader *pfile ATTRIBUTE_UNUSED;
+{
+  tree mode, x;
+
+  if (c_lex (&x)        == CPP_OPEN_PAREN
+      && c_lex (&mode)  == CPP_NAME
+      && c_lex (&x)     == CPP_CLOSE_PAREN)
+    {
+      if (c_lex (&x) != CPP_EOF)
+	warning ("junk at end of #pragma checkout");
+
+      return;
+    }
+
+  warning ("malformed #pragma checkout, ignored");
+}
+
+/* #pragma nomargins
+   #pragma nosequence
+   We just ignore. */
+
+void
+i370_pr_skipit (pfile)
+     cpp_reader *pfile ATTRIBUTE_UNUSED;
+{
+
+  return;
+
 }
 
 #endif

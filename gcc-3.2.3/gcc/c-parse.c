@@ -452,8 +452,16 @@ union yyalloc
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   323
 
+#ifdef HOST_EBCDIC
+#define YYTRANSLATE(YYX) 						\
+  ((unsigned int) (YYX) <= YYMAXUTOK ? \
+  ((unsigned int) (YYX) < 256 ? yytranslate[_sch_ebcasc[YYX]] \
+  : yytranslate[YYX]) : YYUNDEFTOK)
+#else
 #define YYTRANSLATE(YYX) 						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
+#endif
+
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
 static const unsigned char yytranslate[] =

@@ -136,6 +136,10 @@ So instead we use the macro below and test it against specific values.  */
 #define GCC_VERSION (__GNUC__ * 1000 + __GNUC_MINOR__)
 #endif /* GCC_VERSION */
 
+#ifndef GCC_VERSION_REAL
+#define GCC_VERSION_REAL (__GNUC__ * 1000 + __GNUC_MINOR__)
+#endif /* GCC_VERSION_REAL */
+
 #if defined (__STDC__) || defined (_AIX) || (defined (__mips) && defined (_SYSTYPE_SVR4)) || defined(_WIN32)
 /* All known AIX compilers implement these things (but don't always
    define __STDC__).  The RISC/OS MIPS compiler defines these things
@@ -277,7 +281,10 @@ So instead we use the macro below and test it against specific values.  */
 /* We use __extension__ in some places to suppress -pedantic warnings
    about GCC extensions.  This feature didn't work properly before
    gcc 2.8.  */
-#if GCC_VERSION < 2008
+/* note - for MVS we need to keep this on in order to support
+   -pedantic-errors, even though we've dummied up the GCC_VERSION, 
+   so we use GCC_VERSION_REAL to activate it */
+#if GCC_VERSION_REAL < 2008
 #define __extension__
 #endif
 

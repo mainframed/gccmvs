@@ -364,7 +364,7 @@ ffelex_backslash_ (int c, ffewhereColumnNumber col)
 	  return c;
 
 	default:
-	  if (c >= 040 && c < 0177)
+	  if (ISPRINT(c))
 	    {
 	      char m[2];
 
@@ -705,7 +705,7 @@ ffelex_cfebackslash_ (int *use_d, int *d, FILE *finput)
 	pedwarn ("non-ISO escape sequence `\\%c'", c);
       return c;
     }
-  if (c >= 040 && c < 0177)
+  if (isprint(c))
     pedwarn ("unknown escape sequence `\\%c'", c);
   else
     pedwarn ("unknown escape sequence: `\\' followed by char code 0x%x", c);

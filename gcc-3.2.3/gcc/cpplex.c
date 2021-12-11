@@ -1686,16 +1686,18 @@ maybe_read_ucs (pfile, pstr, limit, pc)
    the input pointer, which is just after the backslash.  LIMIT is how
    much text we have.  MASK is a bitmask for the precision for the
    destination type (char or wchar_t).  TRADITIONAL, if true, does not
-   interpret escapes that did not exist in traditional C.
+   interpret escapes that did not exist in traditional C.  INSTRING, if
+   true then we are within a string.
 
    Handles all relevant diagnostics.  */
 unsigned int
-cpp_parse_escape (pfile, pstr, limit, mask, traditional)
+cpp_parse_escape (pfile, pstr, limit, mask, traditional, instring)
      cpp_reader *pfile;
      const unsigned char **pstr;
      const unsigned char *limit;
      unsigned HOST_WIDE_INT mask;
      int traditional;
+     int instring;
 {
   int unknown = 0;
   const unsigned char *str = *pstr;
@@ -1703,18 +1705,28 @@ cpp_parse_escape (pfile, pstr, limit, mask, traditional)
 
   switch (c)
     {
-    case '\\': case '\'': case '"': case '?': break;
-    case 'b': c = TARGET_BS;	  break;
-    case 'f': c = TARGET_FF;	  break;
-    case 'n': c = TARGET_NEWLINE; break;
-    case 'r': c = TARGET_CR;	  break;
-    case 't': c = TARGET_TAB;	  break;
-    case 'v': c = TARGET_VT;	  break;
+    case '\\': case '\'': case '"': case '?':
+#ifdef MAP_OUTCHAR
+      if (!instring)
+        c = MAP_OUTCHAR(c);
+#endif
+      break;
+
+    case 'b': c = instring ? '\b' : TARGET_BS;	  break;
+    case 'f': c = instring ? '\f' : TARGET_FF;	  break;
+    case 'n': c = instring ? '\n' : TARGET_NEWLINE; break;
+    case 'r': c = instring ? '\r' : TARGET_CR;	  break;
+    case 't': c = instring ? '\t' : TARGET_TAB;	  break;
+    case 'v': c = instring ? '\v' : TARGET_VT;	  break;
 
     case '(': case '{': case '[': case '%':
       /* '\(', etc, are used at beginning of line to avoid confusing Emacs.
 	 '\%' is used to prevent SCCS from getting confused.  */
       unknown = CPP_PEDANTIC (pfile);
+#ifdef MAP_OUTCHAR
+      if (!instring)
+        c = MAP_OUTCHAR(c);
+#endif
       break;
 
     case 'a':
@@ -1732,6 +1744,9 @@ cpp_parse_escape (pfile, pstr, limit, mask, traditional)
       
     case 'u': case 'U':
       unknown = maybe_read_ucs (pfile, &str, limit, &c);
+#ifdef MAP_OUTCHAR
+      c = MAP_OUTCHAR(c);
+#endif
       break;
 
     case 'x':
@@ -1763,6 +1778,10 @@ cpp_parse_escape (pfile, pstr, limit, mask, traditional)
 	      i &= mask;
 	    }
 	  c = i;
+#ifdef MAP_INCHAR
+	  if (instring)
+            c = MAP_INCHAR(c);
+#endif
 	}
       break;
 
@@ -1787,6 +1806,10 @@ cpp_parse_escape (pfile, pstr, limit, mask, traditional)
 	    i &= mask;
 	  }
 	c = i;
+#ifdef MAP_INCHAR
+	if (instring)
+          c = MAP_INCHAR(c);
+#endif
       }
       break;
 
@@ -1883,13 +1906,13 @@ cpp_interpret_charconst (pfile, token, warn_multi, traditional, pchars_seen)
 #endif
 
       if (c == '\\')
-	c = cpp_parse_escape (pfile, &str, limit, mask, traditional);
+	c = cpp_parse_escape (pfile, &str, limit, mask, traditional, 0);
 
-#ifdef MAP_CHARACTER
-      if (ISPRINT (c))
-	c = MAP_CHARACTER (c);
+#ifdef MAP_OUTCHAR
+      else
+        c = MAP_OUTCHAR (c);
 #endif
-      
+
       /* Merge character into result; ignore excess chars.  */
       if (++chars_seen <= max_chars)
 	{

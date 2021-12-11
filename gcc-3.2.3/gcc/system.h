@@ -109,7 +109,9 @@ extern int fprintf_unlocked PARAMS ((FILE *, const char *, ...));
    replacement instead.  */
 #include <safe-ctype.h>
 
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 
@@ -589,7 +591,11 @@ typedef char _Bool;
 #undef realloc
 #undef calloc
 #undef strdup
+
+/* causes problems on GCC 4 on Linux compiling c-parse.c */
+#if 0
  #pragma GCC poison malloc realloc calloc strdup
+#endif
 
 /* Old target macros that have moved to the target hooks structure.  */
  #pragma GCC poison ASM_OPEN_PAREN ASM_CLOSE_PAREN			\

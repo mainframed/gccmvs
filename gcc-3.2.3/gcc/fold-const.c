@@ -2207,7 +2207,7 @@ fold_convert (t, arg1)
 	    else
 	      low = (HOST_WIDE_INT) x;
 	    if (TREE_REAL_CST (arg1) < 0)
-	      neg_double (low, high, &low, &high);
+	      neg_double (low, high, (unsigned HOST_WIDE_INT *)&low, &high);
 	    t = build_int_2 (low, high);
 	  }
 #else

@@ -69,7 +69,11 @@ struct _ffeimplic_
 
 /* NOTE: This is definitely ASCII-specific!!  */
 
+#ifdef HOST_EBCDIC
+static struct _ffeimplic_ ffeimplic_table_['Z' - '_' + 1];
+#else
 static struct _ffeimplic_ ffeimplic_table_['z' - 'A' + 1];
+#endif
 
 /* Static functions (internal). */
 
@@ -93,7 +97,11 @@ ffeimplic_lookup_ (unsigned char c)
 {
   /* NOTE: This is definitely ASCII-specific!!  */
   if (ISIDST (c))
+#ifdef HOST_EBCDIC
+    return &ffeimplic_table_[c - '_'];
+#else
     return &ffeimplic_table_[c - 'A'];
+#endif
   return NULL;
 }
 
@@ -225,9 +233,17 @@ ffeimplic_init_2 ()
   ffeimplic_ imp;
   char c;
 
+#ifdef HOST_EBCDIC
+  for (c = '_'; c <= 'Z'; ++c)
+#else
   for (c = 'A'; c <= 'z'; ++c)
+#endif
     {
+#ifdef HOST_EBCDIC
+      imp = &ffeimplic_table_[c - '_'];
+#else
       imp = &ffeimplic_table_[c - 'A'];
+#endif
       imp->state = FFEIMPLIC_stateINITIAL_;
       switch (c)
 	{

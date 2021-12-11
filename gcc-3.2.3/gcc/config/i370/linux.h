@@ -26,7 +26,7 @@ Boston, MA 02111-1307, USA.  */
 
 /* Specify that we're generating code for a Linux port to 370 */
 
-#define TARGET_ELF_ABI
+#define TARGET_LINUX
 #define LINUX_DEFAULT_ELF
 
 
@@ -36,10 +36,6 @@ Boston, MA 02111-1307, USA.  */
  * int conversion.  This seems to have somethings to do with 
  * cross-compiling ...  */
 #define REAL_ARITHMETIC
-
-/* Include system common definitions */
-/* TODO: convert include to ${tm_file} list in config.gcc.  */
-#include "i370/i370.h"
 
 /* Names to predefine in the preprocessor for this target machine.  */
 

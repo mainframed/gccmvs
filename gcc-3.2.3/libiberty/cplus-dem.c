@@ -36,7 +36,9 @@ Boston, MA 02111-1307, USA.  */
 
 #include "safe-ctype.h"
 
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 

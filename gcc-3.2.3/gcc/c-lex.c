@@ -1349,7 +1349,7 @@ lex_string (str, len, wide)
 	  else
 	    mask = ~0;
 	  c = cpp_parse_escape (parse_in, &p, limit,
-				mask, flag_traditional);
+				mask, flag_traditional, 1);
 	}
 	
       /* Add this single character into the buffer either as a wchar_t

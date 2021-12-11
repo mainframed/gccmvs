@@ -23,7 +23,9 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef GCC_CPPLIB_H
 #define GCC_CPPLIB_H
 
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
 #include "hashtable.h"
 #include "line-map.h"
 
@@ -581,7 +583,8 @@ extern const char *cpp_type2name	PARAMS ((enum cpp_ttype));
 extern unsigned int cpp_parse_escape	PARAMS ((cpp_reader *,
 						 const unsigned char **,
 						 const unsigned char *,
-						 unsigned HOST_WIDE_INT, int));
+						 unsigned HOST_WIDE_INT,
+						 int, int));
 
 /* In cpphash.c */
 

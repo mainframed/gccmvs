@@ -88,7 +88,7 @@ fatal_with_file_and_line VPARAMS ((FILE *infile, const char *msg, ...))
 	   read_rtx_filename, read_rtx_lineno, context);
 
   VA_CLOSE (ap);
-  exit (1);
+  exit (FATAL_EXIT_CODE);
 }
 
 /* Dump code after printing a message.  Used when read_rtx finds

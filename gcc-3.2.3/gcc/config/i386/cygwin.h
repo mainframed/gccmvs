@@ -354,7 +354,7 @@ do {							\
 #undef TARGET_SUBTARGET_DEFAULT
 
 #define TARGET_SUBTARGET_DEFAULT \
-   (MASK_80387 | MASK_IEEE_FP | MASK_FLOAT_RETURNS | MASK_STACK_PROBE) 
+   (MASK_80387 | MASK_IEEE_FP | MASK_FLOAT_RETURNS /* | MASK_STACK_PROBE */) 
 
 /* This is how to output an assembler line
    that says to advance the location counter

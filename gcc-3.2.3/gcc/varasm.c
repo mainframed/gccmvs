@@ -944,7 +944,17 @@ make_decl_rtl (decl, asmspec)
      whose scope is less than the whole file, unless it's a member
      of a local class (which will already be unambiguous).
      Concatenate a distinguishing number.  */
-  if (!top_level && !TREE_PUBLIC (decl)
+  if (
+/* On MVS, due to the fact that the assembler can not distinguish
+   variables that are not unique in first 8-characters, we need to
+   change variable names even at the top level. Unfortunately this
+   makes reading the generated assembler very difficult. It would
+   be good to be able to go through the list of existing names and
+   only generate a replacement name for duplicated values. */
+#if !TARGET_MVS && !TARGET_CMS
+      !top_level &&
+#endif
+      !TREE_PUBLIC (decl)
       && ! (DECL_CONTEXT (decl) && TYPE_P (DECL_CONTEXT (decl)))
       && asmspec == 0
       && name == IDENTIFIER_POINTER (DECL_NAME (decl)))

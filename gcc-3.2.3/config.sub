@@ -652,7 +652,7 @@ case $basic_machine in
 		basic_machine=i386-pc
 		os=-msdos
 		;;
-	mvs)
+	mvs*)
 		basic_machine=i370-ibm
 		os=-mvs
 		;;

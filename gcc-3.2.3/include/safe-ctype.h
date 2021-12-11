@@ -99,5 +99,11 @@ extern const unsigned char  _sch_tolower[256];
 #define TOUPPER(c) _sch_toupper[(c) & 0xff]
 #define TOLOWER(c) _sch_tolower[(c) & 0xff]
 
+/* Character conversion.  */
+extern const unsigned char _sch_ebcasc[256];
+extern const unsigned char _sch_ascebc[256];
+#define EBCTOASC(c) _sch_ebcasc[(c) & 0xff]
+#define ASCTOEBC(c) _sch_ascebc[(c) & 0xff]
+
 #endif /* no ctype.h */
 #endif /* SAFE_CTYPE_H */

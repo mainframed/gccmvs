@@ -22,7 +22,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef GCC_GCOV_IO_H
 #define GCC_GCOV_IO_H
 #include <stdio.h>
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
 
 static int __fetch_long	PARAMS ((long *, char *, size_t)) ATTRIBUTE_UNUSED;
 static int __read_long  PARAMS ((long *, FILE *, size_t)) ATTRIBUTE_UNUSED;

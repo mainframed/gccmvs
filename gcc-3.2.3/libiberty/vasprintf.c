@@ -59,13 +59,21 @@ not be allocated, zero is returned and @code{NULL} is stored in
 
 */
 
+#ifdef VALIST_NOT_PTR
+static int int_vasprintf PARAMS ((char **, const char *, va_list ));
+#else
 static int int_vasprintf PARAMS ((char **, const char *, va_list *));
+#endif
 
 static int
 int_vasprintf (result, format, args)
      char **result;
      const char *format;
+#ifdef VALIST_NOT_PTR
+     va_list args;
+#else
      va_list *args;
+#endif
 {
   const char *p = format;
   /* Add one to make sure that it is never zero, which might cause malloc
@@ -73,7 +81,11 @@ int_vasprintf (result, format, args)
   int total_width = strlen (format) + 1;
   va_list ap;
 
+#ifdef VALIST_NOT_PTR
+  memcpy ((PTR) ap, (PTR) args, sizeof (va_list));
+#else
   memcpy ((PTR) &ap, (PTR) args, sizeof (va_list));
+#endif
 
   while (*p != '\0')
     {
@@ -138,9 +150,13 @@ int_vasprintf (result, format, args)
 #ifdef TEST
   global_total_width = total_width;
 #endif
-  *result = malloc (total_width);
+  *result = (char *) malloc (total_width);
   if (*result != NULL)
+#ifdef VALIST_NOT_PTR
+    return vsprintf (*result, format, args);
+#else
     return vsprintf (*result, format, *args);
+#endif
   else
     return 0;
 }
@@ -155,7 +171,11 @@ vasprintf (result, format, args)
      va_list args;
 #endif
 {
+#ifdef VALIST_NOT_PTR
+  return int_vasprintf (result, format, args);
+#else
   return int_vasprintf (result, format, &args);
+#endif
 }
 
 #ifdef TEST

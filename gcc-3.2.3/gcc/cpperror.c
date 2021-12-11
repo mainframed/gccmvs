@@ -28,6 +28,9 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "cpplib.h"
 #include "cpphash.h"
 #include "intl.h"
+#ifdef SINGLE_EXECUTABLE
+#include "diagnostic.h"
+#endif
 
 static void print_location PARAMS ((cpp_reader *, unsigned int, unsigned int));
 
@@ -129,7 +132,12 @@ _cpp_begin_message (pfile, code, line, column)
 
   print_location (pfile, line, column);
   if (is_warning)
+  {
     fputs (_("warning: "), stderr);
+#ifdef SINGLE_EXECUTABLE
+    warningcount++;
+#endif
+  }
 
   return 1;
 }

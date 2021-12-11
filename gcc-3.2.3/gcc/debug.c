@@ -18,6 +18,21 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "config.h"
 #include "system.h"
 #include "debug.h"
+#include "output.h"
+#include "flags.h"
+
+static void
+debug_source_line (line, text)
+     unsigned int line ATTRIBUTE_UNUSED;
+     const char *text ATTRIBUTE_UNUSED;
+{
+   if (flag_debug_asm)
+   {
+       app_enable();
+       fprintf(asm_out_file, "%s %d %s\n", ASM_COMMENT_START, line, text);
+       app_disable();
+   }
+}
 
 /* The do-nothing debug hooks.  */
 struct gcc_debug_hooks do_nothing_debug_hooks =
@@ -31,7 +46,7 @@ struct gcc_debug_hooks do_nothing_debug_hooks =
   debug_nothing_int_int,	/* begin_block */
   debug_nothing_int_int,	/* end_block */
   debug_true_tree,		/* ignore_block */
-  debug_nothing_int_charstar,	/* source_line */
+  debug_source_line,	/* source_line */
   debug_nothing_int_charstar,	/* begin_prologue */
   debug_nothing_int,		/* end_prologue */
   debug_nothing_void,		/* end_epilogue */

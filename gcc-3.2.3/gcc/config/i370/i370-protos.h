@@ -37,7 +37,6 @@ extern int unsigned_jump_follows_p PARAMS ((rtx));
 extern int handle_pragma PARAMS ((int (*)(void), void (*)(int), const char *));
 #endif /* TREE_CODE */
 
-extern char mvs_map_char PARAMS ((int));
 extern void mvs_add_label PARAMS ((int));
 extern int mvs_check_label PARAMS ((int));
 extern int mvs_check_page PARAMS ((FILE *, int, int));
@@ -48,9 +47,13 @@ extern int mvs_get_alias PARAMS ((const char *, char *));
 extern int mvs_check_alias PARAMS ((const char *, char *));
 extern void check_label_emit PARAMS ((void));
 extern void mvs_free_label_list PARAMS ((void));
+extern char *mvs_make_float PARAMS ((REAL_VALUE_TYPE));
 
 #ifdef GCC_C_PRAGMA_H
-extern void i370_pr_map PARAMS ((cpp_reader *));
+extern void i370_pr_map       PARAMS ((cpp_reader *));
+extern void i370_pr_skipit    PARAMS ((cpp_reader *));
+extern void i370_pr_linkage   PARAMS ((cpp_reader *));
+extern void i370_pr_checkout  PARAMS ((cpp_reader *));
 #endif
 
 #endif /* ! GCC_I370_PROTOS_H */

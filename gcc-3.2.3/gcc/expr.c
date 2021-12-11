@@ -2822,7 +2822,7 @@ emit_move_insn_1 (x, y)
 
   if (mov_optab->handlers[(int) mode].insn_code != CODE_FOR_nothing)
     return
-      emit_insn (GEN_FCN (mov_optab->handlers[(int) mode].insn_code) (x, y));
+      emit_insn (GEN_FN2 (mov_optab->handlers[(int) mode].insn_code) (x, y));
 
   /* Expand complex moves by moving real part and imag part, if possible.  */
   else if ((class == MODE_COMPLEX_FLOAT || class == MODE_COMPLEX_INT)

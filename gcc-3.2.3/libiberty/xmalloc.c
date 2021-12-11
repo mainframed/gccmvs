@@ -67,6 +67,7 @@ function will be called to print an error message and terminate execution.
 #include "libiberty.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __STDC__
 #include <stddef.h>
@@ -83,7 +84,9 @@ function will be called to print an error message and terminate execution.
 PTR malloc PARAMS ((size_t));
 PTR realloc PARAMS ((PTR, size_t));
 PTR calloc PARAMS ((size_t, size_t));
-PTR sbrk PARAMS ((ptrdiff_t));
+#ifdef HAVE_SBRK
+PTR sbrk PARAMS ((int));
+#endif
 #endif
 
 /* The program name if set.  */
@@ -129,7 +132,7 @@ xmalloc_failed (size)
 	   name, *name ? ": " : "",
 	   (unsigned long) size);
 #endif /* HAVE_SBRK */
-  xexit (1);
+  xexit (EXIT_FAILURE);
 }  
 
 PTR

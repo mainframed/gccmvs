@@ -81,6 +81,9 @@ compilation is specified by a string called a "spec".  */
 #include "prefix.h"
 #include "gcc.h"
 #include "flags.h"
+#ifdef SINGLE_EXECUTABLE
+#include "diagnostic.h"
+#endif
 
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
@@ -677,7 +680,7 @@ static const char *trad_capable_cpp =
 /* We don't wrap .d files in %W{} since a missing .d file, and
    therefore no dependency entry, confuses make into thinking a .o
    file that happens to exist is up-to-date.  */
-static const char *cpp_unique_options =
+static const char *cpp_unique_options = __extension__
 "%{C:%{!E:%eGNU C does not support -C without using -E}}\
  %{nostdinc*} %{C} %{v} %{I*} %{P} %{$} %I\
  %{MD:-MD %{!o:%b.d}%{o*:%.d%*}}\
@@ -840,6 +843,7 @@ static const struct compiler default_compilers[] =
   {"@c",
    /* cc1 has an integrated ISO C preprocessor.  We should invoke the
       external preprocessor if -save-temps or -traditional is given.  */
+      __extension__
      "%{E|M|MM:%(trad_capable_cpp) -lang-c %{ansi:-std=c89} %(cpp_options)}\
       %{!E:%{!M:%{!MM:\
 	  %{save-temps|no-integrated-cpp:%(trad_capable_cpp) -lang-c %{ansi:-std=c89}\
@@ -852,9 +856,13 @@ static const struct compiler default_compilers[] =
 	    %{!traditional:%{!ftraditional:%{!traditional-cpp:\
 		cc1 -lang-c %{ansi:-std=c89} %(cpp_unique_options) %(cc1_options)}}}}}\
         %{!fsyntax-only:%(invoke_as)}}}}", 0},
+#if TARGET_MVS        
+  {"-", "@c", 0},
+#else
   {"-",
    "%{!E:%e-E required when input is from standard input}\
     %(trad_capable_cpp) -lang-c %{ansi:-std=c89} %(cpp_options)", 0},
+#endif
   {".h", "@c-header", 0},
   {"@c-header",
    "%{!E:%ecompilation of header file requested} \
@@ -870,6 +878,11 @@ static const struct compiler default_compilers[] =
    "%(trad_capable_cpp) -lang-asm %(cpp_options)\
       %{!M:%{!MM:%{!E:%{!S:-o %{|!pipe:%g.s} |\n\
        as %(asm_debug) %(asm_options) %{!pipe:%g.s} %A }}}}", 0},
+#if defined(__MVS__) || defined(__CMS__) || defined(__VSE__)
+/* For MVS & CMS, we use an empty string to signify that
+   any file is considered to be a C file. */
+  {"", "@c", 0},
+#endif         
 #include "specs.h"
   /* Mark end of table */
   {0, 0, 0}
@@ -2725,6 +2738,9 @@ add_prefix (pprefix, prefix, component, priority, require_machine_suffix,
 static int
 execute ()
 {
+#ifdef SINGLE_EXECUTABLE
+  int ret_code = 0;
+#endif    
   int i;
   int n_commands;		/* # of command.  */
   char *string;
@@ -2834,6 +2850,26 @@ execute ()
       char *errmsg_fmt, *errmsg_arg;
       const char *string = commands[i].argv[0];
 
+#ifdef SINGLE_EXECUTABLE
+     {
+         int cnt = 0;
+         
+         while (commands[i].argv[cnt] != NULL)
+         {
+             cnt++;
+         }
+         if (strcmp(string, "cpp0") == 0)
+         {
+             ret_code = cpp(cnt, commands[i].argv);
+             if (ret_code != 0) break;
+         }
+         else if (strcmp(string, "cc1") == 0)
+         {
+             ret_code = toplev_main(cnt, commands[i].argv);
+             if (ret_code != 0) break;
+         }
+      }
+#else
       /* For some bizarre reason, the second argument of execvp() is
 	 char *const *, not const char *const *.  */
       commands[i].pid = pexecute (string, (char *const *) commands[i].argv,
@@ -2847,10 +2883,13 @@ execute ()
 
       if (commands[i].pid == -1)
 	pfatal_pexecute (errmsg_fmt, errmsg_arg);
-
+#endif
       if (string != commands[i].prog)
 	free ((PTR) string);
     }
+#ifdef SINGLE_EXECUTABLE
+    return (ret_code);
+#endif    
 
   execution_count++;
 
@@ -3189,6 +3228,7 @@ process_command (argc, argv)
   const char *spec_lang = 0;
   int last_language_n_infiles;
   int have_c = 0;
+  int have_e = 0;
   int have_o = 0;
   int lang_n_infiles = 0;
 #ifdef MODIFY_TARGET_NAME
@@ -3699,6 +3739,15 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
 		}
 	      goto normal_switch;
 
+	    case 'E':
+	      if (p[1] == 0)
+		{
+		  have_e = 1;
+		  n_switches++;
+		  break;
+		}
+	      goto normal_switch;
+
 	    case 'o':
 	      have_o = 1;
 #if defined(HAVE_TARGET_EXECUTABLE_SUFFIX)
@@ -3797,6 +3846,15 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
 
   if (have_c && have_o && lang_n_infiles > 1)
     fatal ("cannot specify -o with -c or -S and multiple compilations");
+
+#if TARGET_MVS || TARGET_CMS
+#ifdef SINGLE_EXECUTABLE
+  if (have_c && lang_n_infiles > 1)
+    fatal ("cannot compile multiple files");
+  if (!have_c && !have_e && lang_n_infiles > 0)
+    fatal ("must use -S option on MVS (ie produce assembler output)");
+#endif
+#endif
 
   /* Set up the search paths before we go looking for config files.  */
 
@@ -4177,6 +4235,9 @@ set_collect_gcc_options ()
    sans all directory names, and basename_length is the number
    of characters starting there excluding the suffix .c or whatever.  */
 
+#ifdef SINGLE_EXECUTABLE
+extern
+#endif
 const char *input_filename;
 static int input_file_number;
 size_t input_filename_length;
@@ -5816,6 +5877,7 @@ main (argc, argv)
 
   gcc_init_libintl ();
 
+#ifdef USE_SIGNALS
   if (signal (SIGINT, SIG_IGN) != SIG_IGN)
     signal (SIGINT, fatal_error);
 #ifdef SIGHUP
@@ -5832,6 +5894,7 @@ main (argc, argv)
   /* We *MUST* set SIGCHLD to SIG_DFL so that the wait4() call will
      receive the signal.  A different setting is inheritable */
   signal (SIGCHLD, SIG_DFL);
+#endif
 #endif
 
   argbuf_length = 10;
@@ -6135,7 +6198,11 @@ main (argc, argv)
     }
 
   if (n_infiles == added_libraries)
+  {
+    printf (_("%s (GCC) %s\n"), programname, version_string);
+    display_help();
     fatal ("no input files");
+  }
 
   /* Make a place to record the compiler output file names
      that correspond to the input files.  */
@@ -6180,7 +6247,11 @@ main (argc, argv)
 	  else
 	    {
 	      value = do_spec (input_file_compiler->spec);
+#ifdef SINGLE_EXECUTABLE
+	      if (value != 0)
+#else
 	      if (value < 0)
+#endif
 		this_file_error = 1;
 	    }
 	}
@@ -6263,9 +6334,16 @@ main (argc, argv)
       printf ("%s\n", GCCBUGURL);
     }
 
+#ifdef SINGLE_EXECUTABLE
+#if defined(__MVS__) || defined(__CMS__) || defined(__VSE__)
+  if ((error_count <= 0) && (warningcount > 0)) return (4);
+#endif
+  return (error_count > 0 ? EXIT_FAILURE : EXIT_SUCCESS);
+#else
   return (signal_count != 0 ? 2
 	  : error_count > 0 ? (pass_exit_codes ? greatest_status : 1)
 	  : 0);
+#endif
 }
 
 /* Find the proper compilation spec for the file name NAME,
@@ -6391,6 +6469,9 @@ pfatal_pexecute (errmsg_fmt, errmsg_arg)
 
 /* Output an error message and exit */
 
+#ifdef SINGLE_EXECUTABLE
+static
+#endif
 void
 fancy_abort ()
 {
@@ -6410,9 +6491,12 @@ fatal VPARAMS ((const char *msgid, ...))
   VA_CLOSE (ap);
   fprintf (stderr, "\n");
   delete_temp_files ();
-  exit (1);
+  exit (FATAL_EXIT_CODE);
 }
 
+#ifdef SINGLE_EXECUTABLE
+static
+#endif
 void
 error VPARAMS ((const char *msgid, ...))
 {

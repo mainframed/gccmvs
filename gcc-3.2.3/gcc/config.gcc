@@ -1101,22 +1101,56 @@ hppa*-*-mpeix*)
 	install_headers_dir=install-headers-tar
 	use_collect2=yes
 	;;
-i370-*-opened*)			 # IBM 360/370/390 Architecture
-	xm_defines='POSIX FATAL_EXIT_CODE=12'
-	tm_file=i370/oe.h
+i370-*-opened*)			 # IBM 360/370 Architecture
+	xm_defines='POSIX'
+	xm_file="i370/xm-oe.h"
+	tm_file="i370/oe.h i370/i370.h"
 	tmake_file="i370/t-oe i370/t-i370"
 	c_target_objs="i370-c.o"
 	cxx_target_objs="i370-c.o"
 	;;
-i370-*-mvs*)
-	xm_defines='POSIX FATAL_EXIT_CODE=12'
-	tm_file=i370/mvs.h
-	tmake_file="i370/t-i370"
+i370-*-mvsle)
+	xm_defines='POSIX'
+	xm_file="i370/xm-mvs.h"
+	tm_file="i370/mvsle.h i370/i370.h"
+	tmake_file="i370/t-mvs i370/t-i370"
+	c_target_objs="i370-c.o"
+	cxx_target_objs="i370-c.o"
+	;;
+i370-*-mvsdignus)
+	xm_defines='POSIX'
+	xm_file="i370/xm-mvs.h"
+	tm_file="i370/mvsdignus.h i370/i370.h"
+	tmake_file="i370/t-mvs i370/t-i370"
+	c_target_objs="i370-c.o"
+	cxx_target_objs="i370-c.o"
+	;;
+i370-*-mvspdp)
+	xm_defines='POSIX'
+	xm_file="i370/xm-mvs.h"
+	tm_file="i370/mvspdp.h i370/i370.h"
+	tmake_file="i370/t-mvs i370/t-i370"
+	c_target_objs="i370-c.o"
+	cxx_target_objs="i370-c.o"
+	;;
+i370-*-mvs38_dignus)
+	xm_defines='POSIX'
+	xm_file="i370/xm-mvs.h"
+	tm_file="i370/mvs38_dignus.h i370/i370.h"
+	tmake_file="i370/t-mvs i370/t-i370"
+	c_target_objs="i370-c.o"
+	cxx_target_objs="i370-c.o"
+	;;
+i370-*-cms)
+	xm_defines='POSIX'
+	xm_file="i370/xm-mvs.h"
+	tm_file="i370/cms.h i370/i370.h"
+	tmake_file="i370/t-mvs i370/t-i370"
 	c_target_objs="i370-c.o"
 	cxx_target_objs="i370-c.o"
 	;;
 i370-*-linux*)
-	tm_file="dbxelf.h elfos.h svr4.h linux.h i370/linux.h ${tm_file}"
+	tm_file="dbxelf.h elfos.h svr4.h linux.h i370/linux.h i370/i370.h"
 	tmake_file="t-slibgcc-elf-ver t-linux"
 	# broken_install=yes
 	extra_parts="crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o"
@@ -2972,13 +3006,21 @@ rs6000-*-lynxos*)
 	tmake_file=rs6000/t-rs6000
 	use_collect2=yes
 	;;
+s390-*-opened*)			 # IBM 390 Architecture
+	xm_defines='POSIX'
+	xm_file="s390/xm-oe.h"
+	tm_file="s390/oe.h s390/s390.h"
+	tmake_file="s390/t-oe s390/t-s390"
+	c_target_objs="s390-c.o"
+	cxx_target_objs="s390-c.o"
+	;;
 s390-*-linux*)
-	tm_file="s390/s390.h dbxelf.h elfos.h svr4.h linux.h s390/linux.h"
+	tm_file="dbxelf.h elfos.h svr4.h linux.h s390/linux.h s390/s390.h"
 	tmake_file="t-slibgcc-elf-ver t-linux s390/t-linux"
 	extra_parts="crtbegin.o crtend.o crtbeginS.o crtendS.o crtbeginT.o"
 	;;
 s390x-*-linux*)
-	tm_file="s390/s390x.h s390/s390.h dbxelf.h elfos.h svr4.h linux.h s390/linux.h"
+	tm_file="dbxelf.h elfos.h svr4.h linux.h s390/linux.h s390/s390x.h s390/s390.h"
 	tm_p_file=s390/s390-protos.h
 	md_file=s390/s390.md
 	out_file=s390/s390.c

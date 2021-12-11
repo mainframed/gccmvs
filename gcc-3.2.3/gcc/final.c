@@ -1800,7 +1800,7 @@ get_insn_template (code, insn)
     case INSN_OUTPUT_FORMAT_FUNCTION:
       if (insn == NULL)
 	abort ();
-      return (*(insn_output_fn) output) (recog_data.operand, insn);
+      return (*(insn_output_fn *) &output) (recog_data.operand, insn);
 
     default:
       abort ();
@@ -1860,7 +1860,11 @@ final_scan_insn (insn, file, optimize, prescan, nopeepholes)
 #ifdef IA64_UNWIND_INFO
 	  IA64_UNWIND_EMIT (asm_out_file, insn);
 #endif
+#if TARGET_MVS || TARGET_CMS
+	  if (0)
+#else
 	  if (flag_debug_asm)
+#endif
 	    fprintf (asm_out_file, "\t%s basic block %d\n",
 		     ASM_COMMENT_START, NOTE_BASIC_BLOCK (insn)->index);
 	  break;

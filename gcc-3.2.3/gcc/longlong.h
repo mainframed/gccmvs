@@ -400,18 +400,19 @@ UDItype __umulsidi3 (USItype, USItype);
   } while (0)
 #endif
 
-#if (defined (__i370__) || defined (__mvs__)) && W_TYPE_SIZE == 32
+#if (defined (__i370__) || defined(__s390__) \
+     || defined (__VSE__) \
+     || defined (__MVS__) || defined(__CMS__)) && W_TYPE_SIZE == 32
 #define umul_ppmm(xh, xl, m0, m1) \
   do {									\
     union {UDItype __ll;						\
 	   struct {USItype __h, __l;} __i;				\
 	  } __xx;							\
     USItype __m0 = (m0), __m1 = (m1);					\
-    __asm__ ("mr %0,%3"							\
-	     : "=r" (__xx.__i.__h),					\
-	       "=r" (__xx.__i.__l)					\
-	     : "%1" (__m0),						\
-	       "r" (__m1));						\
+     __asm__ ("LR	%N0,%1\
+     MR	%0,%2"								\
+ 	     : "=&r" (__xx.__ll)					\
+ 	     : "r" (__m0), "r" (__m1));					\
     (xh) = __xx.__i.__h; (xl) = __xx.__i.__l;				\
     (xh) += ((((SItype) __m0 >> 31) & __m1)				\
 	     + (((SItype) __m1 >> 31) & __m0));				\
@@ -421,11 +422,10 @@ UDItype __umulsidi3 (USItype, USItype);
     union {DItype __ll;							\
 	   struct {USItype __h, __l;} __i;				\
 	  } __xx;							\
-    __asm__ ("mr %0,%3"							\
-	     : "=r" (__xx.__i.__h),					\
-	       "=r" (__xx.__i.__l)					\
-	     : "%1" (m0),						\
-	       "r" (m1));						\
+     __asm__ ("LR %N0,%1\
+     MR %0,%2"								\
+ 	     : "=&r" (__xx.__ll)					\
+ 	     : "r" (m0), "r" (m1));					\
     (xh) = __xx.__i.__h; (xl) = __xx.__i.__l;				\
   } while (0)
 #define sdiv_qrnnd(q, r, n1, n0, d) \
@@ -434,9 +434,9 @@ UDItype __umulsidi3 (USItype, USItype);
 	   struct {USItype __h, __l;} __i;				\
 	  } __xx;							\
     __xx.__i.__h = n1; __xx.__i.__l = n0;				\
-    __asm__ ("dr %0,%2"							\
-	     : "=r" (__xx.__ll)						\
-	     : "0" (__xx.__ll), "r" (d));				\
+    __asm__ ("DR	%0,%2"						\
+	     : "=d" (__xx.__ll)						\
+	     : "0" (__xx.__ll), "d" (d));				\
     (q) = __xx.__i.__l; (r) = __xx.__i.__h;				\
   } while (0)
 #endif

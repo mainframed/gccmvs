@@ -2,5 +2,9 @@
 # Target is an i370 running OpenEdition
 #
 
-# Don't bother fixing up header files, they're weird
+# Don't run fixproto
 STMP_FIXPROTO =
+
+# Don't bother making libgcc, we don't use it.
+LIBGCC =
+INSTALL_LIBGCC =

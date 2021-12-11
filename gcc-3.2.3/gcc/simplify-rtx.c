@@ -822,7 +822,10 @@ simplify_binary_real (p)
     case DIV:
 #ifndef REAL_INFINITY
       if (f1 == 0)
-	return 0;
+        {
+          args->result = 0;
+          return;
+        }
 #endif
       value = f0 / f1;
       break;

@@ -3,7 +3,7 @@
    Free Software Foundation, Inc.
    Contributed by Jan Stein (jan@cd.chalmers.se).
    Modified for OS/390 LanguageEnvironment C by Dave Pitts (dpitts@cozx.com)
-   Hacked for Linux-ELF/390 by Linas Vepstas (linas@linas.org)
+   Modified for Linux-ELF/390 by Linas Vepstas (linas@linas.org)
 
 This file is part of GNU CC.
 
@@ -32,6 +32,16 @@ extern int target_flags;
 
 extern int mvs_page_code, mvs_page_lit;
 
+/* The length of code used by case labels */
+
+extern int mvs_case_code;
+
+/* Specify that we need to be an entry point.  */
+
+extern int mvs_need_entry;
+extern int mvs_gotmain;  
+extern int mvs_need_to_globalize;
+
 /* The current page number and the base page number for the function.  */
 
 extern int mvs_page_num, function_base_page;
@@ -44,13 +54,27 @@ extern char *mvs_function_name;
 
 extern int mvs_function_name_length;
 
+/* The desired CSECT name */
+
+extern char *mvs_csect_name;
+
+/* The source file module.  */
+
+extern char *mvs_module;
+
 /* Compile using char instructions (mvc, nc, oc, xc).  On 4341 use this since
    these are more than twice as fast as load-op-store.
    On 3090 don't use this since load-op-store is much faster.  */
 
 #define TARGET_CHAR_INSTRUCTIONS (target_flags & 1)
 
+/* Compile experimental position independent code */
+#define TARGET_PIC (target_flags & 2)
+extern int i370_enable_pic;
+
 /* Default target switches */
+/* This appears to be what switches
+   target char instructions on by default */
 
 #define TARGET_DEFAULT 1
 
@@ -62,7 +86,23 @@ extern int mvs_function_name_length;
 #define TARGET_SWITCHES							\
 { { "char-instructions", 1, N_("Generate char instructions")},            \
   { "no-char-instructions", -1, N_("Do not generate char instructions")}, \
+  { "pickax", 2, "Experimental i370 PIC"}, \
+  { "no-pickax", -2, "Disable experimental i370 PIC"}, \
   { "", TARGET_DEFAULT, 0} }
+
+#define TARGET_OPTIONS \
+{ { "csect=", (const char **)&mvs_csect_name, \
+    N_("Set CSECT name")},     \
+  SUBTARGET_OPTIONS    \
+}
+
+#define SUBTARGET_OPTIONS
+
+
+#define REAL_ARITHMETIC
+
+extern void i370_override_options (void);
+#define OVERRIDE_OPTIONS i370_override_options()
 
 /* To use IBM supplied macro function prologue and epilogue, define the
    following to 1.  Should only be needed if IBM changes the definition
@@ -112,7 +152,7 @@ extern int mvs_function_name_length;
 
 /* Boundary (in *bits*) on which stack pointer should be aligned.  */
 
-#define STACK_BOUNDARY 32
+#define STACK_BOUNDARY 64
 
 /* Allocation boundary (in *bits*) for the code of a function.  */
 
@@ -124,7 +164,7 @@ extern int mvs_function_name_length;
 
 /* Alignment of field after `int : 0' in a structure.  */
 
-#define EMPTY_FIELD_BOUNDARY 32
+#define EMPTY_FIELD_BOUNDARY 8
 
 /* Define this if move instructions will actually fail to work when given
    unaligned data.  */
@@ -140,32 +180,47 @@ extern int mvs_function_name_length;
 
 #ifdef TARGET_EBCDIC
 #ifdef HOST_EBCDIC
-#define MAP_CHARACTER(c) ((char)(c))
+#define MAP_OUTCHAR(c) (c)
+#define MAP_INCHAR(c) (c)
 #else
-#define MAP_CHARACTER(c) ((char)mvs_map_char (c))
+#define MAP_OUTCHAR(c) (ASCTOEBC (c))
+#define MAP_INCHAR(c) (EBCTOASC (c))
+#endif
+#else
+#ifdef HOST_EBCDIC
+#define MAP_OUTCHAR(c) ((char)EBCTOASC (c))
+#define MAP_INCHAR(c) (ASCTOEBC (c))
 #endif
 #endif
 
 #ifdef TARGET_HLASM
 /* HLASM requires #pragma map.  */
 #define REGISTER_TARGET_PRAGMAS(PFILE) \
-  cpp_register_pragma (PFILE, 0, "map", i370_pr_map)
+  do { \
+  cpp_register_pragma (PFILE, 0, "map", i370_pr_map); \
+  cpp_register_pragma (PFILE, 0, "nomargins", i370_pr_skipit); \
+  cpp_register_pragma (PFILE, 0, "nosequence", i370_pr_skipit); \
+  cpp_register_pragma (PFILE, 0, "checkout", i370_pr_checkout); \
+  cpp_register_pragma (PFILE, 0, "linkage", i370_pr_linkage); \
+  } while(0)
 #endif /* TARGET_HLASM */
 
 /* Define maximum length of page minus page escape overhead.  */
 
-#define MAX_MVS_PAGE_LENGTH 4080
+#define MAX_MVS_PAGE_LENGTH 4068
 
-/* Define special register allocation order desired.  
-   Don't fiddle with this.  I did, and I got all sorts of register 
-   spill errors when compiling even relatively simple programs...
-   I have no clue why ...
-   E.g. this one is bad:
-   { 0, 1, 2, 9, 8, 7, 6, 5, 10, 15, 14, 12, 3, 4, 16, 17, 18, 19, 11, 13 }
- */
+#define PREDICATE_CODES \
+  {"r_or_s_operand", { REG, SUBREG, MEM }}, \
+  {"s_operand", { MEM }},
 
-#define REG_ALLOC_ORDER							\
-{ 0, 1, 2, 3, 14, 15, 12, 10, 9, 8, 7, 6, 5, 4, 16, 17, 18, 19, 11, 13 }
+/* Conservative page size when considering literals and overhead. */
+
+#define MVS_PAGE_CONSERVATIVE 4060
+
+/* Define special register allocation order desired. */
+
+#define REG_ALLOC_ORDER \
+   { 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 10, 15, 14, 12, 16, 17, 18, 19, 11, 13 }
 
 /* Standard register usage.  */
 
@@ -183,6 +238,7 @@ extern int mvs_function_name_length;
 
 #define BASE_REGISTER 3
 #define PAGE_REGISTER 4
+#define PIC_BASE_REGISTER 12
 
 #ifdef TARGET_HLASM
 /* 1 for registers that have pervasive standard uses and are not available
@@ -192,12 +248,18 @@ extern int mvs_function_name_length;
    they must never be clobbered, and, if clobbered, the register allocator 
    will never restore them back.
    
-   We use five registers in this special way:
+   For the LE/370 mode, we use five registers in this special way:
    -- R3 which is used as the base register
    -- R4 the page origin table pointer used to load R3,
    -- R11 the arg pointer.  
    -- R12 the TCA pointer
    -- R13 the stack (DSA) pointer
+
+   For TARGET_DIGNUS or TARGET_PDPMAC mode:
+   -- R10 the page origin table pointer used to load R3,
+   -- R11 the arg pointer.  
+   -- R12 the base register.
+   -- R13 the stack pointer
 
    A fifth register is also exceptional: R14 is used in many branch
    instructions to hold the target of the branch.  Technically, this
@@ -225,6 +287,45 @@ extern int mvs_function_name_length;
    I think this is a bug, but I can't track it down...
  */
 
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#undef PAGE_REGISTER
+#undef BASE_REGISTER
+#define PAGE_REGISTER 10
+#define BASE_REGISTER 12
+
+#ifdef TARGET_DIGNUS
+#define FIXED_REGISTERS 						\
+{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 }
+/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
+#endif
+
+#ifdef TARGET_PDPMAC
+/* made register 1 fixed because it is used
+   for parameter passing, otherwise we DO
+   have a problem! */
+/* also made register 0 fixed, because I am using that
+   for the struct, instead of 1.  Why would anyone
+   choose 1 for the struct when it is being used
+   already for the parameters? */
+#define FIXED_REGISTERS 						\
+{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 }
+/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
+#endif
+
+/* 1 for registers not available across function calls.  These must include
+   the FIXED_REGISTERS and also any registers that can be used without being
+   saved.
+   The latter must include the registers where values are returned
+   and the register where structure-value addresses are passed.
+   NOTE: all floating registers are undefined across calls.  
+*/
+
+#define CALL_USED_REGISTERS 						\
+{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
+#endif
+
+#ifdef TARGET_LE
 #define FIXED_REGISTERS 						\
 { 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0 }
 /*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
@@ -240,33 +341,49 @@ extern int mvs_function_name_length;
 #define CALL_USED_REGISTERS 						\
 { 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
 /*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
+#endif /* TARGET_LE */
+
+#endif /* TARGET_HLASM */
+
+/* ================= */
+#ifdef TARGET_LINUX 
+/* The Linux/ELF ABI uses the same register layout as the 
+   the MVS/OE version, with the following exceptions:
+   -- r4 is not used; its role is taken by 0(r13)
+   -- r13 is used as a combined argument & frame pointer
+   -- r11 is used to point to the top of the stack.
+   -- r12 is used as a base pointer into the data section
+      but only if i370_enable_pic is true; otherwise we can
+      free up this register.
+
+   Note that the ELF calling convention is radically different 
+   than the MVS/OE convention.  In particular, r11 always points
+   to the top of the stack, and r13 always points to the bottom 
+   of the stack.  Thus, r13 can be used as a dual arg & frame 
+   pointer for all occasions, whereas r11 can be used for alloca
+   and other stack-dynamic allocations.  
+
+   XXX Future enhancment possible: When a function doesn't have
+   any args, and doesn't use alloca(), then r11 is not really needed.
+ */
+
+#define FIXED_REGISTERS 						\
+{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0 }
+/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
+
+#define CALL_USED_REGISTERS 						\
+{ 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
+
+#endif /* TARGET_LINUX */
+/* ================= */
+
 
 /* Return number of consecutive hard regs needed starting at reg REGNO
    to hold something of mode MODE.
    This is ordinarily the length in words of a value of mode MODE
    but can be less for certain modes in special long registers.  
-   Note that DCmode (complex double) needs two regs.
-*/
-#endif /* TARGET_HLASM */
-
-/* ================= */
-#ifdef TARGET_ELF_ABI 
-/* The Linux/ELF ABI uses the same register layout as the 
- * the MVS/OE version, with the following exceptions:
- * -- r12 (rtca) is not used.
- */
-
-#define FIXED_REGISTERS 						\
-{ 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0 }
-/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
-
-#define CALL_USED_REGISTERS 						\
-{ 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1 }
-/*0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19*/
-
-#endif /* TARGET_ELF_ABI */
-/* ================= */
-
+   Note that DCmode (complex double) needs two regs.  */
 
 #define HARD_REGNO_NREGS(REGNO, MODE) 					\
   ((REGNO) > 15 ? 							\
@@ -306,6 +423,10 @@ extern int mvs_function_name_length;
 
 /* #define PC_REGNUM */
 
+/* ------------------------------------------------------------------- */
+/* ================= */
+#ifdef TARGET_HLASM
+
 /* Register to use for pushing function arguments.  */
 
 #define STACK_POINTER_REGNUM 13
@@ -324,6 +445,40 @@ extern int mvs_function_name_length;
 /* Base register for access to arguments of the function.  */
 
 #define ARG_POINTER_REGNUM 11
+
+#endif /* TARGET_HLASM */
+
+/* ================= */
+#ifdef TARGET_LINUX 
+
+/* Register to use for pushing function arguments.  */
+
+#define STACK_POINTER_REGNUM 11
+
+/* Base register for access to local variables of the function.
+   A separate stack and frame pointer is required for any function 
+   that calls alloca() or does other pushing onto the stack. */
+
+#define FRAME_POINTER_REGNUM 13
+
+/* Value should be nonzero if functions must have frame pointers.
+   Zero means the frame pointer need not be set up (and parms may be
+   accessed via the stack pointer) in functions that seem suitable.
+   This is computed in `reload', in reload1.c.  */
+
+#define FRAME_POINTER_REQUIRED 1
+
+/* Function epilogue uses the frame pointer to restore the context */
+#define EXIT_IGNORE_STACK 1
+
+/* Base register for access to arguments of the function.  
+   We will use the frame pointer as the arg pointer. */
+
+#define ARG_POINTER_REGNUM 13
+
+#endif /* TARGET_LINUX */
+/* ================= */
+/* ------------------------------------------------------------------- */
 
 /* R10 is register in which static-chain is passed to a function.  
    Static-chaining is done when a nested function references as a global
@@ -349,7 +504,11 @@ extern int mvs_function_name_length;
    the R1 points at that mem location.
  */
 
+#ifdef TARGET_PDPMAC
+#define STRUCT_VALUE_REGNUM 0
+#else
 #define STRUCT_VALUE_REGNUM 1
+#endif
 
 /* Define the classes of registers for register constraints in the
    machine description.  Also define ranges of constants.
@@ -462,10 +621,7 @@ enum reg_class
 
 /* Define this if pushing a word on the stack makes the stack pointer a
    smaller address.  */
-/* ------------------------------------------------------------------- */
 
-/* ================= */
-#ifdef TARGET_HLASM
 /* #define STACK_GROWS_DOWNWARD */
 
 /* Define this if the nominal address of the stack frame is at the
@@ -473,6 +629,32 @@ enum reg_class
    variable allocated goes at a more negative offset in the frame.  */
 
 /* #define FRAME_GROWS_DOWNWARD */
+
+
+/* ------------------------------------------------------------------- */
+/* ================= */
+#ifdef TARGET_HLASM
+
+/* Define offset from stack pointer, to location where a parm can be
+   pushed.  */
+
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#define STACK_POINTER_OFFSET 88
+#else
+#define STACK_POINTER_OFFSET 148
+#endif
+
+#define STACK_FRAME_BASE 88
+
+
+/* used in i370.md for temp scratch area */
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#define CONVLO "80"
+#define CONVHI "84"
+#else
+#define CONVLO "140"
+#define CONVHI "144"
+#endif
 
 /* Offset within stack frame to start allocating local variables at.
    If FRAME_GROWS_DOWNWARD, this is the offset to the END of the
@@ -484,43 +666,107 @@ enum reg_class
 
 #define INITIAL_FRAME_POINTER_OFFSET(DEPTH) (DEPTH) = STARTING_FRAME_OFFSET
 
-/* If we generate an insn to push BYTES bytes, this says how many the stack
-   pointer really advances by.  On the 370, we have no push instruction.  */
+/* Offset of first parameter from the argument pointer register value.  */
 
-#endif /* TARGET_HLASM */
-
-/* ================= */
-#ifdef TARGET_ELF_ABI 
-
-/* With ELF/Linux, stack is placed at large virtual addrs and grows down.
-   But we want the compiler to generate posistive displacements from the 
-   stack pointer, and so we make the frame lie above the stack.  */
-
-#define STACK_GROWS_DOWNWARD 
-/* #define FRAME_GROWS_DOWNWARD */
-
-/* Offset within stack frame to start allocating local variables at.
-   This is the offset to the BEGINNING of the first local allocated.  */
-
-#define STARTING_FRAME_OFFSET  						\
-     (STACK_POINTER_OFFSET + current_function_outgoing_args_size)
-
-#define INITIAL_FRAME_POINTER_OFFSET(DEPTH) (DEPTH) = STARTING_FRAME_OFFSET
-
-#endif /* TARGET_ELF_ABI */
-/* ================= */
-
-/* #define PUSH_ROUNDING(BYTES) */
+#define FIRST_PARM_OFFSET(FNDECL) 0
 
 /* Accumulate the outgoing argument count so we can request the right
    DSA size and determine stack offset.  */
 
 #define ACCUMULATE_OUTGOING_ARGS 1
 
+#endif /* TARGET_HLASM */
+
+/* ================= */
+#ifdef TARGET_LINUX 
+/* Here's the stack layout as currently designed:
+
+   r11 -- top of stack aka stack pointer
+   -4(r11) -- last local (stack) variable)
+   ...          ...
+   88+4*nargs(r13) -- first local (stack) variable.
+   ...          ...
+   92(r13) -- second incoming (callee) argument
+   88(r13) -- first incoming (callee) argument
+   84(r13) -- volatile scratch area
+   80(r13) -- volatile scratch area
+   76(r13) -- not used (frame size)
+   72(r13) -- not used
+   68(r13) -- saved callers r12
+   64(r13) -- saved callers r11
+   ...          ...
+   28(r13) -- saved callers r2
+   24(r13) -- saved callers r1
+   20(r13) -- saved callers r0
+   16(r13) -- saved callers r15
+   12(r13) -- saved callers r14
+   8(r13)  -- saved callers r13
+   4(r13)  -- not used
+   0(r13)  -- code page table pointer
+   r13 -- bottom of stack aka frame pointer aka arg pointer
+
+   Note that this bears superficial similarity to the MVS/OE stack layout,
+   but in fact it is very very different.  In particular, under MVS/OE
+   the roles of r11 and r13 are quite different.   
+
+   Note that the use of varargs/stdarg is limited to 512 bytes of
+   of arguments.  This is the price that is paid for freeing up a 
+   register and having a more efficient function return.
+*/
+
+/* Define size of the calling convention register save area.
+   This includes room for the 16 GPR's, a saved frame size, and 
+   a (floating point math) scratch area */
+#define I370_SAVE_AREA_SIZE 88
+
+/* Define the size of the amount of room reserved for varargs */
+#define I370_VARARGS_AREA_SIZE 512
+
+/* Used in i370.md for temp scratch area. Must be that last two words
+   of the I370_SAVE_AREA. */
+#define CONVLO "80"
+#define CONVHI "84"
+
 /* Define offset from stack pointer, to location where a parm can be
    pushed.  */
 
+#define STACK_POINTER_OFFSET I370_SAVE_AREA_SIZE
+
+#define STACK_DYNAMIC_OFFSET(FNDECL) 0
+
+/* Offset within frame to start allocating local variables at.
+   It is the offset to the BEGINNING of the first local allocated.  */
+
+#define STARTING_FRAME_OFFSET  						\
+     ((current_function_varargs || current_function_stdarg) ?		\
+     (I370_SAVE_AREA_SIZE + I370_VARARGS_AREA_SIZE):			\
+     (I370_SAVE_AREA_SIZE + current_function_args_size))
+
+#define INITIAL_FRAME_POINTER_OFFSET(DEPTH) (DEPTH) = STARTING_FRAME_OFFSET
+
+/* Offset of first incoming parameter from the arg ptr register value.  */
+#define FIRST_PARM_OFFSET(FNDECL) I370_SAVE_AREA_SIZE
+
+/* The ACCUMULATE_OUTGOING_ARGS flag seems to have some funny side effects
+   that we need.  Specifically, if it is set, then the stack pointer is
+   not bumped when args are placed on the stack, which is just how we want
+   it. */
+#define ACCUMULATE_OUTGOING_ARGS 1
+
+#endif /* TARGET_LINUX */
+
+/* ================= */
+/* ------------------------------------------------------------------- */
+
+/* If we generate an insn to push BYTES bytes, this says how many the stack
+   pointer really advances by.  On the 370, we have no push instruction.  */
+
+/* #define PUSH_ROUNDING(BYTES) */
+
+#ifdef TARGET_LE
 #define STACK_POINTER_OFFSET 148
+#define STACK_FRAME_BASE 28
+#endif
 
 /* Offset of first parameter from the argument pointer register value.  */
 
@@ -1041,6 +1287,7 @@ enum reg_class
 /* ======================================================== */
 
 #ifdef TARGET_HLASM
+
 #define TEXT_SECTION_ASM_OP "* Program text area"
 #define DATA_SECTION_ASM_OP "* Program data area"
 #define INIT_SECTION_ASM_OP "* Program initialization area"
@@ -1058,11 +1305,115 @@ enum reg_class
   "0",  "2",  "4",  "6"							\
 }
 
-#define ASM_FILE_START(FILE)						\
-{ fputs ("\tRMODE\tANY\n", FILE);					\
-  fputs ("\tCSECT\n", FILE); }
+#ifdef TARGET_ALIASES
 
-#define ASM_FILE_END(FILE) fputs ("\tEND\n", FILE);
+#define ASM_FILE_START(FILE)						\
+{ extern const char *main_input_filename;				\
+  extern char *asm_file_name;						\
+  char temp[256];							\
+  const char *cbp, *cfp;						\
+  char *bp;								\
+  if (asm_file_name)							\
+    {									\
+      if (strncmp (asm_file_name, "/tmp", 4) == 0)			\
+        cfp = main_input_filename;					\
+      else								\
+        cfp = asm_file_name;						\
+    }									\
+  else cfp = main_input_filename;					\
+  if ((cbp = strrchr (cfp, '/')) == NULL)				\
+    cbp = cfp;								\
+  else cbp++;								\
+  while (*cbp == '_') cbp++;						\
+  strcpy (temp, cbp);							\
+  if ((bp = strchr (temp, '.')) != NULL) *bp = '\0';			\
+  for (bp = temp; *bp; bp++)						\
+    *bp = ISLOWER(*bp) ? TOUPPER(*bp) : *bp;				\
+  mvs_module = (char *) xmalloc (strlen(temp)+2);			\
+  strcpy (mvs_module, temp);						\
+  for (bp = temp; *bp; bp++)						\
+    *bp = ISUPPER(*bp) ? TOLOWER(*bp) : *bp;				\
+  fprintf (FILE, "@DATA\tALIAS\tC'@%s'\n", temp);			\
+  fputs ("@DATA\tAMODE\tANY\n", FILE);					\
+  fputs ("@DATA\tRMODE\tANY\n", FILE);					\
+  fputs ("@DATA\tCSECT\n", FILE); }
+
+#define ASM_FILE_END(FILE) 						\
+{ mvs_dump_alias (FILE);						\
+  fputs ("\tEND\n", FILE);						\
+}
+
+#else
+
+#ifdef TARGET_PDPMAC
+#define ASM_FILE_START(FILE)						\
+{ extern const char *main_input_filename;				\
+  extern char *asm_file_name;						\
+  char temp[256];							\
+  const char *cbp, *cfp;						\
+  char *bp;								\
+  if (asm_file_name)							\
+    {									\
+      if (strncmp (asm_file_name, "/tmp", 4) == 0)			\
+        cfp = main_input_filename;					\
+      else								\
+        cfp = asm_file_name;						\
+    }									\
+  else cfp = main_input_filename;					\
+  if ((cbp = strrchr (cfp, '/')) == NULL)				\
+    cbp = cfp;								\
+  else cbp++;								\
+  while (*cbp == '_') cbp++;						\
+  strcpy (temp, cbp);							\
+  if ((bp = strchr (temp, '.')) != NULL) *bp = '\0';			\
+  if (strlen (temp) > MAX_MVS_LABEL_SIZE - 1)				\
+    temp[MAX_MVS_LABEL_SIZE-1] = '\0';					\
+  for (bp = temp; *bp; bp++)						\
+    *bp = ISLOWER(*bp) ? TOUPPER(*bp) : *bp;				\
+  mvs_module = (char *) xmalloc (strlen(temp)+2);			\
+  strcpy (mvs_module, temp);						\
+  fprintf(FILE, "\tCOPY\tPDPTOP\n"); \
+  fprintf (FILE, "%s\tCSECT\n", mvs_csect_name ? mvs_csect_name : "");\
+}
+#else
+#define ASM_FILE_START(FILE)						\
+{ extern const char *main_input_filename;				\
+  extern char *asm_file_name;						\
+  char temp[256];							\
+  const char *cbp, *cfp;						\
+  char *bp;								\
+  if (asm_file_name)							\
+    {									\
+      if (strncmp (asm_file_name, "/tmp", 4) == 0)			\
+        cfp = main_input_filename;					\
+      else								\
+        cfp = asm_file_name;						\
+    }									\
+  else cfp = main_input_filename;					\
+  if ((cbp = strrchr (cfp, '/')) == NULL)					\
+    cbp = cfp;								\
+  else cbp++;								\
+  while (*cbp == '_') cbp++;						\
+  strcpy (temp, cbp);							\
+  if ((bp = strchr (temp, '.')) != NULL) *bp = '\0';			\
+  if (strlen (temp) > MAX_MVS_LABEL_SIZE - 1)				\
+    temp[MAX_MVS_LABEL_SIZE-1] = '\0';					\
+  for (bp = temp; *bp; bp++)						\
+    *bp = ISLOWER(*bp) ? TOUPPER(*bp) : *bp;				\
+  mvs_module = (char *) xmalloc (strlen(temp)+2);			\
+  strcpy (mvs_module, temp);						\
+  fprintf (FILE, "$%s\tCSECT\n", mvs_module);				\
+}
+#endif
+
+#define ASM_FILE_END(FILE) 						\
+{ if (mvs_gotmain) fputs ("\tEND\t@@MAIN\n", FILE);			\
+  else fputs ("\tEND\n", FILE);						\
+}
+
+#endif /* TARGET_ALIASES */
+
+
 #define ASM_COMMENT_START "*"
 #define ASM_APP_OFF ""
 #define ASM_APP_ON ""
@@ -1070,6 +1421,14 @@ enum reg_class
 #define ASM_OUTPUT_LABEL(FILE, NAME) 					\
 { assemble_name (FILE, NAME); fputs ("\tEQU\t*\n", FILE); }
 
+#define ASM_OUTPUT_FUNCTION_PREFIX(FILE, NAME)				\
+  mvs_need_to_globalize = 0; \
+  mvs_need_entry = 0
+
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#define ASM_OUTPUT_EXTERNAL(FILE, DECL, NAME)
+#endif
+#ifdef TARGET_LE
 #define ASM_OUTPUT_EXTERNAL(FILE, DECL, NAME)				\
 {									\
   char temp[MAX_MVS_LABEL_SIZE + 1];					\
@@ -1078,7 +1437,55 @@ enum reg_class
       fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
     }									\
 }
+#endif
 
+#ifdef TARGET_ALIASES
+#ifdef TARGET_DIGNUS
+#define ASM_GLOBALIZE_LABEL(FILE, NAME)					\
+{ 									\
+  char temp[MAX_MVS_LABEL_SIZE + 1];					\
+  if (!strcmp (NAME, "main"))						\
+    {									\
+      fputs ("@CRT0\tALIAS\tC'@crt0'\n", FILE);				\
+      fputs ("\tEXTRN\t@CRT0\n", FILE);					\
+    }									\
+  if (mvs_check_alias (NAME, temp) == 2)				\
+    {									\
+      fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
+    }									\
+  if (mvs_need_to_globalize)						\
+    {									\
+      fputs ("\tENTRY\t", FILE);					\
+      assemble_name (FILE, NAME);					\
+      fputs ("\n", FILE);						\
+    }									\
+  mvs_need_entry = 1;							\
+}
+#endif
+#ifdef TARGET_PDPMAC
+#define ASM_GLOBALIZE_LABEL(FILE, NAME)					\
+{ 									\
+  char temp[MAX_MVS_LABEL_SIZE + 1];					\
+  if (!strcmp (NAME, "main"))						\
+    {									\
+      fputs ("@@CRT0\tALIAS\tC'@@crt0'\n", FILE);			\
+      fputs ("\tEXTRN\t@@CRT0\n", FILE);				\
+    }									\
+  if (mvs_check_alias (NAME, temp) == 2)				\
+    {									\
+      fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
+    }									\
+  if (mvs_need_to_globalize)						\
+    {									\
+      fprintf(FILE, "* X-var %s\n", NAME); \
+      fputs ("\tENTRY\t", FILE);					\
+      assemble_name (FILE, NAME);					\
+      fputs ("\n", FILE);						\
+    }									\
+  mvs_need_entry = 1;							\
+}
+#endif
+#ifdef TARGET_LE
 #define ASM_GLOBALIZE_LABEL(FILE, NAME)					\
 { 									\
   char temp[MAX_MVS_LABEL_SIZE + 1];					\
@@ -1090,11 +1497,103 @@ enum reg_class
   assemble_name (FILE, NAME);						\
   fputs ("\n", FILE);							\
 }
+#endif
+#else /* !TARGET_ALIASES */
+#ifdef TARGET_DIGNUS
+#define ASM_GLOBALIZE_LABEL(FILE, NAME)					\
+{ 									\
+  char temp[MAX_MVS_LABEL_SIZE + 1];					\
+  if (!strcmp (NAME, "main"))						\
+    {									\
+      fputs ("\tEXTRN\t@CRT0\n", FILE);					\
+    }									\
+  if (mvs_check_alias (NAME, temp) == 2)				\
+    {									\
+      fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
+    }									\
+  if (mvs_need_to_globalize)						\
+    {									\
+      fputs ("\tENTRY\t", FILE);					\
+      assemble_name (FILE, NAME);					\
+      fputs ("\n", FILE);						\
+    }									\
+  mvs_need_entry = 1;							\
+}
+#endif
+#ifdef TARGET_PDPMAC
+#ifdef TARGET_VSE
+#define ASM_GLOBALIZE_LABEL(FILE, NAME)					\
+{ 									\
+  char temp[MAX_MVS_LABEL_SIZE + 1];					\
+  if (!strcmp (NAME, "main"))						\
+    {									\
+      fputs ("\tDC\tC'GCCMVS!!'\n", FILE);				\
+      fputs ("\tEXTRN\t@@CRT0\n", FILE);				\
+      fputs ("\tENTRY\t@@MAIN\n", FILE);				\
+      fputs ("@@MAIN\tDS\t0H\n", FILE);				\
+      fputs ("\tBALR\t10,0\n", FILE);				\
+      fputs ("\tUSING\t*,10\n", FILE);				\
+      fputs ("\tL\t10,=V(@@CRT0)\n", FILE);				\
+      fputs ("\tBR\t10\n", FILE);				\
+      fputs ("\tDROP\t10\n", FILE);				\
+      fputs ("\tLTORG\n", FILE);				\
+      mvs_gotmain = 1; /* was 1 */         				\
+    }									\
+  if (mvs_check_alias (NAME, temp) == 2)				\
+    {									\
+      fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
+    }									\
+  if (mvs_need_to_globalize)						\
+    {									\
+      fprintf(FILE, "* X-var %s\n", NAME); \
+      fputs ("\tENTRY\t", FILE);					\
+      assemble_name (FILE, NAME);					\
+      fputs ("\n", FILE);						\
+    }									\
+  mvs_need_entry = 1;							\
+}
+#else
+#define ASM_GLOBALIZE_LABEL(FILE, NAME)					\
+{ 									\
+  char temp[MAX_MVS_LABEL_SIZE + 1];					\
+  if (!strcmp (NAME, "main"))						\
+    {									\
+      fputs ("\tCOPY\tPDPMAIN\n", FILE);				\
+      mvs_gotmain = 1; /* was 1 */         				\
+    }									\
+  if (mvs_check_alias (NAME, temp) == 2)				\
+    {									\
+      fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
+    }									\
+  if (mvs_need_to_globalize)						\
+    {									\
+      fprintf(FILE, "* X-var %s\n", NAME); \
+      fputs ("\tENTRY\t", FILE);					\
+      assemble_name (FILE, NAME);					\
+      fputs ("\n", FILE);						\
+    }									\
+  mvs_need_entry = 1;							\
+}
+#endif /* TARGET_VSE */
+#endif /* TARGET_PDPMAC */
+#endif /* TARGET_ALIASES */
+
 
 /* MVS externals are limited to 8 characters, upper case only.
    The '_' is mapped to '@', except for MVS functions, then '#'.  */
 
 
+#ifdef TARGET_ALIASES
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#define ASM_OUTPUT_LABELREF(FILE, NAME)					\
+{									\
+  char *bp, ch, temp[MAX_MVS_LABEL_SIZE + 1];				\
+  if (!mvs_get_alias (NAME, temp))					\
+    strcpy (temp, NAME);						\
+  fprintf (FILE, "%s", temp);						\
+}
+#endif
+#ifdef TARGET_LE
 #define ASM_OUTPUT_LABELREF(FILE, NAME)					\
 {									\
   char *bp, ch, temp[MAX_MVS_LABEL_SIZE + 1];				\
@@ -1110,9 +1609,41 @@ enum reg_class
     *bp = (*bp == '_' ? ch : TOUPPER (*bp));				\
   fprintf (FILE, "%s", temp);						\
 }
+#endif
+#else /* !TARGET_ALIASES */
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#define ASM_OUTPUT_LABELREF(FILE, NAME)					\
+{									\
+  char *bp, ch, temp[MAX_MVS_LABEL_SIZE + 1];				\
+  if (!mvs_get_alias (NAME, temp))					\
+    strcpy (temp, NAME);						\
+  ch = '@';								\
+  for (bp = temp; *bp; bp++)						\
+    *bp = (*bp == '_' ? ch : TOUPPER (*bp));				\
+  fprintf (FILE, "%s", temp);						\
+}
+#endif
+#ifdef TARGET_LE
+#define ASM_OUTPUT_LABELREF(FILE, NAME)					\
+{									\
+  char *bp, ch, temp[MAX_MVS_LABEL_SIZE + 1];				\
+  if (!mvs_get_alias (NAME, temp))					\
+    strcpy (temp, NAME);						\
+  if (!strcmp (temp,"main"))						\
+    strcpy (temp,"gccmain");						\
+  if (mvs_function_check (temp))					\
+    ch = '#';								\
+  else									\
+    ch = '@';								\
+  for (bp = temp; *bp; bp++)						\
+    *bp = (*bp == '_' ? ch : TOUPPER (*bp));				\
+  fprintf (FILE, "%s", temp);						\
+}
+#endif
+#endif /* TARGET_ALIASES */
 
 #define ASM_GENERATE_INTERNAL_LABEL(LABEL, PREFIX, NUM)			\
-  sprintf (LABEL, "*%s%d", PREFIX, NUM)
+  sprintf (LABEL, "*@@%s%d", PREFIX, NUM)
 
 /* Generate internal label.  Since we can branch here from off page, we
    must reload the base register.  */
@@ -1123,33 +1654,60 @@ enum reg_class
     {									\
       mvs_add_label(NUM);						\
     }									\
-  fprintf (FILE, "%s%d\tEQU\t*\n", PREFIX, NUM);			\
+  fprintf (FILE, "@@%s%d\tEQU\t*\n", PREFIX, NUM);			\
 }
 
 /* Generate case label.  For HLASM we can change to the data CSECT
    and put the vectors out of the code body. The assembler just
    concatenates CSECTs with the same name.  */
 
+#ifdef TARGET_ALIASES
 #define ASM_OUTPUT_CASE_LABEL(FILE, PREFIX, NUM, TABLE)			\
   fprintf (FILE, "\tDS\t0F\n");                                         \
-  fprintf (FILE,"\tCSECT\n");                                           \
+  fprintf (FILE,"@DATA\tCSECT\n");                                      \
   fprintf (FILE, "%s%d\tEQU\t*\n", PREFIX, NUM)
+#else /* !TARGET_ALIASES */
+#ifdef TARGET_PDPMAC
+#define ASM_OUTPUT_CASE_LABEL(FILE, PREFIX, NUM, TABLE)			\
+  fprintf (FILE, "\tLTORG\n");                                          \
+  fprintf (FILE, "\tDS\t0F\n");                                         \
+  mvs_case_code = 0;							\
+  fprintf (FILE, "@@%s%d\tEQU\t*\n", PREFIX, NUM)
+#else
+#define ASM_OUTPUT_CASE_LABEL(FILE, PREFIX, NUM, TABLE)			\
+  fprintf (FILE, "\tDS\t0F\n");                                         \
+  fprintf (FILE,"$%s\tCSECT\n", mvs_module);                            \
+  fprintf (FILE, "%s%d\tEQU\t*\n", PREFIX, NUM)
+#endif
+#endif /* TARGET_ALIASES */
 
 /* Put the CSECT back to the code body */
 
+#ifdef TARGET_ALIASES
 #define ASM_OUTPUT_CASE_END(FILE, NUM, TABLE)                           \
-  assemble_name (FILE, mvs_function_name);                              \
-  fputs ("\tCSECT\n", FILE);
+  fputs ("@CODE\tCSECT\n", FILE);
+#else /* !TARGET_ALIASES */
+#ifdef TARGET_PDPMAC
+#define ASM_OUTPUT_CASE_END(FILE, NUM, TABLE)                           \
+  mvs_page_code += mvs_case_code;					\
+  mvs_check_page (FILE, 0, 0);						\
+  mvs_case_code = 0;
+#else
+#define ASM_OUTPUT_CASE_END(FILE, NUM, TABLE)                           \
+  fprintf (FILE, "@%s\tCSECT\n", mvs_module);
+#endif
+#endif /* TARGET_ALIASES */
 
 /* This is how to output an element of a case-vector that is absolute.  */
 
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE)  				\
-  fprintf (FILE, "\tDC\tA(L%d)\n", VALUE)
+  mvs_case_code += 4;							\
+  fprintf (FILE, "\tDC\tA(@@L%d)\n", VALUE)
 
 /* This is how to output an element of a case-vector that is relative.  */
 
 #define ASM_OUTPUT_ADDR_DIFF_ELT(FILE, BODY, VALUE, REL) 		\
-  fprintf (FILE, "\tDC\tA(L%d-L%d)\n", VALUE, REL)
+  fprintf (FILE, "\tDC\tA(@@L%d-@@L%d)\n", VALUE, REL)
 
 /* This is how to output an insn to push a register on the stack.
     It need not be very fast code.  
@@ -1184,12 +1742,12 @@ enum reg_class
   for (j = 0, i = 0; i < limit; j++, i++)				\
     {									\
       int c = (PTR)[i];							\
-      if (ISCNTRL (c) || c == '&')					\
+      if (!IS_ISOBASIC (c) || ISCNTRL(c) || c == '&')			\
 	{								\
 	  if (j % MVS_ASCII_TEXT_LENGTH != 0 )				\
 	    fprintf (FILE, "'\n");					\
 	  j = -1;							\
-	  if (c == '&') c = MAP_CHARACTER (c);				\
+	  c = MAP_OUTCHAR (c);						\
 	  fprintf (FILE, "\tDC\tX'%X'\n", c );				\
 	}								\
       else								\
@@ -1197,7 +1755,12 @@ enum reg_class
 	  if (j % MVS_ASCII_TEXT_LENGTH == 0)				\
             fprintf (FILE, "\tDC\tC'");					\
           if ( c == '\'' )                                       	\
-	    fprintf (FILE, "%c%c", c, c);                        	\
+	    {	/* we are going to print 2 chars - is there space */	\
+	  if( j % MVS_ASCII_TEXT_LENGTH == MVS_ASCII_TEXT_LENGTH - 1)   \
+          { /* not enough space */					\
+	    fprintf (FILE, "'\n" );					\
+            fprintf (FILE, "\tDC\tC'");	++j;}				\
+               fprintf (FILE, "%c%c", c, c);++j;}                   	\
 	  else                                                   	\
 	    fprintf (FILE, "%c", c);                             	\
 	  if (j % MVS_ASCII_TEXT_LENGTH == MVS_ASCII_TEXT_LENGTH - 1)	\
@@ -1229,6 +1792,20 @@ enum reg_class
    instruction to advance the location counter by SIZE bytes. Those
    bytes should be zero when loaded.  */
 
+#ifdef TARGET_PDPMAC
+#define ASM_OUTPUT_SKIP(FILE, SIZE)  					\
+{									\
+  int s, k;								\
+  for (s = (SIZE); s > 0; s -= MAX_CHUNK)				\
+    {									\
+      if (s > MAX_CHUNK)						\
+	k = MAX_CHUNK;							\
+      else								\
+	k = s;								\
+      fprintf (FILE, "\tDC\t%dX'00'\n", k);				\
+    }									\
+}
+#else
 #define ASM_OUTPUT_SKIP(FILE, SIZE)  					\
 {									\
   int s, k;								\
@@ -1241,6 +1818,7 @@ enum reg_class
       fprintf (FILE, "\tDS\tXL%d\n", k);				\
     }									\
 }
+#endif
 
 /* A C statement (sans semicolon) to output to the stdio stream
    FILE the assembler definition of a common-label named NAME whose
@@ -1254,6 +1832,7 @@ enum reg_class
     {									\
       fprintf (FILE, "%s\tALIAS\tC'%s'\n", temp, NAME);			\
     }									\
+  fprintf(FILE, "* X-var %s\n", NAME); \
   fputs ("\tENTRY\t", FILE);						\
   assemble_name (FILE, NAME);						\
   fputs ("\n", FILE);							\
@@ -1278,11 +1857,19 @@ enum reg_class
    assembler-name for a local static variable named NAME.
    LABELNO is an integer which is different for each call.  */
 
+#ifdef TARGET_PDPMAC
+#define ASM_FORMAT_PRIVATE_NAME(OUTPUT, NAME, LABELNO)  		\
+{									\
+  (OUTPUT) = (char *) alloca (strlen ((NAME)) + 10);			\
+  sprintf ((OUTPUT), "__%d", (LABELNO));				\
+}
+#else
 #define ASM_FORMAT_PRIVATE_NAME(OUTPUT, NAME, LABELNO)  		\
 {									\
   (OUTPUT) = (char *) alloca (strlen ((NAME)) + 10);			\
   sprintf ((OUTPUT), "%s%d", (NAME), (LABELNO));			\
 }
+#endif
 
 /* Print operand XV (an rtx) in assembler syntax to file FILE.
    CODE is a letter or dot (`z' in `%z0') or 0 if no letter was specified.
@@ -1324,10 +1911,19 @@ enum reg_class
       case SYMBOL_REF:							\
       case LABEL_REF:							\
 	mvs_page_lit += 4;						\
-	if (SYMBOL_REF_FLAG (XV)) fprintf (FILE, "=V(");		\
-	else                      fprintf (FILE, "=A(");		\
-	output_addr_const (FILE, XV);					\
-	fprintf (FILE, ")");						\
+	if (SYMBOL_REF_FLAG (XV))					\
+	  {								\
+	    fprintf (FILE, "=V(");					\
+	    output_addr_const (FILE, XV);				\
+	    fprintf (FILE, ")");					\
+	    mvs_mark_alias (XSTR(XV,0));				\
+	  }								\
+	else								\
+	  {								\
+	    fprintf (FILE, "=A(");					\
+	    output_addr_const (FILE, XV);				\
+	    fprintf (FILE, ")");					\
+	  }								\
 	break;								\
       case CONST_INT:					        	\
 	if (CODE == 'B')						\
@@ -1386,21 +1982,26 @@ enum reg_class
 	  }								\
 	else								\
 	  { 								\
-            /* hack alert -- this prints wildly incorrect values */	\
-            /* when run in cross-compiler mode. See ELF section  */	\
-            /* for suggested fix */					\
-	    union { double d; int i[2]; } u;				\
-	    u.i[0] = CONST_DOUBLE_LOW (XV);				\
-	    u.i[1] = CONST_DOUBLE_HIGH (XV);				\
 	    if (GET_MODE (XV) == SFmode)				\
 	      {								\
+	        REAL_VALUE_TYPE rval;					\
+	        REAL_VALUE_FROM_CONST_DOUBLE(rval, XV);			\
 		mvs_page_lit += 4;					\
-		fprintf (FILE, "=E'%.9G'", u.d);			\
+		fprintf (FILE, "=E'%s'", mvs_make_float(rval));		\
 	      }								\
 	    else							\
+	    if (GET_MODE (XV) == DFmode)				\
+	      {								\
+	        REAL_VALUE_TYPE rval;					\
+	        REAL_VALUE_FROM_CONST_DOUBLE(rval, XV);			\
+		mvs_page_lit += 8;					\
+		fprintf (FILE, "=D'%s'", mvs_make_float(rval));		\
+	      }								\
+	    else 							\
 	      {								\
 		mvs_page_lit += 8;					\
-		fprintf (FILE, "=D'%.18G'", u.d);			\
+		fprintf (FILE, "=XL8'%08X%08X'", 			\
+			CONST_DOUBLE_HIGH (XV), CONST_DOUBLE_LOW (XV));	\
 	      }								\
 	  }								\
 	break;								\
@@ -1411,11 +2012,18 @@ enum reg_class
 	    mvs_page_lit += 4;						\
 	    if (SYMBOL_REF_FLAG (XEXP (XEXP (XV, 0), 0)))		\
 	      {								\
+		int xx = INTVAL (XEXP (XEXP (XV, 0), 1));		\
 		fprintf (FILE, "=V(");					\
 		ASM_OUTPUT_LABELREF (FILE,				\
 				  XSTR (XEXP (XEXP (XV, 0), 0), 0));	\
-		fprintf (FILE, ")\n\tA\t%s,=F'%d'", curreg,		\
-				  INTVAL (XEXP (XEXP (XV, 0), 1)));	\
+		if ((unsigned)xx < 4096)				\
+		  fprintf (FILE, ")\n\tLA\t%s,%d(0,%s)", curreg,	\
+				  xx,					\
+				  curreg);				\
+		else							\
+		  fprintf (FILE, ")\n\tA\t%s,=F'%d'", curreg,		\
+				  xx);					\
+		mvs_mark_alias (XSTR (XEXP (XEXP (XV, 0), 0), 0));	\
 	      }								\
 	    else							\
 	      {								\
@@ -1505,7 +2113,7 @@ enum reg_class
 	if (offset)							\
 	  {								\
 	    if (GET_CODE (offset) == LABEL_REF)				\
-	      fprintf (FILE, "L%d",					\
+	      fprintf (FILE, "@@L%d",					\
 			CODE_LABEL_NUMBER (XEXP (offset, 0)));		\
 	    else							\
 	      output_addr_const (FILE, offset);				\
@@ -1520,16 +2128,27 @@ enum reg_class
 	break;								\
       default:								\
 	mvs_page_lit += 4;						\
-	if (SYMBOL_REF_FLAG (ADDR)) fprintf (FILE, "=V(");		\
-	else                        fprintf (FILE, "=A(");		\
-	output_addr_const (FILE, ADDR);					\
-	fprintf (FILE, ")");						\
+	if (SYMBOL_REF_FLAG (ADDR))					\
+	  {								\
+	    fprintf (FILE, "=V(");					\
+	    output_addr_const (FILE, ADDR);				\
+	    fprintf (FILE, ")");					\
+	    mvs_mark_alias (XSTR (ADDR, 0));				\
+	  }								\
+	else								\
+	  {								\
+	    fprintf (FILE, "=A(");					\
+	    output_addr_const (FILE, ADDR);				\
+	    fprintf (FILE, ")");					\
+	  }								\
 	break;								\
     }									\
 }
 
+#ifdef TARGET_LE
 #define ASM_DECLARE_FUNCTION_NAME(FILE, NAME, DECL)			\
 {									\
+  /* Save a copy of the function name. We need it later */		\
   if (strlen (NAME) + 1 > mvs_function_name_length)			\
     {									\
       if (mvs_function_name)						\
@@ -1545,12 +2164,27 @@ enum reg_class
     strcpy (mvs_function_name, "gccmain");				\
   else									\
     strcpy (mvs_function_name, NAME);					\
-  fprintf (FILE, "\tDS\t0F\n");						\
-  assemble_name (FILE, mvs_function_name);				\
-  fputs ("\tRMODE\tANY\n", FILE);					\
-  assemble_name (FILE, mvs_function_name);				\
-  fputs ("\tCSECT\n", FILE);						\
 }
+#endif
+
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+#define ASM_DECLARE_FUNCTION_NAME(FILE, NAME, DECL)			\
+{									\
+  if (strlen (NAME) + 1 > mvs_function_name_length)			\
+    {									\
+      if (mvs_function_name)						\
+	free (mvs_function_name);					\
+      mvs_function_name = 0;						\
+    }									\
+  if (!mvs_function_name)						\
+    {									\
+      mvs_function_name_length = strlen (NAME) * 2 + 1;			\
+      mvs_function_name = (char *) xmalloc (mvs_function_name_length);	\
+    }									\
+  strcpy (mvs_function_name, NAME);					\
+  mvs_need_to_globalize = 1;						\
+}
+#endif
 
 /* Output assembler code to FILE to increment profiler label # LABELNO
    for profiling a function entry.  */
@@ -1562,7 +2196,7 @@ enum reg_class
 
 /* ======================================================== */
 
-#ifdef TARGET_ELF_ABI 
+#ifdef TARGET_LINUX 
 
 /* How to refer to registers in assembler output.  This sequence is
    indexed by compiler's hard-register-number (see above).  */
@@ -1675,20 +2309,20 @@ enum reg_class
 	  }								\
 	else								\
 	  { 								\
-            char buf[50];						\
-            REAL_VALUE_TYPE rval;					\
-            REAL_VALUE_FROM_CONST_DOUBLE(rval, XV);			\
-            REAL_VALUE_TO_DECIMAL (rval, HOST_WIDE_INT_PRINT_DEC, buf);	\
 	    if (GET_MODE (XV) == SFmode)				\
 	      {								\
+	        REAL_VALUE_TYPE rval;					\
+	        REAL_VALUE_FROM_CONST_DOUBLE(rval, XV);			\
 		mvs_page_lit += 4;					\
-		fprintf (FILE, "=E'%s'", buf);				\
+		fprintf (FILE, "=E'%s'", mvs_make_float(rval));		\
 	      }								\
 	    else							\
 	    if (GET_MODE (XV) == DFmode)				\
 	      {								\
+	        REAL_VALUE_TYPE rval;					\
+	        REAL_VALUE_FROM_CONST_DOUBLE(rval, XV);			\
 		mvs_page_lit += 8;					\
-		fprintf (FILE, "=D'%s'", buf);				\
+		fprintf (FILE, "=D'%s'", mvs_make_float(rval));		\
 	      }								\
 	    else /* VOIDmode !?!? strange but true ...  */		\
 	      {								\
@@ -1803,7 +2437,7 @@ abort(); \
 	if (offset)							\
 	  {								\
 	    if (GET_CODE (offset) == LABEL_REF)				\
-	      fprintf (FILE, "L%d",					\
+	      fprintf (FILE, "@@L%d",					\
 			CODE_LABEL_NUMBER (XEXP (offset, 0)));		\
 	    else							\
 	      output_addr_const (FILE, offset);				\
@@ -1825,6 +2459,84 @@ abort(); \
 	break;								\
     }									\
 }
+
+#ifdef ASM_DECLARE_FUNCTION_NAME
+#undef ASM_DECLARE_FUNCTION_NAME
+#endif
+#define ASM_DECLARE_FUNCTION_NAME(FILE, NAME, DECL)			\
+{									\
+  /* Save a copy of the function name. We need it later */		\
+  if (strlen (NAME) +1 > mvs_function_name_length)			\
+    {									\
+      if (mvs_function_name)						\
+	free (mvs_function_name);					\
+      mvs_function_name = 0;						\
+    }									\
+  if (!mvs_function_name)						\
+    {									\
+      mvs_function_name_length = strlen (NAME) * 2 + 1;			\
+      mvs_function_name = (char *) xmalloc (mvs_function_name_length);	\
+    }									\
+  strcpy (mvs_function_name, NAME);					\
+									\
+  ASM_DECLARE_RESULT (FILE, DECL_RESULT (DECL));			\
+}
+
+/* This macro generates the assembly code for function exit, on machines
+   that need it.  If FUNCTION_EPILOGUE is not defined then individual
+   return instructions are generated for each return statement.  Args are
+   same as for FUNCTION_PROLOGUE.
+
+   The function epilogue should not depend on the current stack pointer!
+   It should use the frame pointer only.  This is mandatory because
+   of alloca; we also take advantage of it to omit stack adjustments
+   before returning.  */
+
+#define FUNCTION_EPILOGUE(FILE, LSIZE)					\
+{									\
+  int i;								\
+  check_label_emit();							\
+  mvs_check_page (FILE,14,0);						\
+  fprintf (FILE, "# Function epilogue\n");				\
+  fprintf (FILE, "\tL\tr14,12(,r13)\n");				\
+  fprintf (FILE, "\tLM\t2,12,28(r13)\n");				\
+  fprintf (FILE, "\tL\tr13,8(,r13)\n");					\
+  fprintf (FILE, "\tBASR\tr1,r14\n");					\
+  fprintf (FILE, "# Function literal pool\n");				\
+  if (i370_enable_pic)							\
+    {									\
+      fprintf (FILE, ".data\n");					\
+      fprintf (FILE, "\t.balign\t4\n");					\
+      fprintf (FILE, ".LPOOL%d:\n",mvs_page_num);			\
+      fprintf (FILE, "\t.ltorg\n");					\
+      fprintf (FILE, "# Function page table\n");			\
+      fprintf (FILE, "\t.balign\t4\n");					\
+      fprintf (FILE, ".LPGT%d:\n", function_base_page);			\
+      mvs_page_num++;							\
+      for ( i = function_base_page; i < mvs_page_num; i++ )		\
+        {								\
+          fprintf (FILE, "\t.long\t.LPG%d\n", i);			\
+          fprintf (FILE, "\t.long\t.LPOOL%d\n", i);			\
+        }								\
+      /* fprintf (FILE, ".previous\n");	 */				\
+    }									\
+  else									\
+    {									\
+      fprintf (FILE, "\t.balign\t4\n");					\
+      fprintf (FILE, "\t.ltorg\n");					\
+      fprintf (FILE, "# Function page table\n");			\
+      fprintf (FILE, "\t.balign\t4\n");					\
+      fprintf (FILE, ".LPGT%d:\n", function_base_page);			\
+      mvs_page_num++;							\
+      for ( i = function_base_page; i < mvs_page_num; i++ )		\
+        {								\
+          fprintf (FILE, "\t.long\t.LPG%d\n", i);			\
+        }								\
+    }									\
+  mvs_free_label_list();						\
+}
+
+#define FUNCTION_PROLOGUE(FILE, LSIZE) i370_function_prolog ((FILE), (LSIZE));
 
 /* Output assembler code to FILE to increment profiler label # LABELNO
    for profiling a function entry.  */
@@ -1955,5 +2667,5 @@ abort(); \
   assemble_name ((FILE), (NAME)),               \
   fprintf ((FILE), ",%u\n", (ROUNDED)))
 
-#endif /* TARGET_ELF_ABI */
+#endif /* TARGET_LINUX */
 #endif /* ! GCC_I370_H */

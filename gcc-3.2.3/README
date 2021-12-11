@@ -1,3 +1,11 @@
+See gcc/gccmvs.txt for documentation on MVS
+See gcc/gcccms.txt for documentation on CMS
+See gcc/gccvse.txt for documentation on VSE
+See gcc/gccmus.txt for documentation on MUSIC/SP
+See gcc/gccdos.txt for documentation on PDOS/Windows
+
+
+
 This directory contains the GNU Compiler Collection (GCC).
 
 The GNU Compiler Collection is free software.  See the file COPYING

@@ -712,7 +712,7 @@ dequote_string (pfile, str, len)
       if (c != '\\')
 	*dst++ = c;
       else
-	*dst++ = cpp_parse_escape (pfile, (const U_CHAR **)&str, limit, mask, 0);
+	*dst++ = cpp_parse_escape (pfile, (const U_CHAR **)&str, limit, mask, 0, 1);
     }
   *dst++ = '\0';
   return result;

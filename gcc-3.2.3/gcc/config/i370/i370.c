@@ -3,7 +3,7 @@
    Free Software Foundation, Inc.
    Contributed by Jan Stein (jan@cd.chalmers.se).
    Modified for OS/390 LanguageEnvironment C by Dave Pitts (dpitts@cozx.com)
-   Hacked for Linux-ELF/390 by Linas Vepstas (linas@linas.org) 
+   Modified for Linux-ELF/390 by Linas Vepstas (linas@linas.org) 
 
 This file is part of GNU CC.
 
@@ -43,6 +43,11 @@ Boston, MA 02111-1307, USA.  */
 #include "target.h"
 #include "target-def.h"
 
+
+/* maximum length output line */
+/* need to allow for people dumping specs */
+#define MAX_LEN_OUT 2000
+
 extern FILE *asm_out_file;
 
 /* Label node.  This structure is used to keep track of labels 
@@ -67,8 +72,20 @@ typedef struct label_node
   }
 label_node_t;
 
+/* if we just inspected a label on another page, we want to
+   record that */
+static int just_referenced_page = -1;
+
 /* Is 1 when a label has been generated and the base register must be reloaded.  */
 int mvs_need_base_reload = 0;
+
+/* Is 1 when an entry point is to be generated.  */
+int mvs_need_entry = 0;
+
+/* Is 1 if we have seen main() */
+int mvs_gotmain = 0;
+
+int mvs_need_to_globalize = 1;
 
 /* Current function starting base page.  */
 int function_base_page;
@@ -79,14 +96,26 @@ int mvs_page_code;
 /* Length of the current page literals.  */
 int mvs_page_lit;
 
+/* Length of case statement entries */
+int mvs_case_code = 0;
+
+/* The desired CSECT name */
+char *mvs_csect_name = 0;
+
 /* Current function name.  */
 char *mvs_function_name = 0;
+
+/* Current source module.  */
+char *mvs_module = 0;
 
 /* Current function name length.  */
 int mvs_function_name_length = 0;
 
 /* Page number for multi-page functions.  */
 int mvs_page_num = 0;
+
+/* First entry point.  */
+static int mvs_first_entry = 1;
 
 /* Label node list anchor.  */
 static label_node_t *label_anchor = 0;
@@ -97,6 +126,9 @@ static label_node_t *free_anchor = 0;
 /* Assembler source file descriptor.  */
 static FILE *assembler_source = 0;
 
+/* Flag that enables position independent code */
+int i370_enable_pic = 1;
+
 static label_node_t * mvs_get_label PARAMS ((int));
 static void i370_label_scan PARAMS ((void));
 #ifdef TARGET_HLASM
@@ -104,7 +136,7 @@ static bool i370_hlasm_assemble_integer PARAMS ((rtx, unsigned int, int));
 #endif
 static void i370_output_function_prologue PARAMS ((FILE *, HOST_WIDE_INT));
 static void i370_output_function_epilogue PARAMS ((FILE *, HOST_WIDE_INT));
-#ifdef LONGEXTERNAL
+#ifdef TARGET_ALIASES
 static int mvs_hash_alias PARAMS ((const char *));
 #endif
 
@@ -113,7 +145,7 @@ static int mvs_hash_alias PARAMS ((const char *));
 #ifdef TARGET_HLASM
 
 #define MVS_HASH_PRIME 999983
-#if defined(HOST_EBCDIC)
+#if 1 /*defined(HOST_EBCDIC)*/
 #define MVS_SET_SIZE 256
 #else
 #define MVS_SET_SIZE 128
@@ -133,6 +165,7 @@ typedef struct alias_node
   {
     struct alias_node *alias_next;
     int  alias_emitted;
+    int  alias_used;
     char alias_name [MAX_MVS_LABEL_SIZE + 1];
     char real_name [MAX_LONG_LABEL_SIZE + 1];
   }
@@ -141,6 +174,7 @@ alias_node_t;
 /* Alias node list anchor.  */
 static alias_node_t *alias_anchor = 0;
 
+#ifdef TARGET_LE
 /* Define the length of the internal MVS function table.  */
 #define MVS_FUNCTION_TABLE_LENGTH 32
 
@@ -164,131 +198,9 @@ static const char *const mvs_function_table[MVS_FUNCTION_TABLE_LENGTH] =
    "y1",       "yn"
 #endif
 };
+#endif /* TARGET_LE */
 
 #endif /* TARGET_HLASM */
-/* ===================================================== */
-
-/* ASCII to EBCDIC conversion table.  */
-static const unsigned char ascebc[256] =
-{
- /*00  NL    SH    SX    EX    ET    NQ    AK    BL */
-     0x00, 0x01, 0x02, 0x03, 0x37, 0x2D, 0x2E, 0x2F,
- /*08  BS    HT    LF    VT    FF    CR    SO    SI */
-     0x16, 0x05, 0x15, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
- /*10  DL    D1    D2    D3    D4    NK    SN    EB */
-     0x10, 0x11, 0x12, 0x13, 0x3C, 0x3D, 0x32, 0x26,
- /*18  CN    EM    SB    EC    FS    GS    RS    US */
-     0x18, 0x19, 0x3F, 0x27, 0x1C, 0x1D, 0x1E, 0x1F,
- /*20  SP     !     "     #     $     %     &     ' */
-     0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D,
- /*28   (     )     *     +     ,     -    .      / */
-     0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61,
- /*30   0     1     2     3     4     5     6     7 */
-     0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,
- /*38   8     9     :     ;     <     =     >     ? */
-     0xF8, 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F,
- /*40   @     A     B     C     D     E     F     G */
-     0x7C, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
- /*48   H     I     J     K     L     M     N     O */
-     0xC8, 0xC9, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6,
- /*50   P     Q     R     S     T     U     V     W */
-     0xD7, 0xD8, 0xD9, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,
- /*58   X     Y     Z     [     \     ]     ^     _ */
-     0xE7, 0xE8, 0xE9, 0xAD, 0xE0, 0xBD, 0x5F, 0x6D,
- /*60   `     a     b     c     d     e     f     g */
-     0x79, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
- /*68   h     i     j     k     l     m     n     o */
-     0x88, 0x89, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,
- /*70   p     q     r     s     t     u     v     w */
-     0x97, 0x98, 0x99, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6,
- /*78   x     y     z     {     |     }     ~    DL */
-     0xA7, 0xA8, 0xA9, 0xC0, 0x4F, 0xD0, 0xA1, 0x07,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0xFF
-};
-
-/* EBCDIC to ASCII conversion table.  */
-static const unsigned char ebcasc[256] =
-{
- /*00  NU    SH    SX    EX    PF    HT    LC    DL */
-     0x00, 0x01, 0x02, 0x03, 0x00, 0x09, 0x00, 0x7F,
- /*08              SM    VT    FF    CR    SO    SI */
-     0x00, 0x00, 0x00, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
- /*10  DE    D1    D2    TM    RS    NL    BS    IL */
-     0x10, 0x11, 0x12, 0x13, 0x14, 0x0A, 0x08, 0x00,
- /*18  CN    EM    CC    C1    FS    GS    RS    US */
-     0x18, 0x19, 0x00, 0x00, 0x1C, 0x1D, 0x1E, 0x1F,
- /*20  DS    SS    FS          BP    LF    EB    EC */
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x17, 0x1B,
- /*28              SM    C2    EQ    AK    BL       */
-     0x00, 0x00, 0x00, 0x00, 0x05, 0x06, 0x07, 0x00,
- /*30              SY          PN    RS    UC    ET */
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
- /*38                    C3    D4    NK          SU */
-     0x00, 0x00, 0x00, 0x00, 0x14, 0x15, 0x00, 0x1A,
- /*40  SP                                           */
-     0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*48                     .     <     (     +     | */
-     0x00, 0x00, 0x00, 0x2E, 0x3C, 0x28, 0x2B, 0x7C,
- /*50   &                                           */
-     0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*58               !     $     *     )     ;     ^ */
-     0x00, 0x00, 0x21, 0x24, 0x2A, 0x29, 0x3B, 0x5E,
- /*60   -     /                                     */
-     0x2D, 0x2F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*68                     ,     %     _     >     ? */
-     0x00, 0x00, 0x00, 0x2C, 0x25, 0x5F, 0x3E, 0x3F,
- /*70                                               */
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*78         `     :     #     @     '     =     " */
-     0x00, 0x60, 0x3A, 0x23, 0x40, 0x27, 0x3D, 0x22,
- /*80         a     b     c     d     e     f     g */
-     0x00, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
- /*88   h     i           {                         */
-     0x68, 0x69, 0x00, 0x7B, 0x00, 0x00, 0x00, 0x00,
- /*90         j     k     l     m     n     o     p */
-     0x00, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,
- /*98   q     r           }                         */
-     0x71, 0x72, 0x00, 0x7D, 0x00, 0x00, 0x00, 0x00,
- /*A0         ~     s     t     u     v     w     x */
-     0x00, 0x7E, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
- /*A8   y     z                       [             */
-     0x79, 0x7A, 0x00, 0x00, 0x00, 0x5B, 0x00, 0x00,
- /*B0                                               */
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*B8                                 ]             */
-     0x00, 0x00, 0x00, 0x00, 0x00, 0x5D, 0x00, 0x00,
- /*C0   {     A     B     C     D     E     F     G */
-     0x7B, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
- /*C8   H     I                                     */
-     0x48, 0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*D0   }     J     K     L     M     N     O     P */
-     0x7D, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,
- /*D8   Q     R                                     */
-     0x51, 0x52, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*E0   \           S     T     U     V     W     X */
-     0x5C, 0x00, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
- /*E8   Y     Z                                     */
-     0x59, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- /*F0   0     1     2     3     4     5     6     7 */
-     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
- /*F8   8     9                                     */
-     0x38, 0x39, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF
-};
 
 /* Initialize the GCC target structure.  */
 #ifdef TARGET_HLASM
@@ -309,25 +221,46 @@ static const unsigned char ebcasc[256] =
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 
-/* Map characters from one character set to another.
-   C is the character to be translated.  */
 
-char
-mvs_map_char (c)
-     int c;
+#define CURRFUNC (IDENTIFIER_POINTER (DECL_NAME (current_function_decl)))
+
+
+/* ===================================================== */
+/* This is our last chance to clean up before starting to compile.
+   We do this to fix up some initializations.   */
+
+void
+i370_override_options (void)
 {
-#if defined(TARGET_EBCDIC) && !defined(HOST_EBCDIC)
-  fprintf (stderr, "mvs_map_char: TE & !HE: c = %02x\n", c);
-  return ascebc[c];
-#else
-#if defined(HOST_EBCDIC) && !defined(TARGET_EBCDIC)
-  fprintf (stderr, "mvs_map_char: !TE & HE: c = %02x\n", c);
-  return ebcasc[c];
-#else
-  fprintf (stderr, "mvs_map_char: !TE & !HE: c = %02x\n", c);
-  return c;
-#endif
-#endif
+  i370_enable_pic = flag_pic;
+
+  if (mvs_csect_name)
+  {
+      static char buf[9];
+      char *p;
+      
+      strncpy(buf, mvs_csect_name, 8);
+      p = buf;
+      while (*p != '\0')
+      {
+          *p = toupper((unsigned char)*p);
+          p++;
+      }
+      mvs_csect_name = buf;
+  }
+#ifdef TARGET_LINUX
+  /* Override CALL_USED_REGISTERS & FIXED_REGISTERS 
+     PIC requires r12, otherwise its free */
+  if (i370_enable_pic) 
+    {
+      fix_register ("r12", 1, 1);
+    }
+  else
+    {
+      fix_register ("r12", 0, 0);
+    }
+#endif /* TARGET_LINUX */
+
 }
 
 /* ===================================================== */
@@ -367,6 +300,7 @@ i370_branch_dest (branch)
 
      lp = mvs_get_label (labelno);
      if (-1 == lp -> first_ref_page) lp->first_ref_page = mvs_page_num;
+     just_referenced_page = lp->label_page;
   }
   return dest_addr;
 }
@@ -389,6 +323,17 @@ i370_short_branch (insn)
   int base_offset;
 
   base_offset = i370_branch_length(insn);
+  /* If we just referenced something off-page, then you can
+     forget about doing a short branch to it! So for backward
+     references, we'll have a page number and can see that it is
+     different. For forward references, the page number isn't
+     available yet (ie it's still set to -1), so don't use
+     this logic on them. */
+  if ((just_referenced_page != mvs_page_num)
+      && (just_referenced_page != -1))
+    {
+      return 0;
+    }
   if (0 > base_offset) 
     {
       base_offset += mvs_page_code;
@@ -401,7 +346,7 @@ i370_short_branch (insn)
     }
   
   /* make a conservative estimate of room left on page */
-  if ((4060 >base_offset) && ( 0 < base_offset)) return 1;
+  if ((MVS_PAGE_CONSERVATIVE >base_offset) && ( 0 < base_offset)) return 1;
   return 0;
 }
 
@@ -529,7 +474,7 @@ i370_label_scan ()
    off than yesterday.  */
 
                     /* print_rtl_single (stdout, insn); */
-                    debug_rtx (insn);
+                    /* debug_rtx (insn); */
                     /* abort(); */
                     continue;
                  }
@@ -572,19 +517,56 @@ i370_label_scan ()
    reloads when several labels are generated pointing to the same place
    in the code.  
 
-   The page table is written at the end of the function. 
-   The entries in the page table look like
+   The table of base register values is created at the end of the function.
+   The MVS/OE/USS/HLASM version keeps this table in the text section, and
+   it looks like the following:
+      PGT0 EQU *
+      DC A(PG0)
+      DC A(PG1)
+   
+   The ELF version keeps the base register table in either the text or the 
+   data section, depending on the setting of the i370_enable_pic flag.
+   Disabling this flag frees r12 for general purpose use, but makes the 
+   code non-relocatable.  The non-pic table resemble the mvs-style table.
+   The pic table stores values for both r3 (the register used for branching)
+   and r12 (the register to index the literal pool, also in the data section).
+   Thus, the ELF pic version has twice as many entries, and double the offset.
+
      .LPGT0:          // PGT0 EQU *
      .long .LPG0      // DC A(PG0)
+     .long .LPOOL0     
      .long .LPG1      // DC A(PG1)
-  while the prologue generates
-      L       r4,=A(.LPGT0)
+     .long .LPOOL1     
 
-  Note that this paging scheme breaks down if a single subroutine 
-  has more than about 10MB of code in it ... as long as humans write
-  code, this shouldn't be a problem ...
+  Note that the functin prologue loads the page addressing register:
+      L       PAGE_REGISTER,=A(.LPGT0)
+
+  The ELF version then stores this value at 0(r13), so that its always
+  accessible. This frees up r4 for general register allocation; whereas
+  the MVS version is stuck with r4.
+
+  Note that this addressing scheme breaks down when a single subroutine
+  has more than twelve MBytes of code or so for non-pic, and 6MB for pic.
+  Its hard to imagine under what circumstances a single subroutine would 
+  ever get that big ...
  */
 
+#ifdef TARGET_HLASM
+void
+check_label_emit ()
+{
+  if (mvs_need_base_reload)
+    {
+      mvs_need_base_reload = 0;
+      mvs_page_code += 4;
+      fprintf (assembler_source, "\tL\t%d,%d(,%d)\n",
+          BASE_REGISTER, (mvs_page_num - function_base_page) * 4,
+          PAGE_REGISTER);
+    }
+}
+#endif /* TARGET_HLASM */
+
+#ifdef TARGET_LINUX
 void
 check_label_emit ()
 {
@@ -592,12 +574,25 @@ check_label_emit ()
     {
       mvs_need_base_reload = 0;
 
-      mvs_page_code += 4;
-      fprintf (assembler_source, "\tL\t%d,%d(,%d)\n",
-	  BASE_REGISTER, (mvs_page_num - function_base_page) * 4,
-	  PAGE_REGISTER);
+      if (i370_enable_pic) 
+        {
+          mvs_page_code += 12;
+          fprintf (assembler_source, "\tL\tr3,0(,r13)\n");
+          fprintf (assembler_source, "\tL\tr%d,%d(,r3)\n",
+              PIC_BASE_REGISTER, ((mvs_page_num - function_base_page) * 8 +4));
+          fprintf (assembler_source, "\tL\tr3,%d(,r3)\n",
+              (mvs_page_num - function_base_page) * 8);
+        }
+      else
+        {
+          mvs_page_code += 8;
+          fprintf (assembler_source, "\tL\tr3,0(,r13)\n");
+          fprintf (assembler_source, "\tL\tr3,%d(,r3)\n",
+              ((mvs_page_num - function_base_page) * 4));
+        }
     }
 }
+#endif /* TARGET_LINUX */
 
 /* Add the label to the current page label list.  If a free element is available
    it will be used for the new label.  Otherwise, a label element will be
@@ -650,6 +645,17 @@ mvs_add_label (id)
   lp = mvs_get_label (id);
   lp->label_page = mvs_page_num;
 
+/* Note that without this, some case statements are
+     not generating correct code, e.g. case '{' in
+     do_spec_1 in gcc.c */
+#if 1
+  if (mvs_page_num != function_base_page)
+  {
+      mvs_need_base_reload ++;
+      return;
+  }
+#endif
+
   /* OK, we just saw the label.  Determine if this label
    * needs a reload of the base register */
   if ((-1 != lp->first_ref_page) && 
@@ -677,7 +683,8 @@ mvs_add_label (id)
 
   fwd_distance = lp->label_last_ref - lp->label_addr;
 
-  if (mvs_page_code + 2 * fwd_distance + mvs_page_lit < 4060) return;
+  if (mvs_page_code + 2 * fwd_distance + mvs_page_lit < MVS_PAGE_CONSERVATIVE)
+      return;
 
   mvs_need_base_reload ++;
 }
@@ -748,6 +755,27 @@ mvs_free_label_list ()
   label_anchor = 0;
 }
 
+/* Convert a float to a printable form.  */
+
+char *
+mvs_make_float (REAL_VALUE_TYPE r)
+{
+   char *p;
+   static char buf[50];
+
+   REAL_VALUE_TO_DECIMAL (r, "%.9G", buf);
+   for (p = buf; *p; p++)
+      if (ISLOWER(*p)) *p = TOUPPER(*p);
+   if ((p = strrchr (buf, 'E')) != NULL)
+   {
+      char *t = p;
+      for (p--; *p == '0'; p--) ;
+      if (*p == '.') p++;
+      strcpy (++p, t);
+   }
+   return (buf);
+}
+
 /* ====================================================================== */
 /* If the page size limit is reached a new code page is started, and the base
    register is set to it.  This page break point is counted conservatively,
@@ -768,18 +796,22 @@ mvs_check_page (file, code, lit)
 
   if (mvs_page_code + code + mvs_page_lit + lit > MAX_MVS_PAGE_LENGTH)
     {
-      fprintf (assembler_source, "\tB\tPGE%d\n", mvs_page_num);
+      /* no need to dump literals if we're at the end of
+         a case statement - they will already have been 
+	 dumped prior to the jump table generation. */
+      if (mvs_case_code == 0)
+        {
+	  fprintf (assembler_source, "\tB\t@@PGE%d\n", mvs_page_num);
+	  fprintf (assembler_source, "\tDS\t0F\n");
+	  fprintf (assembler_source, "\tLTORG\n");
+	}
       fprintf (assembler_source, "\tDS\t0F\n");
-      fprintf (assembler_source, "\tLTORG\n");
-      fprintf (assembler_source, "\tDS\t0F\n");
-      fprintf (assembler_source, "PGE%d\tEQU\t*\n", mvs_page_num);
+      fprintf (assembler_source, "@@PGE%d\tEQU\t*\n", mvs_page_num);
       fprintf (assembler_source, "\tDROP\t%d\n", BASE_REGISTER);
       mvs_page_num++;
-      /* Safe to use BASR not BALR, since we are
-       * not switching addressing mode here ...  */
-      fprintf (assembler_source, "\tBASR\t%d,0\n", BASE_REGISTER);
-      fprintf (assembler_source, "PG%d\tEQU\t*\n", mvs_page_num);
+      fprintf (assembler_source, "\tBALR\t%d,0\n", BASE_REGISTER);
       fprintf (assembler_source, "\tUSING\t*,%d\n", BASE_REGISTER);
+      fprintf (assembler_source, "@@PG%d\tEQU\t*\n", mvs_page_num);
       mvs_page_code = code;
       mvs_page_lit = lit;
       return 1;
@@ -791,7 +823,7 @@ mvs_check_page (file, code, lit)
 #endif /* TARGET_HLASM */
 
 
-#ifdef TARGET_ELF_ABI
+#ifdef TARGET_LINUX
 int
 mvs_check_page (file, code, lit)
      FILE *file;
@@ -802,26 +834,61 @@ mvs_check_page (file, code, lit)
 
   if (mvs_page_code + code + mvs_page_lit + lit > MAX_MVS_PAGE_LENGTH)
     {
-      /* hop past the literal pool */
-      fprintf (assembler_source, "\tB\t.LPGE%d\n", mvs_page_num);
-
-      /* dump the literal pool. The .baligns are optional, since 
-       * ltorg will align to the size of the largest literal 
-       * (which is possibly 8 bytes) */
-      fprintf (assembler_source, "\t.balign\t4\n");
-      fprintf (assembler_source, "\t.LTORG\n");
-      fprintf (assembler_source, "\t.balign\t4\n");
-
-      /* we continue execution here ...  */
-      fprintf (assembler_source, ".LPGE%d:\n", mvs_page_num);
-      fprintf (assembler_source, "\t.DROP\t%d\n", BASE_REGISTER);
-      mvs_page_num++;
-
-      /* BASR puts the contents of the PSW into r3
-       * that is, r3 will be loaded with the address of "." */
-      fprintf (assembler_source, "\tBASR\tr%d,0\n", BASE_REGISTER);
-      fprintf (assembler_source, ".LPG%d:\n", mvs_page_num);
-      fprintf (assembler_source, "\t.USING\t.,r%d\n", BASE_REGISTER);
+      if (i370_enable_pic) 
+        {
+          /* Dump the literal pool. The .baligns are optional, since 
+             ltorg will align to the size of the largest literal 
+             (which is possibly 8 bytes) */
+          fprintf (assembler_source, ".data\n"
+                                     "\t.balign\t4\n"
+                                     ".LPOOL%d:\n"
+                                     "\t.ltorg\n"
+                                     "\t.drop\tr%d\n"
+                                     "\t.using\t.LPOOL%d,r%d\n"
+                                     ".previous\n", 
+                   mvs_page_num, PIC_BASE_REGISTER, 
+                   mvs_page_num+1, PIC_BASE_REGISTER);
+    
+    
+          /* we continue execution here ...  */
+          fprintf (assembler_source, ".LPGE%d:\n", mvs_page_num);
+          fprintf (assembler_source, "\t.drop\tr%d\n",
+                                      BASE_REGISTER);
+          mvs_page_num++;
+    
+          /* BASR puts the contents of the PSW into r3
+             that is, r3 will be loaded with the address of "." 
+             We also put location of new literal pool into r12 */
+          fprintf (assembler_source, "\tBASR\tr%d,0\n", BASE_REGISTER);
+          fprintf (assembler_source, ".LPG%d:\n", mvs_page_num);
+          fprintf (assembler_source, "\t.using\t.,r%d\n", BASE_REGISTER);
+          fprintf (assembler_source, "\tL\tr%d,%d(,r%d)\n", PIC_BASE_REGISTER,
+               (mvs_page_num - function_base_page) * 8 + 4, PAGE_REGISTER);
+    
+        }
+      else
+        {
+          /* hop past the literal pool */
+          fprintf (assembler_source, "\tB\t.LPGE%d\n", mvs_page_num);
+    
+          /* dump the literal pool. The .baligns are optional, since
+           * ltorg will align to the size of the largest literal
+           * (which is possibly 8 bytes) */
+          fprintf (assembler_source, "\t.balign\t4\n");
+          fprintf (assembler_source, "\t.LTORG\n");
+          fprintf (assembler_source, "\t.balign\t4\n");
+    
+          /* we continue execution here ...  */
+          fprintf (assembler_source, ".LPGE%d:\n", mvs_page_num);
+          fprintf (assembler_source, "\t.drop\t%d\n", BASE_REGISTER);
+          mvs_page_num++;
+    
+          /* BASR puts the contents of the PSW into r3
+           * that is, r3 will be loaded with the address of "." */
+          fprintf (assembler_source, "\tBASR\tr%d,0\n", BASE_REGISTER);
+          fprintf (assembler_source, ".LPG%d:\n", mvs_page_num);
+          fprintf (assembler_source, "\t.using\t.,r%d\n", BASE_REGISTER);
+        }
       mvs_page_code = code;
       mvs_page_lit = lit;
       return 1;
@@ -830,7 +897,7 @@ mvs_check_page (file, code, lit)
   mvs_page_lit += lit;
   return 0;
 }
-#endif /* TARGET_ELF_ABI */
+#endif /* TARGET_LINUX */
 
 /* ===================================================== */
 /* defines and functions specific to the HLASM assembler */
@@ -844,6 +911,7 @@ int
 mvs_function_check (name)
      const char *name;
 {
+#ifdef TARGET_LE
   int lower, middle, upper;
   int i;
 
@@ -860,12 +928,13 @@ mvs_function_check (name)
       else
 	lower = middle + 1;
     }
+#endif
   return 0;
 }
 
 /* Generate a hash for a given key.  */
 
-#ifdef LONGEXTERNAL
+#ifdef TARGET_ALIASES
 static int
 mvs_hash_alias (key)
      const char *key;
@@ -874,9 +943,9 @@ mvs_hash_alias (key)
   int i;
   int l = strlen (key);
 
-  h = key[0];
+  h = (unsigned char) MAP_OUTCHAR(key[0]);
   for (i = 1; i < l; i++)
-    h = ((h * MVS_SET_SIZE) + key[i]) % MVS_HASH_PRIME;
+    h = ((h * MVS_SET_SIZE) + (unsigned char) MAP_OUTCHAR(key[i])) % MVS_HASH_PRIME;
   return (h);
 }
 #endif
@@ -890,6 +959,12 @@ mvs_add_alias (realname, aliasname, emitted)
      int   emitted;
 {
   alias_node_t *ap;
+
+#ifdef DEBUG
+  printf("mvs_add_alias: realname(%d) = '%s'\n", strlen(realname), realname);
+  printf("   aliasname(%d) = '%s'\n", strlen(aliasname), aliasname);
+  printf("   emitted = %d\n", emitted);
+#endif
 
   ap = (alias_node_t *) xmalloc (sizeof (alias_node_t));
   if (strlen (realname) > MAX_LONG_LABEL_SIZE)
@@ -906,6 +981,7 @@ mvs_add_alias (realname, aliasname, emitted)
   strcpy (ap->real_name, realname);
   strcpy (ap->alias_name, aliasname);
   ap->alias_emitted = emitted;
+  ap->alias_used = 0 /* FALSE */;
   ap->alias_next = alias_anchor;
   alias_anchor = ap;
 }
@@ -921,6 +997,13 @@ mvs_need_alias (realname)
 {
    int i, j = strlen (realname);
 
+#ifdef DEBUG
+  printf("mvs_need_alias: realname(%d) = '%s'\n", strlen(realname), realname);
+#endif
+
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+   return 1;
+#else
    if (mvs_function_check (realname))
      return 0;
 #if 0
@@ -951,6 +1034,53 @@ mvs_need_alias (realname)
      }
 
    return 0;
+#endif
+}
+
+/* Mark an alias as used as an external.  */
+
+int
+mvs_mark_alias (realname)
+   const char *realname;
+{
+  alias_node_t *ap;
+
+#ifdef DEBUG
+  printf("mvs_mark_alias: realname(%d) = '%s'\n", strlen(realname), realname);
+#endif
+
+  for (ap = alias_anchor; ap; ap = ap->alias_next)
+    {
+      if (!strcmp (ap->real_name, realname))
+	{
+	  ap->alias_used = 1;
+	  return 0;
+	}
+    }
+  return 1;
+}
+
+/* Dump any used aliases that have been emitted.  */
+
+int
+mvs_dump_alias(FILE *f)
+{
+  alias_node_t *ap;
+
+#ifdef DEBUG
+  printf("mvs_dump_alias: \n");
+#endif
+
+  for (ap = alias_anchor; ap; ap = ap->alias_next)
+    {
+      if (ap->alias_used && !ap->alias_emitted)
+	{
+	  fprintf (f, "%s\tALIAS\tC'%s'\n",
+	     ap->alias_name,
+	     ap->real_name);
+	}
+    }
+  return 0;
 }
 
 /* Get the alias from the list. 
@@ -961,8 +1091,13 @@ mvs_get_alias (realname, aliasname)
      const char *realname;
      char *aliasname;
 {
-#ifdef LONGEXTERNAL
   alias_node_t *ap;
+
+#ifdef DEBUG
+  printf("mvs_get_alias: realname(%d) = '%s'\n", strlen(realname), realname);
+#endif
+
+#ifdef TARGET_ALIASES
 
   for (ap = alias_anchor; ap; ap = ap->alias_next)
     {
@@ -1006,8 +1141,13 @@ mvs_check_alias (realname, aliasname)
      const char *realname;
      char *aliasname;
 {
-#ifdef LONGEXTERNAL
   alias_node_t *ap;
+
+#ifdef DEBUG
+  printf("mvs_check_alias: realname(%d) = '%s'\n", strlen(realname), realname);
+#endif
+
+#ifdef TARGET_ALIASES
 
   for (ap = alias_anchor; ap; ap = ap->alias_next)
     {
@@ -1046,12 +1186,12 @@ mvs_check_alias (realname, aliasname)
   return 0;
 }
 
-/* defines and functions specific to the HLASM assembler */
 #endif /* TARGET_HLASM */
+
 /* ===================================================== */
 /* ===================================================== */
 /* defines and functions specific to the gas assembler */
-#ifdef TARGET_ELF_ABI
+#ifdef TARGET_LINUX
 
 /* Check for C/370 runtime function, they don't use standard calling
    conventions.  True is returned if the function is in the table.
@@ -1065,7 +1205,7 @@ mvs_function_check (name)
    return 0;
 }
 
-#endif /* TARGET_ELF_ABI */
+#endif /* TARGET_LINUX */
 /* ===================================================== */
 
 
@@ -1157,24 +1297,27 @@ r_or_s_operand (op, mode)
    arithmetic insn's set the condition code as well.
 
    The unsigned_jump_follows_p() routine  returns a 1 if the next jump 
-   is unsigned.  INSN is the current instruction.  */
+   is unsigned.  INSN is the current instruction. We err on the side
+   of assuming unsigned, so there are a lot of return 1. */
 
 int
 unsigned_jump_follows_p (insn)
      register rtx insn;
 {
   rtx orig_insn = insn;
+
   while (1) 
     {
       register rtx tmp_insn;
       enum rtx_code coda;
   
       insn = NEXT_INSN (insn);
-      if (!insn) fatal_insn ("internal error--no jump follows compare:", orig_insn);
+      if (!insn) return (1);
   
       if (GET_CODE (insn) != JUMP_INSN) continue;
     
-      tmp_insn = XEXP (insn, 3);
+      tmp_insn = PATTERN (insn);
+      if (!tmp_insn) continue;
       if (GET_CODE (tmp_insn) != SET) continue;
     
       if (GET_CODE (XEXP (tmp_insn, 0)) != PC) continue;
@@ -1186,6 +1329,46 @@ unsigned_jump_follows_p (insn)
       tmp_insn = XEXP (tmp_insn, 0);
       coda = GET_CODE (tmp_insn);
   
+      /* if we get an equal or not equal, either comparison
+         will work. What we're really interested in what happens
+         after that. So check one more instruction to see if
+         anything comes up. */
+         
+      if ((coda == EQ) || (coda == NE))
+        {
+          insn = NEXT_INSN (insn);
+          if (!insn) return (1);
+  
+          if (GET_CODE (insn) != JUMP_INSN)
+          {
+              /* skip any labels or notes or non-branching
+                 instructions, looking to see if there's a
+                 branch ahead */
+              while (GET_CODE (insn) != JUMP_INSN)
+              {
+                  if ((GET_CODE (insn) != CODE_LABEL)
+                      && (GET_CODE (insn) != NOTE)
+                      && (GET_CODE (insn) != INSN)
+                      && (GET_CODE (insn) != JUMP_INSN)) return (1);
+                  insn = NEXT_INSN (insn);
+                  if (!insn) return (1);
+              }
+          }
+    
+          tmp_insn = PATTERN (insn);
+          if (!tmp_insn) continue;
+          if (GET_CODE (tmp_insn) != SET) return (1);
+    
+          if (GET_CODE (XEXP (tmp_insn, 0)) != PC) return (1);
+    
+          tmp_insn = XEXP (tmp_insn, 1);
+          if (GET_CODE (tmp_insn) != IF_THEN_ELSE) return (1);
+    
+          tmp_insn = XEXP (tmp_insn, 0);
+          coda = GET_CODE (tmp_insn);
+        }
+
+      /* if we got to here, this instruction is a jump.  Is it signed? */
       return coda != GE && coda != GT && coda != LE && coda != LT;
     }
 }
@@ -1202,16 +1385,19 @@ i370_hlasm_assemble_integer (x, size, aligned_p)
      int aligned_p;
 {
   const char *int_format = NULL;
+  int intmask;
 
   if (aligned_p)
     switch (size)
       {
       case 1:
 	int_format = "\tDC\tX'%02X'\n";
+	intmask = 0xFF;
 	break;
 
       case 2:
 	int_format = "\tDC\tX'%04X'\n";
+	intmask = 0xFFFF;
 	break;
 
       case 4:
@@ -1223,7 +1409,45 @@ i370_hlasm_assemble_integer (x, size, aligned_p)
 	  }
 	else
 	  {
-	    fputs ("\tDC\tA(", asm_out_file);
+            if (GET_CODE (x) == CONST			
+  	      && GET_CODE (XEXP (XEXP (x, 0), 0)) == SYMBOL_REF	
+	      && SYMBOL_REF_FLAG (XEXP (XEXP (x, 0), 0)))
+              {
+                const char *fname;
+                typedef struct _entnod { 
+                    char *data; 
+                    struct _entnod *next; 
+                    } entnod;
+                static entnod *enstart = NULL;
+                entnod **en;
+                
+                fname = XSTR((XEXP (XEXP (x, 0), 0)), 0);
+                en = &enstart;
+                while (*en != NULL)
+                {
+                    if (strcmp((*en)->data, fname) == 0) break;
+                    en = &((*en)->next);
+                }
+                if (*en == NULL)
+                {
+                    *en = xmalloc(sizeof(entnod));
+                    (*en)->data = xmalloc(strlen(fname) + 1);
+                    strcpy((*en)->data, fname);
+                    (*en)->next = NULL;
+                    fputs ("\tEXTRN\t", asm_out_file);
+                    assemble_name(asm_out_file, 
+                                  XSTR((XEXP (XEXP (x, 0), 0)), 0));
+                    fputs ("\n", asm_out_file);
+                }                
+              }
+            if (SYMBOL_REF_FLAG(x))
+              {
+                fputs ("\tDC\tV(", asm_out_file);
+              }
+            else
+              {
+    	        fputs ("\tDC\tA(", asm_out_file);
+              }
 	    output_addr_const (asm_out_file, x);
 	    fputs (")\n", asm_out_file);
 	  }
@@ -1232,7 +1456,7 @@ i370_hlasm_assemble_integer (x, size, aligned_p)
 
   if (int_format && GET_CODE (x) == CONST_INT)
     {
-      fprintf (asm_out_file, int_format, INTVAL (x));
+      fprintf (asm_out_file, int_format, INTVAL (x) & intmask);
       return true;
     }
   return default_assemble_integer (x, size, aligned_p);
@@ -1252,17 +1476,75 @@ i370_output_function_prologue (f, l)
      FILE *f;
      HOST_WIDE_INT l;
 {
-#if MACROPROLOGUE == 1
-  fprintf (f, "* Function %s prologue\n", mvs_function_name);
+/* Don't print stack and args in PDPMAC as it makes the
+   comment too long */
+#ifdef TARGET_PDPMAC
+  fprintf (f, "* %c-func %s prologue\n",
+           mvs_need_entry ? 'X' : 'S',
+           CURRFUNC);
+#else
+  fprintf (f, "* Function %s prologue: stack = %d, args = %d\n",
+           mvs_function_name,
+	   l,
+	   current_function_outgoing_args_size);
+#endif
+
+  if (mvs_first_entry)
+    {
+#ifdef TARGET_ALIASES
+      fprintf (f, "@CODE\tALIAS\tC'@%s'\n", mvs_module);
+      fputs ("@CODE\tAMODE\tANY\n", f);
+      fputs ("@CODE\tRMODE\tANY\n", f);
+      fputs ("@CODE\tCSECT\n", f);
+#elif !defined(TARGET_PDPMAC)
+      fprintf (f, "@%s\tCSECT\n", mvs_module);
+#endif
+      mvs_first_entry = 0;
+    }
+#ifdef TARGET_MACROS
+
+#if defined(TARGET_DIGNUS) || defined(TARGET_PDPMAC)
+  assemble_name (f, mvs_function_name);
+#ifdef TARGET_DIGNUS
+  fprintf (f, "\tDCCPRLG CINDEX=%d,FRAME=%d,BASER=%d,ENTRY=%s\n",
+#endif
+#ifdef TARGET_PDPMAC
+  fprintf (f, "\tPDPPRLG CINDEX=%d,FRAME=%d,BASER=%d,ENTRY=%s\n",
+#endif
+	   mvs_page_num,
+	   STACK_FRAME_BASE + l + current_function_outgoing_args_size,
+	   BASE_REGISTER,
+	   mvs_need_entry ? "YES" : "NO");
+  fprintf (f, "\tB\t@@FEN%d\n", mvs_page_num);
+#ifdef TARGET_DIGNUS
+  fprintf (f, "@FRAMESIZE_%d DC F'%d'\n", 
+	   mvs_page_num,
+	   STACK_FRAME_BASE + l + current_function_outgoing_args_size);
+#endif
+#ifdef TARGET_PDPMAC
+  fprintf (f, "\tLTORG\n");
+#endif
+  fprintf (f, "@@FEN%d\tEQU\t*\n", mvs_page_num);
+  fprintf (f, "\tDROP\t%d\n", BASE_REGISTER);
+  fprintf (f, "\tBALR\t%d,0\n", BASE_REGISTER);
+  fprintf (f, "\tUSING\t*,%d\n", BASE_REGISTER);
+#endif
+
+#ifdef TARGET_LE
+  assemble_name (f, mvs_function_name);
   fprintf (f, "\tEDCPRLG USRDSAL=%d,BASEREG=%d\n",
-	   STACK_POINTER_OFFSET + l - 120 +
-	   current_function_outgoing_args_size, BASE_REGISTER);
-#else /* MACROPROLOGUE != 1 */
+	   STACK_FRAME_BASE + l + current_function_outgoing_args_size,
+	   BASE_REGISTER);
+#endif
+
+#else /* TARGET_MACROS != 1 */
+
+#if defined(TARGET_LE)
+{
   static int function_label_index = 1;
   static int function_first = 0;
   static int function_year, function_month, function_day;
   static int function_hour, function_minute, function_second;
-#if defined(LE370)
   if (!function_first)
     {
       struct tm *function_time;
@@ -1276,7 +1558,6 @@ i370_output_function_prologue (f, l)
       function_minute = function_time->tm_min;
       function_second = function_time->tm_sec;
     }
-  fprintf (f, "* Function %s prologue\n", mvs_function_name);
   fprintf (f, "FDSE%03d\tDSECT\n", function_label_index);
   fprintf (f, "\tDS\tD\n");
   fprintf (f, "\tDS\tCL(%d)\n", STACK_POINTER_OFFSET + l
@@ -1288,10 +1569,14 @@ i370_output_function_prologue (f, l)
   fprintf (f, "FDSL%03d\tEQU\t*-FDSE%03d-8\n", function_label_index,
 	   function_label_index);
   fprintf (f, "\tDS\t0H\n");
-  assemble_name (f, mvs_function_name);
-  fprintf (f, "\tCSECT\n");
+#ifdef TARGET_ALIASES
+  fprintf (f, "@CODE\tCSECT\n");
+#else
+  fprintf (f, "@%s\tCSECT\n", mvs_module);
+#endif
   fprintf (f, "\tUSING\t*,15\n");
-  fprintf (f, "\tB\tFENT%03d\n", function_label_index);
+  assemble_name (f, mvs_function_name);
+  fprintf (f, "\tB\t@@FENT%03d\n", function_label_index);
   fprintf (f, "\tDC\tAL1(FNAM%03d+4-*)\n", function_label_index);
   fprintf (f, "\tDC\tX'CE',X'A0',AL1(16)\n");
   fprintf (f, "\tDC\tAL4(FPPA%03d)\n", function_label_index);
@@ -1310,7 +1595,7 @@ i370_output_function_prologue (f, l)
   		 function_year, function_month, function_day,
     		 function_hour, function_minute);
   fprintf (f, "\tDC\tCL2'01',CL4'0100'\n");
-  fprintf (f, "FENT%03d\tDS\t0H\n", function_label_index);
+  fprintf (f, "@@FENT%03d\tDS\t0H\n", function_label_index);
   fprintf (f, "\tSTM\t14,12,12(13)\n");
   fprintf (f, "\tL\t2,76(,13)\n");
   fprintf (f, "\tL\t0,16(,15)\n");
@@ -1330,79 +1615,15 @@ i370_output_function_prologue (f, l)
   fprintf (f, "\tUSING\t*,%d\n", BASE_REGISTER);
   function_first = 1;
   function_label_index ++;
-#else /* !LE370 */
-  if (!function_first)
-    {
-      struct tm *function_time;
-      time_t lcltime;
-      time (&lcltime);
-      function_time = localtime (&lcltime);
-      function_year = function_time->tm_year + 1900;
-      function_month = function_time->tm_mon + 1;
-      function_day = function_time->tm_mday;
-      function_hour = function_time->tm_hour;
-      function_minute = function_time->tm_min;
-      function_second = function_time->tm_sec;
-      fprintf (f, "PPA2\tDS\t0F\n");
-      fprintf (f, "\tDC\tX'03',X'00',X'33',X'00'\n");
-      fprintf (f, "\tDC\tV(CEESTART),A(0)\n");
-      fprintf (f, "\tDC\tA(CEETIMES)\n");
-      fprintf (f, "CEETIMES\tDS\t0F\n");
-      fprintf (f, "\tDC\tCL4'%d',CL4'%02d%02d',CL6'%02d%02d00'\n",
-    		 function_year, function_month, function_day,
-    		 function_hour, function_minute, function_second);
-      fprintf (f, "\tDC\tCL2'01',CL4'0100'\n");
-    }
-  fprintf (f, "* Function %s prologue\n", mvs_function_name);
-  fprintf (f, "FDSD%03d\tDSECT\n", function_label_index);
-  fprintf (f, "\tDS\tD\n");
-  fprintf (f, "\tDS\tCL(%d)\n", STACK_POINTER_OFFSET + l
-			+ current_function_outgoing_args_size);
-  fprintf (f, "\tORG\tFDSD%03d\n", function_label_index);
-  fprintf (f, "\tDS\tCL(120+8)\n");
-  fprintf (f, "\tORG\n");
-  fprintf (f, "\tDS\t0D\n");
-  fprintf (f, "FDSL%03d\tEQU\t*-FDSD%03d-8\n", function_label_index,
-	   function_label_index);
-  fprintf (f, "\tDS\t0H\n");
-  assemble_name (f, mvs_function_name);
-  fprintf (f, "\tCSECT\n");
-  fprintf (f, "\tUSING\t*,15\n");
-  fprintf (f, "\tB\tFPL%03d\n", function_label_index);
-  fprintf (f, "\tDC\tAL1(FPL%03d+4-*)\n", function_label_index + 1);
-  fprintf (f, "\tDC\tX'CE',X'A0',AL1(16)\n");
-  fprintf (f, "\tDC\tAL4(PPA2)\n");
-  fprintf (f, "\tDC\tAL4(0)\n");
-  fprintf (f, "\tDC\tAL4(FDSL%03d)\n", function_label_index);
-  fprintf (f, "FPL%03d\tEQU\t*\n", function_label_index + 1);
-  fprintf (f, "\tDC\tAL2(%d),C'%s'\n", strlen (mvs_function_name),
-	mvs_function_name);
-  fprintf (f, "FPL%03d\tDS\t0H\n", function_label_index);
-  fprintf (f, "\tSTM\t14,12,12(13)\n");
-  fprintf (f, "\tL\t2,76(,13)\n");
-  fprintf (f, "\tL\t0,16(,15)\n");
-  fprintf (f, "\tALR\t0,2\n");
-  fprintf (f, "\tCL\t0,12(,12)\n");
-  fprintf (f, "\tBNH\t*+10\n");
-  fprintf (f, "\tL\t15,116(,12)\n");
-  fprintf (f, "\tBALR\t14,15\n");
-  fprintf (f, "\tL\t15,72(,13)\n");
-  fprintf (f, "\tSTM\t15,0,72(2)\n");
-  fprintf (f, "\tMVI\t0(2),X'10'\n");
-  fprintf (f, "\tST\t2,8(,13)\n ");
-  fprintf (f, "\tST\t13,4(,2)\n ");
-  fprintf (f, "\tLR\t13,2\n");
-  fprintf (f, "\tDROP\t15\n");
-  fprintf (f, "\tBALR\t%d,0\n", BASE_REGISTER);
-  fprintf (f, "\tUSING\t*,%d\n", BASE_REGISTER);
-  function_first = 1;
-  function_label_index += 2;
-#endif /* !LE370 */
-#endif /* MACROPROLOGUE */
-  fprintf (f, "PG%d\tEQU\t*\n", mvs_page_num );
+}
+#endif /* TARGET_LE */
+
+#endif /* TARGET_MACROS */
+
+  fprintf (f, "@@PG%d\tEQU\t*\n", mvs_page_num );
   fprintf (f, "\tLR\t11,1\n"); 
-  fprintf (f, "\tL\t%d,=A(PGT%d)\n", PAGE_REGISTER, mvs_page_num);
-  fprintf (f, "* Function %s code\n", mvs_function_name);
+  fprintf (f, "\tL\t%d,=A(@@PGT%d)\n", PAGE_REGISTER, mvs_page_num);
+  fprintf (f, "* Function %s code\n", CURRFUNC);
 
   mvs_free_label_list ();
   mvs_page_code = 6;
@@ -1416,25 +1637,32 @@ i370_output_function_prologue (f, l)
 #endif /* TARGET_HLASM */
 
 
-#ifdef TARGET_ELF_ABI
+#ifdef TARGET_LINUX
 /*
    The 370_function_prolog() routine generates the current ELF ABI ES/390 prolog.
-   It implements a stack that grows downward. 
-   It performs the following steps:
-   -- saves the callers non-volatile registers on the callers stack.
-   -- subtracts stackframe size from the stack pointer.
+   There are some provisions for stacks that grow both up and down.  Both
+   were implemented for experimental purposes.  The two differ in subtle ways:
+
+   The downward growing stack requires the following steps:
+   -- saves the caller's non-volatile registers on the callers stack.
+   -- places callee's arguments in callers stack
+   -- adds the stackframe size to the stack/frame pointer.
+   -- optionally sets up a frame pointer
    -- stores backpointer to old caller stack.
-  
-   XXX hack alert -- if the global var int leaf_function is non-zero, 
-   then this is a leaf, and it might be possible to optimize the prologue
-   into doing even less, e.g. not grabbing a new stackframe or maybe just a
-   partial stack frame.
-  
-   XXX hack alert -- the current stack frame is bloated into twice the 
-   needed size by unused entries. These entries make it marginally 
-   compatible with MVS/OE/USS C environment, but really they're not used
-   and could probably chopped out. Modifications to i370.md would be needed
-   also, to quite using addresses 136, 140, etc.
+
+   The upward growing stack performs the following:
+   -- saves the caller's non-volatile registers on the callee's stack.
+   -- places callee's arguments in callee's stack
+   -- adds the stackframe size to the stack pointer.
+   -- callers stack pointer becomes calee's frame pointer.
+   -- stores backpointer to old caller stack.
+
+   Note that with the upwards growing stack, we pass args on the callee's
+   stack.  As a result, we don't know a-priori how many arguments there 
+   will be.  We make a worse case assumption and hard-code room for 128 
+   args (== I370_VARARGS_AREA_SIZE/4).  This hard-coded limit seems to 
+   be a reasonable tradeoff for the otherwise much simplified and speedier
+   design.
  */
 
 static void
@@ -1446,58 +1674,112 @@ i370_output_function_prologue (f, frame_size)
   static int function_first = 0;
   int stackframe_size, aligned_size;
 
-  fprintf (f, "# Function prologue\n");
-  /* define the stack, put it into its own data segment
-     FDSE == Function Stack Entry
-     FDSL == Function Stack Length */
+  /* store stack size where we can get to it */
+#ifdef STACK_GROWS_DOWNWARDS 
   stackframe_size = 
      STACK_POINTER_OFFSET + current_function_outgoing_args_size + frame_size;
+#else /* STACK_GROWS_DOWNWARDS */
+  stackframe_size = 
+     STACK_POINTER_OFFSET + current_function_args_size + frame_size;
+  if (current_function_varargs || current_function_stdarg) 
+    {
+      stackframe_size += I370_VARARGS_AREA_SIZE;
+    }
+#endif /* STACK_GROWS_DOWNWARDS */
   aligned_size = (stackframe_size + 7) >> 3;
   aligned_size <<= 3;
   
   fprintf (f, "# arg_size=0x%x frame_size=0x%x aligned size=0x%x\n", 
-     current_function_outgoing_args_size, frame_size, aligned_size);
+     current_function_args_size, frame_size, aligned_size);
+  fprintf (f, "# varargs=%d stdarg=%d rserved area size=0x%x\n", 
+     current_function_varargs, current_function_stdarg, I370_VARARGS_AREA_SIZE);
 
-  fprintf (f, "\t.using\t.,r15\n");
+#ifdef STACK_GROWS_DOWNWARDS 
+  /* If you want your stack to grow down, you will need to create this piece. */
+#else /* STACK_GROWS_DOWNWARDS */
+  if (i370_enable_pic)
+    {
+      /* Use register 12 as base register for addressing into the data section. */
+      fprintf (f, "# Function %s data segment PIC glue \n"
+                  ".data\n"
+                  "\t.balign 4\n"
+                  "%s:\n"
+                  "\tST\tr12,68(,r11)\n"
+                  "\tL\tr12,12(,r15)\n"
+                  "\tBR\tr12\n"
+                  "\t.short\t0\n"
+                  "\t.long\t%s.textentry\n"
+                  "\t.long\t.LPOOL%d\n"
+                  "\t.long\t%d\n"
+                  "\t.long\t.LPGT%d\n"
+                  "\t.using\t.LPOOL%d,r12\n"
+                  ".previous\n"
+                  "# Function %s prologue \n"
+                  "%s.textentry:\n",
+               mvs_function_name,
+               mvs_function_name, mvs_function_name,
+               mvs_page_num, aligned_size, mvs_page_num, mvs_page_num,
+               mvs_function_name, mvs_function_name);
 
-  /* Branch to exectuable part of prologue.  */
-  fprintf (f, "\tB\t.LFENT%03d\n", function_label_index);
+      /* store multiple registers 13,15,0,...11 at 8 bytes from sp */
+      fprintf (f, "\tSTM\tr13,r11,8(r11)\n");
+    
+      /* load frame, arg pointer from callers top-of-stack */
+      fprintf (f, "\tLR\tr13,r11\n");
+   
+      /* bump stack pointer by 20(r15) == stackframe size */
+      fprintf (f, "\tA\tr11,20(,r15)\n");
 
-  /* write the length of the stackframe */
-  fprintf (f, "\t.long\t%d\n", aligned_size);
+      /* 16(r15) == PIC pool pointer (pointer to literals in data section */
+      fprintf (f, "\tL\tr12,16(,r15)\n");
 
-  /* FENT == function prologue entry */
-  fprintf (f, "\t.balign 2\n.LFENT%03d:\n",
-              function_label_index);
+      /* r4 will be the pointer to the code page pool for this function */
+      fprintf (f, "\tL\tr4,24(,r15)\n");
+    }
+  else 
+    {
+      fprintf (f, "%s:\n"
+                  "# Function prologue\n"
+                  "\t.using\t.,r15\n", mvs_function_name);
+    
+      /* Branch to exectuable part of prologue.  */
+      fprintf (f, "\tB\t.LFENT%06d\n", function_label_index);
+    
+      /* write the length of the stackframe */
+      fprintf (f, "\t.long\t%d\n", aligned_size);
+    
+      /* write the code page table pointer */
+      fprintf (f, "\t.long\t.LPGT%d\n", mvs_page_num);
 
-  /* store multiple registers 14,15,0,...12 at 12 bytes from sp */
-  fprintf (f, "\tSTM\tr14,r12,12(sp)\n");
+      fprintf (f, "\t.drop\tr15\n");
 
-  /* r3 == saved callee stack pointer */
-  fprintf (f, "\tLR\tr3,sp\n");
+      /* FENT == function prologue entry */
+      fprintf (f, "\t.balign 2\n.LFENT%06d:\n", function_label_index);
+    
+      /* store multiple registers 13,14,...12 at 8 bytes from sp */
+      fprintf (f, "\tSTM\tr13,r12,8(r11)\n");
+    
+      /* r13 == callee frame ptr == callee arg ptr == caller stack ptr */
+      fprintf (f, "\tLR\tr13,r11\n");
+    
+      /* r11 == callee top-of-stack pointer = caller sp + stackframe size */
+      fprintf (f, "\tA\tr11,4(,r15)\n");
 
-  /* 4(r15) == stackframe size */
-  fprintf (f, "\tSL\tsp,4(,r15)\n");
+      /* r4 will be the pointer to the code page pool for this function */
+      fprintf (f, "\tL\tr4,8(,r15)\n");
+    }
+#endif /* STACK_GROWS_DOWNWARDS */
 
-  /* r11 points to arg list in callers stackframe; was passed in r2 */
-  fprintf (f, "\tLR\tr11,r2\n");
-
-  /* store callee stack pointer at 8(sp) */
-  /* fprintf (f, "\tST\tsp,8(,r3)\n ");  wasted cycles, no one uses this ...  */
-
-  /* backchain -- store caller sp at 4(callee_sp)  */
-  fprintf (f, "\tST\tr3,4(,sp)\n ");
-
-  fprintf (f, "\t.drop\tr15\n");
-  /* Place contents of the PSW into r3
-     that is, place the address of "." into r3 */
-  fprintf (f, "\tBASR\tr%d,0\n", BASE_REGISTER);
-  fprintf (f, "\t.using\t.,r%d\n", BASE_REGISTER);
+  /* r3 will be the base register for this code page.
+     That is, place the address of "." into r3 */
+  fprintf (f, "\tBASR\tr3,0\n");
+  fprintf (f, "\t.using\t.,r3\n");
+  fprintf (f, ".LPG%d:\n", mvs_page_num  );
   function_first = 1;
   function_label_index ++;
 
-  fprintf (f, ".LPG%d:\n", mvs_page_num  );
-  fprintf (f, "\tL\tr%d,=A(.LPGT%d)\n", PAGE_REGISTER, mvs_page_num);
+  /* Store the code page pool off of the frame pointer for easy access. */
+  fprintf (f, "\tST\tr4,0(r13)\n");
   fprintf (f, "# Function code\n");
 
   mvs_free_label_list ();
@@ -1509,7 +1791,7 @@ i370_output_function_prologue (f, frame_size)
   /* find all labels in this routine */
   i370_label_scan ();
 }
-#endif /* TARGET_ELF_ABI */
+#endif /* TARGET_LINUX */
 
 /* This function generates the assembly code for function exit.
    Args are as for output_function_prologue ().
@@ -1528,29 +1810,174 @@ i370_output_function_epilogue (file, l)
 
   check_label_emit ();
   mvs_check_page (file, 14, 0);
-  fprintf (file, "* Function %s epilogue\n", mvs_function_name);
+  fprintf (file, "* Function %s epilogue\n", CURRFUNC);
   mvs_page_num++;
 
-#if MACROEPILOGUE == 1
+#ifdef TARGET_MACROS
+
+#ifdef TARGET_DIGNUS
+  fprintf (file, "\tDCCEPIL\n");
+#endif
+#ifdef TARGET_PDPMAC
+  fprintf (file, "\tPDPEPIL\n");
+#endif
+#ifdef TARGET_LE
   fprintf (file, "\tEDCEPIL\n");
-#else /* MACROEPILOGUE != 1 */
+  fprintf (file, "\tDROP\t%d\n", BASE_REGISTER);
+#endif
+
+#else /* !TARGET_MACROS */
+
+#ifdef TARGET_LE
   fprintf (file, "\tL\t13,4(,13)\n");
   fprintf (file, "\tL\t14,12(,13)\n");
   fprintf (file, "\tLM\t2,12,28(13)\n");
   fprintf (file, "\tBALR\t1,14\n");
+  fprintf (file, "\tDROP\t%d\n", BASE_REGISTER);
   fprintf (file, "\tDC\tA(");
   assemble_name (file, mvs_function_name);
   fprintf (file, ")\n" );
-#endif /* MACROEPILOGUE */
+#endif
 
-  fprintf (file, "* Function %s literal pool\n", mvs_function_name);
+#endif /* TARGET_MACROS */
+
+  fprintf (file, "* Function %s literal pool\n", CURRFUNC);
   fprintf (file, "\tDS\t0F\n" );
   fprintf (file, "\tLTORG\n");
-  fprintf (file, "* Function %s page table\n", mvs_function_name);
+  fprintf (file, "* Function %s page table\n", CURRFUNC);
   fprintf (file, "\tDS\t0F\n");
-  fprintf (file, "PGT%d\tEQU\t*\n", function_base_page);
+  fprintf (file, "@@PGT%d\tEQU\t*\n", function_base_page);
 
   mvs_free_label_list();
   for (i = function_base_page; i < mvs_page_num; i++)
-    fprintf (file, "\tDC\tA(PG%d)\n", i);
+    fprintf (file, "\tDC\tA(@@PG%d)\n", i);
+  mvs_need_entry = 0;
 }
+
+
+#if defined(PUREISO) && !defined(NO_DETAB)
+
+#undef fputs
+#undef fprintf
+#undef vfprintf
+#undef fwrite
+#undef fputc
+
+int
+t_fputs (const char *str, FILE *file)
+{
+    t_fprintf(file, "%s", str);
+    if (ferror(file)) return (EOF);
+    else return (0);
+}
+
+size_t
+t_fwrite (const void *ptr, size_t size, size_t nmemb, FILE *file)
+{
+    size_t tot;
+    
+    tot = size * nmemb;
+    t_fprintf(file, "%.*s", tot, ptr);
+    return (nmemb);
+}
+
+int
+t_fprintf (FILE *file, const char *format, ...)
+{
+    va_list arg;
+    int ret;
+
+    va_start(arg, format);
+    ret = t_vfprintf(file, format, arg);
+    va_end(arg);
+    return (ret);
+}
+
+static int ocnt = 0;
+static char obuf[MAX_LEN_OUT];
+
+int
+t_fputc (int c, FILE *file)
+{
+    if (c == '\t')
+    {
+        if (ocnt < 9)
+        {
+            for (; ocnt < 9; ocnt++)
+            {
+                obuf[ocnt] = ' ';
+            }
+        }
+        else if (ocnt < 15)
+        {
+            for (; ocnt < 15; ocnt++)
+            {
+                obuf[ocnt] = ' ';
+            }
+        }
+        else
+        {
+            obuf[ocnt] = ' ';
+            ocnt++;
+        }
+    }
+    else if (c == '\n')
+    {
+        t_fprintf(file, "%c", c);
+    }
+    else
+    {
+        obuf[ocnt] = c;
+        ocnt++;
+    }
+    return (c);
+}
+
+int
+t_vfprintf (FILE *file, const char *format, va_list arg)
+{
+    char buf[MAX_LEN_OUT];
+    int icnt;
+
+    vsprintf(buf, format, arg);
+    icnt = 0;
+    while (buf[icnt] != '\0')
+    {
+        if (buf[icnt] == '\t')
+        {
+            if (ocnt < 9)
+            {
+                for (; ocnt < 9; ocnt++)
+                {
+                    obuf[ocnt] = ' ';
+                }
+            }
+            else if (ocnt < 15)
+            {
+                for (; ocnt < 15; ocnt++)
+                {
+                    obuf[ocnt] = ' ';
+                }
+            }
+            else
+            {
+                obuf[ocnt] = ' ';
+                ocnt++;
+            }
+        }
+        else
+        {
+            obuf[ocnt] = buf[icnt];
+            ocnt++;
+            if (buf[icnt] == '\n')
+            {
+                fwrite(obuf, ocnt, 1, file);
+                ocnt = 0;
+            }
+        }
+        icnt++;
+    }
+    return (icnt);
+}
+
+#endif

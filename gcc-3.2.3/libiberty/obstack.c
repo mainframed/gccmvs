@@ -44,7 +44,9 @@
 #if !defined (_LIBC) && defined (__GNU_LIBRARY__) && __GNU_LIBRARY__ > 1
 #include <gnu-versions.h>
 #if _GNU_OBSTACK_INTERFACE_VERSION == OBSTACK_INTERFACE_VERSION
+#if !defined(PUREISO)
 #define ELIDE_CODE
+#endif
 #endif
 #endif
 

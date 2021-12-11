@@ -34,7 +34,7 @@ Boston, MA 02111-1307, USA.  */
 
 #undef CPP_PREDEFINES
 #define CPP_PREDEFINES "-D_WIN32 -D__WIN32__ \
-  -D_UWIN -DWINNT  -D_X86_=1 -D__STDC__=1 \
+  -D_UWIN -DWINNT  -D_X86_=1 \
   -D__UWIN__ -D__MSVCRT__ \
   -D_STD_INCLUDE_DIR=mingw32 \
   -D__stdcall=__attribute__((__stdcall__)) \
@@ -44,9 +44,10 @@ Boston, MA 02111-1307, USA.  */
   -Asystem=winnt"
 
 #undef CPP_SPEC
-#define CPP_SPEC "-remap %(cpp_cpu) %{posix:-D_POSIX_SOURCE} \
+#define CPP_SPEC "-remap %(cpp_cpu) %{posix:-D_POSIX_SOURCE}"
+  /* \
   -include /usr/include/astwin32.h \
-  -idirafter /usr/gnu/include/mingw32"
+  -idirafter /usr/gnu/include/mingw32" */
 
 /* For Windows applications, include more libraries, but always include
    kernel32.  */

@@ -51,6 +51,11 @@ typedef struct optab
    the body of that kind of insn.  */
 #define GEN_FCN(CODE) (*insn_data[(int) (CODE)].genfun)
 
+/* Allow for compilers that pass parameters in registers */
+#define GEN_FN2(CODE) \
+(*((struct rtx_def *(*) PARAMS ((struct rtx_def *, struct rtx_def *)))\
+(insn_data[(int) (CODE)].genfun)))
+
 /* Enumeration of valid indexes into optab_table.  */
 enum optab_index
 {

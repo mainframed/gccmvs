@@ -182,6 +182,12 @@ extern int profile_flag;
 
 extern int profile_arc_flag;
 
+#if IFOX
+/* used to work around the 399 identifier limit of IFOX */
+extern int gflags[32];
+#endif
+
+#if !IFOX
 /* Nonzero if generating info for gcov to calculate line test coverage.  */
 
 extern int flag_test_coverage;
@@ -197,6 +203,7 @@ extern int flag_reorder_blocks;
 /* Nonzero if registers should be renamed.  */
 
 extern int flag_rename_registers;
+#endif
 
 /* Nonzero for -pedantic switch: warn about anything
    that standard C forbids.  */
@@ -233,6 +240,7 @@ extern int flag_caller_saves;
 
 extern int flag_pcc_struct_return;
 
+#if !IFOX
 /* Nonzero for -fforce-mem: load memory value into a register
    before arithmetic on it.  This makes better cse but slower compilation.  */
 
@@ -332,6 +340,7 @@ extern int flag_volatile_static;
 /* Nonzero allows GCC to optimize sibling and tail recursive calls.  */
 
 extern int flag_optimize_sibling_calls;
+#endif
 
 /* Nonzero means the front end generally wants `errno' maintained by math
    operations, like built-in SQRT.  */
@@ -351,6 +360,7 @@ extern int flag_unsafe_math_optimizations;
 
 extern int flag_trapping_math;
 
+#if !IFOX
 /* 0 means straightforward implementation of complex divide acceptable.
    1 means wide ranges of inputs must work for complex divide.
    2 means C99-like requirements for complex divide (not yet implemented).  */
@@ -360,6 +370,7 @@ extern int flag_complex_divide_method;
 /* Nonzero means to run loop optimizations twice.  */
 
 extern int flag_rerun_loop_opt;
+#endif
 
 /* Nonzero means make functions that look like good inline candidates
    go inline.  */
@@ -385,9 +396,11 @@ extern int flag_no_inline;
 
 extern int flag_really_no_inline;
 
+#if !IFOX
 /* Nonzero if we are only using compiler to check syntax errors.  */
 
 extern int flag_syntax_only;
+#endif
 
 /* Nonzero means we should save auxiliary info into a .X file.  */
 
@@ -479,6 +492,7 @@ extern int flag_no_common;
    needed for crtstuff.c on other systems.  */
 extern int flag_inhibit_size_directive;
 
+#if !IFOX
 /* Nonzero means place each function into its own section on those platforms
    which support arbitrary section names and unlimited numbers of sections.  */
 
@@ -487,6 +501,7 @@ extern int flag_function_sections;
 /* ... and similar for data.  */
  
 extern int flag_data_sections;
+#endif
 
 /* -fverbose-asm causes extra commentary information to be produced in
    the generated assembly code (to make it more readable).  This option
@@ -534,8 +549,10 @@ extern int flag_strict_aliasing;
    may cause large objects to be allocated dynamically.  */
 extern int flag_stack_check;
 
+#if !IFOX
 /* Do the full regmove optimization pass.  */
 extern int flag_regmove;
+#endif
 
 /* Instrument functions with calls at entry and exit, for profiling.  */
 extern int flag_instrument_function_entry_exit;

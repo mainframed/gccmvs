@@ -41,6 +41,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "predict.h"
 #include "tm_p.h"
 #include "target.h"
+#ifdef S390
+/* avoid warning */
+#include "integrate.h"
+#endif
 
 #define CALLED_AS_BUILT_IN(NODE) \
    (!strncmp (IDENTIFIER_POINTER (DECL_NAME (NODE)), "__builtin_", 10))
@@ -343,7 +347,11 @@ c_readstr (str, mode)
       if (j > 2 * HOST_BITS_PER_WIDE_INT)
 	abort ();
       if (ch)
+#ifdef MAP_OUTCHAR
+	ch = MAP_OUTCHAR((unsigned char) str[i]) & 0xFF;
+#else
 	ch = (unsigned char) str[i];
+#endif
       c[j / HOST_BITS_PER_WIDE_INT] |= ch << (j % HOST_BITS_PER_WIDE_INT);
     }
   return immed_double_const (c[0], c[1], mode);
@@ -1962,6 +1970,7 @@ expand_builtin_memcpy (arglist, target, mode)
       len_rtx = expand_expr (len, NULL_RTX, VOIDmode, 0);
       src_str = c_getstr (src);
 
+#if !TARGET_MVS && !TARGET_CMS
       /* If SRC is a string constant and block move would be done
 	 by pieces, we can avoid loading the string from memory
 	 and only stored the computed constants.  */
@@ -1976,6 +1985,7 @@ expand_builtin_memcpy (arglist, target, mode)
 			   (PTR) src_str, dest_align);
 	  return force_operand (XEXP (dest_mem, 0), NULL_RTX);
 	}
+#endif
 
       src_mem = get_memory_rtx (src);
       set_mem_align (src_mem, src_align);
@@ -2014,6 +2024,14 @@ expand_builtin_strcpy (exp, target, mode)
   len = c_strlen (TREE_VALUE (TREE_CHAIN (arglist)));
   if (len == 0)
     return 0;
+
+#ifdef MAP_OUTCHAR
+  if (compare_tree_int (len, 1) == 0)
+  {
+    char *p = (char *)c_getstr (TREE_VALUE (TREE_CHAIN (arglist)));
+    if (ISPRINT(p[0])) p[0] = MAP_OUTCHAR(p[0]);
+  }
+#endif
 
   len = size_binop (PLUS_EXPR, len, ssize_int (1));
   chainon (arglist, build_tree_list (NULL_TREE, len));
@@ -2076,6 +2094,14 @@ expand_builtin_strncpy (arglist, target, mode)
       /* Now, we must be passed a constant src ptr parameter.  */
       if (slen == 0 || TREE_CODE (slen) != INTEGER_CST)
 	return 0;
+
+#ifdef MAP_OUTCHAR
+      if (compare_tree_int (slen, 1) == 0)
+      {
+        char *p = (char *)c_getstr (TREE_VALUE (TREE_CHAIN (arglist)));
+        if (ISPRINT(p[0])) p[0] = MAP_OUTCHAR(p[0]);
+      }
+#endif
 
       slen = size_binop (PLUS_EXPR, slen, ssize_int (1));
 
@@ -3284,6 +3310,12 @@ expand_builtin_alloca (arglist, target)
   rtx op0;
   rtx result;
 
+/* This function is generating bad code for MVS,
+   so we just return failure instead. */
+#if TARGET_MVS
+  return 0;
+#endif
+
   if (!validate_arglist (arglist, INTEGER_TYPE, VOID_TYPE))
     return 0;
 
@@ -3368,12 +3400,15 @@ expand_builtin_fputs (arglist, ignore, unlocked)
       }
     case 0: /* length is 1, call fputc.  */
       {
-	const char *p = c_getstr (TREE_VALUE (arglist));
+	char *p = (char *)c_getstr (TREE_VALUE (arglist));
 
 	if (p != NULL)
 	  {
 	    /* New argument list transforming fputs(string, stream) to
 	       fputc(string[0], stream).  */
+#ifdef MAP_OUTCHAR
+            if (ISPRINT(p[0])) p[0] = MAP_OUTCHAR(p[0]);
+#endif
 	    arglist =
 	      build_tree_list (NULL_TREE, TREE_VALUE (TREE_CHAIN (arglist)));
 	    arglist =
@@ -3604,7 +3639,7 @@ expand_builtin (exp, target, subtarget, mode, ignore)
   tree arglist = TREE_OPERAND (exp, 1);
   enum built_in_function fcode = DECL_FUNCTION_CODE (fndecl);
 
-  /* Perform postincrements before expanding builtin functions.  */
+  /* Perform postincrements before expanding builtin functions. */
   emit_queue ();
 
   if (DECL_BUILT_IN_CLASS (fndecl) == BUILT_IN_MD)

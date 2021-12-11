@@ -22,6 +22,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "system.h"
 #include "gcc.h"
 
+#ifdef SINGLE_EXECUTABLE
+#undef lang_specific_driver
+#undef lang_specific_extra_outfiles
+#undef lang_specific_pre_link
+#define lang_specific_driver cpsp_lsd
+#define lang_specific_pre_link cpsp_lspl
+#define lang_specific_extra_outfiles cpsp_lseo
+#endif
+
+
 /* The `cpp' executable installed in $(bindir) and $(cpp_install_dir)
    is a customized version of the gcc driver.  It forces -E; -S and -c
    are errors.  It defaults to -x c for files with unrecognized

@@ -26,12 +26,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /* These are exported by gcc.c.  */
 extern int do_spec PARAMS ((const char *));
 extern void record_temp_file PARAMS ((const char *, int, int));
-extern void fancy_abort PARAMS ((void)) ATTRIBUTE_NORETURN;
+#ifdef SINGLE_EXECUTABLE
+static
+#else
+extern
+#endif
+void fancy_abort PARAMS ((void)) ATTRIBUTE_NORETURN;
 extern const char *input_filename;
 extern size_t input_filename_length;
 extern void fatal PARAMS ((const char *, ...))
      ATTRIBUTE_PRINTF_1 ATTRIBUTE_NORETURN;
-extern void error PARAMS ((const char *, ...)) ATTRIBUTE_PRINTF_1;
+#ifdef SINGLE_EXECUTABLE
+static
+#else
+extern
+#endif
+void error PARAMS ((const char *, ...)) ATTRIBUTE_PRINTF_1;
 extern void pfatal_with_name PARAMS ((const char *)) ATTRIBUTE_NORETURN;
 extern void set_input PARAMS ((const char *));
 

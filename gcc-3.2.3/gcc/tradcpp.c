@@ -2490,9 +2490,35 @@ process_include (stackp, fbeg, flen, system_header_p, op)
 
   /* If specified file name is absolute, just open it.  */
 
-  if (IS_ABSOLUTE_PATHNAME (fbeg)) {
+  if (IS_ABSOLUTE_PATHNAME (fbeg) || 
+  #if defined(__MVS__) || defined(__VSE__)
+  1
+  #else
+  0
+  #endif
+  ) {
     strncpy (fname, (const char *)fbeg, flen);
     fname[flen] = 0;
+    #if defined(__MVS__) || defined(__VSE__)
+    {
+        char *p;
+        char buf[FILENAME_MAX];
+        
+        strcpy(buf, "dd:");
+        strcat(buf, system_header_p ? "sysincl" : "include");
+        strcat(buf, "(");
+        p = strrchr(fname, '/');
+        p = (p != NULL) ? p + 1 : fname;
+        strcat(buf, p);
+        p = strchr(buf, '.');
+        if (p != NULL)
+        {
+            *p = '\0';
+        }
+        strcat(buf, ")");
+        strcpy(fname, buf);
+    }
+    #endif
     f = open (fname, O_RDONLY, 0666);
   } else {
     /* Search directory path, trying to open the file.

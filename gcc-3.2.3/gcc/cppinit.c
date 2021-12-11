@@ -30,6 +30,12 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "cppdefault.h"
 #include "except.h"	/* for USING_SJLJ_EXCEPTIONS */
 
+#ifndef HAVE_STAT
+#undef S_ISDIR
+#define S_ISDIR(a) (1)
+#endif
+
+
 /* Predefined symbols, built-in macros, and the default include path.  */
 
 #ifndef GET_ENV_PATH_LIST
@@ -43,7 +49,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 # define INO_T_EQ(A, B) (!memcmp (&(A), &(B), sizeof (A)))
 # define INO_T_COPY(DEST, SRC) memcpy(&(DEST), &(SRC), sizeof (SRC))
 #else
-# if (defined _WIN32 && ! defined (_UWIN)) || defined __MSDOS__
+# if (defined _WIN32 && ! defined (_UWIN)) || defined __MSDOS__ \
+  || !defined HAVE_STAT
 #  define INO_T_EQ(A, B) 0
 # else
 #  define INO_T_EQ(A, B) ((A) == (B))
@@ -160,6 +167,119 @@ END
 #undef s
 #undef END
 #undef TRIGRAPH_MAP
+
+/* Irix6 "cc -n32" and OSF4 cc have problems with char foo[] = ("string");
+   I.e. a const string initializer with parens around it.  That is
+   what N_("string") resolves to, so we make no_* be macros instead.  */
+#define no_arg N_("argument missing after %s")
+#define no_ass N_("assertion missing after %s")
+#define no_dir N_("directory name missing after %s")
+#define no_fil N_("file name missing after %s")
+#define no_mac N_("macro name missing after %s")
+#define no_pth N_("path name missing after %s")
+#define no_num N_("number missing after %s")
+#define no_tgt N_("target missing after %s")
+
+/* This is the list of all command line options, with the leading
+   "-" removed.  It must be sorted in ASCII collating order.  */
+#define COMMAND_LINE_OPTIONS                                                  \
+  DEF_OPT("$",                        0,      OPT_dollar)                     \
+  DEF_OPT("+",                        0,      OPT_plus)                       \
+  DEF_OPT("-help",                    0,      OPT__help)                      \
+  DEF_OPT("-target-help",             0,      OPT_target__help)               \
+  DEF_OPT("-version",                 0,      OPT__version)                   \
+  DEF_OPT("A",                        no_ass, OPT_A)                          \
+  DEF_OPT("C",                        0,      OPT_C)                          \
+  DEF_OPT("D",                        no_mac, OPT_D)                          \
+  DEF_OPT("H",                        0,      OPT_H)                          \
+  DEF_OPT("I",                        no_dir, OPT_I)                          \
+  DEF_OPT("M",                        0,      OPT_M)                          \
+  DEF_OPT("MD",                       no_fil, OPT_MD)                         \
+  DEF_OPT("MF",                       no_fil, OPT_MF)                         \
+  DEF_OPT("MG",                       0,      OPT_MG)                         \
+  DEF_OPT("MM",                       0,      OPT_MM)                         \
+  DEF_OPT("MMD",                      no_fil, OPT_MMD)                        \
+  DEF_OPT("MP",                       0,      OPT_MP)                         \
+  DEF_OPT("MQ",                       no_tgt, OPT_MQ)                         \
+  DEF_OPT("MT",                       no_tgt, OPT_MT)                         \
+  DEF_OPT("P",                        0,      OPT_P)                          \
+  DEF_OPT("U",                        no_mac, OPT_U)                          \
+  DEF_OPT("W",                        no_arg, OPT_W)  /* arg optional */      \
+  DEF_OPT("d",                        no_arg, OPT_d)                          \
+  DEF_OPT("fleading-underscore",      0,      OPT_fleading_underscore)        \
+  DEF_OPT("fno-leading-underscore",   0,      OPT_fno_leading_underscore)     \
+  DEF_OPT("fno-operator-names",       0,      OPT_fno_operator_names)         \
+  DEF_OPT("fno-preprocessed",         0,      OPT_fno_preprocessed)           \
+  DEF_OPT("fno-show-column",          0,      OPT_fno_show_column)            \
+  DEF_OPT("fpreprocessed",            0,      OPT_fpreprocessed)              \
+  DEF_OPT("fshow-column",             0,      OPT_fshow_column)               \
+  DEF_OPT("fsigned-char",             0,      OPT_fsigned_char)               \
+  DEF_OPT("ftabstop=",                no_num, OPT_ftabstop)                   \
+  DEF_OPT("funsigned-char",           0,      OPT_funsigned_char)             \
+  DEF_OPT("h",                        0,      OPT_h)                          \
+  DEF_OPT("idirafter",                no_dir, OPT_idirafter)                  \
+  DEF_OPT("imacros",                  no_fil, OPT_imacros)                    \
+  DEF_OPT("include",                  no_fil, OPT_include)                    \
+  DEF_OPT("iprefix",                  no_pth, OPT_iprefix)                    \
+  DEF_OPT("isystem",                  no_dir, OPT_isystem)                    \
+  DEF_OPT("iwithprefix",              no_dir, OPT_iwithprefix)                \
+  DEF_OPT("iwithprefixbefore",        no_dir, OPT_iwithprefixbefore)          \
+  DEF_OPT("lang-asm",                 0,      OPT_lang_asm)                   \
+  DEF_OPT("lang-c",                   0,      OPT_lang_c)                     \
+  DEF_OPT("lang-c++",                 0,      OPT_lang_cplusplus)             \
+  DEF_OPT("lang-c89",                 0,      OPT_lang_c89)                   \
+  DEF_OPT("lang-objc",                0,      OPT_lang_objc)                  \
+  DEF_OPT("lang-objc++",              0,      OPT_lang_objcplusplus)          \
+  DEF_OPT("nostdinc",                 0,      OPT_nostdinc)                   \
+  DEF_OPT("nostdinc++",               0,      OPT_nostdincplusplus)           \
+  DEF_OPT("o",                        no_fil, OPT_o)                          \
+  DEF_OPT("pedantic",                 0,      OPT_pedantic)                   \
+  DEF_OPT("pedantic-errors",          0,      OPT_pedantic_errors)            \
+  DEF_OPT("remap",                    0,      OPT_remap)                      \
+  DEF_OPT("std=c++98",                0,      OPT_std_cplusplus98)            \
+  DEF_OPT("std=c89",                  0,      OPT_std_c89)                    \
+  DEF_OPT("std=c99",                  0,      OPT_std_c99)                    \
+  DEF_OPT("std=c9x",                  0,      OPT_std_c9x)                    \
+  DEF_OPT("std=gnu89",                0,      OPT_std_gnu89)                  \
+  DEF_OPT("std=gnu99",                0,      OPT_std_gnu99)                  \
+  DEF_OPT("std=gnu9x",                0,      OPT_std_gnu9x)                  \
+  DEF_OPT("std=iso9899:1990",         0,      OPT_std_iso9899_1990)           \
+  DEF_OPT("std=iso9899:199409",       0,      OPT_std_iso9899_199409)         \
+  DEF_OPT("std=iso9899:1999",         0,      OPT_std_iso9899_1999)           \
+  DEF_OPT("std=iso9899:199x",         0,      OPT_std_iso9899_199x)           \
+  DEF_OPT("trigraphs",                0,      OPT_trigraphs)                  \
+  DEF_OPT("v",                        0,      OPT_v)                          \
+  DEF_OPT("version",                  0,      OPT_version)                    \
+  DEF_OPT("w",                        0,      OPT_w)
+
+#define DEF_OPT(text, msg, code) code,
+enum opt_code
+{
+  COMMAND_LINE_OPTIONS
+  N_OPTS
+};
+#undef DEF_OPT
+
+struct cl_option
+{
+  const char *opt_text;
+  const char *msg;
+  size_t opt_len;
+  enum opt_code opt_code;
+};
+
+#define DEF_OPT(text, msg, code) { text, msg, sizeof(text) - 1, code },
+#ifdef HOST_EBCDIC
+static struct cl_option cl_options[] =
+#else
+static const struct cl_option cl_options[] =
+#endif
+{
+  COMMAND_LINE_OPTIONS
+};
+#undef DEF_OPT
+#undef COMMAND_LINE_OPTIONS
+
 
 /* Given a colon-separated list of file names PATH,
    add all the names to the search path for include files.  */
@@ -549,6 +669,9 @@ cpp_create_reader (lang)
   CPP_OPTION (pfile, signed_char) = 1;
 #else
   CPP_OPTION (pfile, signed_char) = 0;
+#endif
+#if TARGET_MVS
+  CPP_OPTION (pfile, no_standard_includes) = 1;
 #endif
 
   CPP_OPTION (pfile, pending) =
@@ -1211,118 +1334,6 @@ new_pending_directive (pend, text, handler)
   o->handler = handler;
   APPEND (pend, directive, o);
 }
-
-/* Irix6 "cc -n32" and OSF4 cc have problems with char foo[] = ("string");
-   I.e. a const string initializer with parens around it.  That is
-   what N_("string") resolves to, so we make no_* be macros instead.  */
-#define no_arg N_("argument missing after %s")
-#define no_ass N_("assertion missing after %s")
-#define no_dir N_("directory name missing after %s")
-#define no_fil N_("file name missing after %s")
-#define no_mac N_("macro name missing after %s")
-#define no_pth N_("path name missing after %s")
-#define no_num N_("number missing after %s")
-#define no_tgt N_("target missing after %s")
-
-/* This is the list of all command line options, with the leading
-   "-" removed.  It must be sorted in ASCII collating order.  */
-#define COMMAND_LINE_OPTIONS                                                  \
-  DEF_OPT("$",                        0,      OPT_dollar)                     \
-  DEF_OPT("+",                        0,      OPT_plus)                       \
-  DEF_OPT("-help",                    0,      OPT__help)                      \
-  DEF_OPT("-target-help",             0,      OPT_target__help)               \
-  DEF_OPT("-version",                 0,      OPT__version)                   \
-  DEF_OPT("A",                        no_ass, OPT_A)                          \
-  DEF_OPT("C",                        0,      OPT_C)                          \
-  DEF_OPT("D",                        no_mac, OPT_D)                          \
-  DEF_OPT("H",                        0,      OPT_H)                          \
-  DEF_OPT("I",                        no_dir, OPT_I)                          \
-  DEF_OPT("M",                        0,      OPT_M)                          \
-  DEF_OPT("MD",                       no_fil, OPT_MD)                         \
-  DEF_OPT("MF",                       no_fil, OPT_MF)                         \
-  DEF_OPT("MG",                       0,      OPT_MG)                         \
-  DEF_OPT("MM",                       0,      OPT_MM)                         \
-  DEF_OPT("MMD",                      no_fil, OPT_MMD)                        \
-  DEF_OPT("MP",                       0,      OPT_MP)                         \
-  DEF_OPT("MQ",                       no_tgt, OPT_MQ)                         \
-  DEF_OPT("MT",                       no_tgt, OPT_MT)                         \
-  DEF_OPT("P",                        0,      OPT_P)                          \
-  DEF_OPT("U",                        no_mac, OPT_U)                          \
-  DEF_OPT("W",                        no_arg, OPT_W)  /* arg optional */      \
-  DEF_OPT("d",                        no_arg, OPT_d)                          \
-  DEF_OPT("fleading-underscore",      0,      OPT_fleading_underscore)        \
-  DEF_OPT("fno-leading-underscore",   0,      OPT_fno_leading_underscore)     \
-  DEF_OPT("fno-operator-names",       0,      OPT_fno_operator_names)         \
-  DEF_OPT("fno-preprocessed",         0,      OPT_fno_preprocessed)           \
-  DEF_OPT("fno-show-column",          0,      OPT_fno_show_column)            \
-  DEF_OPT("fpreprocessed",            0,      OPT_fpreprocessed)              \
-  DEF_OPT("fshow-column",             0,      OPT_fshow_column)               \
-  DEF_OPT("fsigned-char",             0,      OPT_fsigned_char)               \
-  DEF_OPT("ftabstop=",                no_num, OPT_ftabstop)                   \
-  DEF_OPT("funsigned-char",           0,      OPT_funsigned_char)             \
-  DEF_OPT("h",                        0,      OPT_h)                          \
-  DEF_OPT("idirafter",                no_dir, OPT_idirafter)                  \
-  DEF_OPT("imacros",                  no_fil, OPT_imacros)                    \
-  DEF_OPT("include",                  no_fil, OPT_include)                    \
-  DEF_OPT("iprefix",                  no_pth, OPT_iprefix)                    \
-  DEF_OPT("isystem",                  no_dir, OPT_isystem)                    \
-  DEF_OPT("iwithprefix",              no_dir, OPT_iwithprefix)                \
-  DEF_OPT("iwithprefixbefore",        no_dir, OPT_iwithprefixbefore)          \
-  DEF_OPT("lang-asm",                 0,      OPT_lang_asm)                   \
-  DEF_OPT("lang-c",                   0,      OPT_lang_c)                     \
-  DEF_OPT("lang-c++",                 0,      OPT_lang_cplusplus)             \
-  DEF_OPT("lang-c89",                 0,      OPT_lang_c89)                   \
-  DEF_OPT("lang-objc",                0,      OPT_lang_objc)                  \
-  DEF_OPT("lang-objc++",              0,      OPT_lang_objcplusplus)          \
-  DEF_OPT("nostdinc",                 0,      OPT_nostdinc)                   \
-  DEF_OPT("nostdinc++",               0,      OPT_nostdincplusplus)           \
-  DEF_OPT("o",                        no_fil, OPT_o)                          \
-  DEF_OPT("pedantic",                 0,      OPT_pedantic)                   \
-  DEF_OPT("pedantic-errors",          0,      OPT_pedantic_errors)            \
-  DEF_OPT("remap",                    0,      OPT_remap)                      \
-  DEF_OPT("std=c++98",                0,      OPT_std_cplusplus98)            \
-  DEF_OPT("std=c89",                  0,      OPT_std_c89)                    \
-  DEF_OPT("std=c99",                  0,      OPT_std_c99)                    \
-  DEF_OPT("std=c9x",                  0,      OPT_std_c9x)                    \
-  DEF_OPT("std=gnu89",                0,      OPT_std_gnu89)                  \
-  DEF_OPT("std=gnu99",                0,      OPT_std_gnu99)                  \
-  DEF_OPT("std=gnu9x",                0,      OPT_std_gnu9x)                  \
-  DEF_OPT("std=iso9899:1990",         0,      OPT_std_iso9899_1990)           \
-  DEF_OPT("std=iso9899:199409",       0,      OPT_std_iso9899_199409)         \
-  DEF_OPT("std=iso9899:1999",         0,      OPT_std_iso9899_1999)           \
-  DEF_OPT("std=iso9899:199x",         0,      OPT_std_iso9899_199x)           \
-  DEF_OPT("trigraphs",                0,      OPT_trigraphs)                  \
-  DEF_OPT("v",                        0,      OPT_v)                          \
-  DEF_OPT("version",                  0,      OPT_version)                    \
-  DEF_OPT("w",                        0,      OPT_w)
-
-#define DEF_OPT(text, msg, code) code,
-enum opt_code
-{
-  COMMAND_LINE_OPTIONS
-  N_OPTS
-};
-#undef DEF_OPT
-
-struct cl_option
-{
-  const char *opt_text;
-  const char *msg;
-  size_t opt_len;
-  enum opt_code opt_code;
-};
-
-#define DEF_OPT(text, msg, code) { text, msg, sizeof(text) - 1, code },
-#ifdef HOST_EBCDIC
-static struct cl_option cl_options[] =
-#else
-static const struct cl_option cl_options[] =
-#endif
-{
-  COMMAND_LINE_OPTIONS
-};
-#undef DEF_OPT
-#undef COMMAND_LINE_OPTIONS
 
 /* Perform a binary search to find which, if any, option the given
    command-line matches.  Returns its index in the option array,

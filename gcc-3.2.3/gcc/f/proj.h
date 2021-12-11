@@ -31,7 +31,7 @@ the Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 #include "system.h"
 
-#if (GCC_VERSION < 2000)
+#if 0 /*(GCC_VERSION < 2000)*/
  #error "You have to use gcc 2.x to build g77."
 #endif
 

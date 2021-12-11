@@ -2853,6 +2853,14 @@ c_common_nodes_and_builtins ()
 #undef DEF_FUNCTION_TYPE_VAR_1
 #undef DEF_POINTER_TYPE
 
+/* Prevent the name "builtins.def" etc from going to the generated
+   assembler */
+#ifdef TARGET_MVS
+#define xxabort (abort)
+#else
+#define xxabort abort
+#endif
+
 #define DEF_BUILTIN(ENUM, NAME, CLASS,					\
                     TYPE, LIBTYPE, BOTH_P, FALLBACK_P, NONANSI_P)	\
   if (NAME)								\
@@ -2860,7 +2868,7 @@ c_common_nodes_and_builtins ()
       tree decl;							\
 									\
       if (strncmp (NAME, "__builtin_", strlen ("__builtin_")) != 0)	\
-	abort ();							\
+	xxabort ();							\
 									\
       if (!BOTH_P)							\
 	decl = builtin_function (NAME, builtin_types[TYPE], ENUM,	\
@@ -3992,7 +4000,15 @@ c_expand_builtin_printf (arglist, target, tmode, modifier, ignore, unlocked)
 	  /* Given printf("c"), (where c is any one character,)
              convert "c"[0] to an int and pass that to the replacement
              function.  */
+#ifdef MAP_OUTCHAR
+	  { 
+	    unsigned x = TREE_STRING_POINTER (stripped_string)[0];
+	    if (ISPRINT(x)) x = MAP_OUTCHAR(x);
+	    arglist = build_int_2 (x, 0);
+	  }
+#else
 	  arglist = build_int_2 (TREE_STRING_POINTER (stripped_string)[0], 0);
+#endif
 	  arglist = build_tree_list (NULL_TREE, arglist);
 	  
 	  fn = fn_putchar;
@@ -4003,10 +4019,10 @@ c_expand_builtin_printf (arglist, target, tmode, modifier, ignore, unlocked)
          includes the terminating NULL in its count.  */
       else if (TREE_STRING_LENGTH (stripped_string) > 2
 	       && TREE_STRING_POINTER (stripped_string)
-	       [TREE_STRING_LENGTH (stripped_string) - 2] == '\n')
+	       [TREE_STRING_LENGTH (stripped_string) - 2] == TARGET_NEWLINE)
         {
 	  /* Create a NULL-terminated string that's one char shorter
-	     than the original, stripping off the trailing '\n'.  */
+	     than the original, stripping off the trailing TARGET_NEWLINE.  */
 	  const int newlen = TREE_STRING_LENGTH (stripped_string) - 1;
 	  char *newstr = (char *) alloca (newlen);
 	  memcpy (newstr, TREE_STRING_POINTER (stripped_string), newlen - 1);
@@ -4186,6 +4202,9 @@ c_common_init_options (lang)
 
   /* Mark as "unspecified" (see c_common_post_options).  */
   flag_bounds_check = -1;
+#if TARGET_MVS
+  flag_no_builtin = 1;
+#endif
 }
 
 /* Post-switch processing.  */

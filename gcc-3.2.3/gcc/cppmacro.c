@@ -158,6 +158,20 @@ builtin_macro (pfile, node)
 	    map = INCLUDED_FROM (&pfile->line_maps, map);
 
 	name = map->to_file;
+#ifdef TARGET_MVS
+        /* In order to get the generated assembler consistent on
+           MVS where we don't have an input file name, we force
+           the cross-compile to generate the same name. It may
+           be better to pass an extra parameter to
+           gcc to provide a filename. Even if we could extract
+           the member name from the SYSIN DD statement, it still
+           wouldn't make the source consistent with the PC
+           filename. */
+        if (strstr(name, ".c") != NULL)
+        {
+            name = "<stdin>";
+        }
+#endif
 	len = strlen (name);
 	buf = _cpp_unaligned_alloc (pfile, len * 4 + 1);
 	len = cpp_quote_string (buf, (const unsigned char *) name, len) - buf;

@@ -131,7 +131,11 @@ static void print_switch_values PARAMS ((FILE *, int, int, const char *,
 				       const char *, const char *));
 
 /* Length of line when printing switch values.  */
+#ifdef TARGET_MVS
+#define MAX_LINE 72
+#else
 #define MAX_LINE 75
+#endif
 
 /* Name of program invoked, sans directories.  */
 
@@ -386,6 +390,14 @@ int profile_flag = 0;
 
 int profile_arc_flag = 0;
 
+#if IFOX
+/* to avoid problems with the number of externals being too
+   large (more than 399) for IFOX to handle, we move a bunch
+   of them into an array */
+int gflags[32];
+#endif
+
+#if !IFOX
 /* Nonzero if generating info for gcov to calculate line test coverage.  */
 
 int flag_test_coverage = 0;
@@ -402,6 +414,7 @@ int flag_reorder_blocks = 0;
 
 int flag_rename_registers = 0;
 int flag_cprop_registers = 0;
+#endif
 
 /* Nonzero for -pedantic switch: warn about anything
    that standard spec forbids.  */
@@ -464,6 +477,7 @@ int flag_caller_saves = 0;
 
 int flag_pcc_struct_return = DEFAULT_PCC_STRUCT_RETURN;
 
+#if !IFOX
 /* Nonzero for -fforce-mem: load memory value into a register
    before arithmetic on it.  This makes better cse but slower compilation.  */
 
@@ -569,6 +583,7 @@ int flag_no_peephole = 0;
 /* Nonzero allows GCC to optimize sibling and tail recursive calls.  */
 
 int flag_optimize_sibling_calls = 0;
+#endif
 
 /* Nonzero means the front end generally wants `errno' maintained by math
    operations, like built-in SQRT.  */
@@ -588,6 +603,7 @@ int flag_unsafe_math_optimizations = 0;
 
 int flag_trapping_math = 1;
 
+#if !IFOX
 /* 0 means straightforward implementation of complex divide acceptable.
    1 means wide ranges of inputs must work for complex divide.
    2 means C99-like requirements for complex divide (not yet implemented).  */
@@ -609,6 +625,7 @@ int flag_volatile_static;
 /* Nonzero means just do syntax checking; don't output anything.  */
 
 int flag_syntax_only = 0;
+#endif
 
 /* Nonzero means perform global cse.  */
 
@@ -1691,6 +1708,7 @@ do_float_handler (fn, data)
 {
   jmp_buf buf;
 
+#ifdef USE_SIGNALS
   if (setjmp (buf))
     {
       /* We got here via longjmp () caused by an exception in function
@@ -1698,6 +1716,7 @@ do_float_handler (fn, data)
       set_float_handler (NULL);
       return 0;
     }
+#endif
 
   set_float_handler (buf);
   (*fn)(data);
@@ -4095,7 +4114,11 @@ ignoring option `%s' due to invalid debug level specification",
 		}
 	    }
 
+#if defined(TARGET_MVS) || defined(TARGET_CMS)
+	  if (0)
+#else
 	  if (type == NO_DEBUG)
+#endif
 	    warning ("`%s': unknown or unsupported -g option", arg - 2);
 
 	  /* Does it conflict with an already selected type?  */
@@ -4577,7 +4600,11 @@ init_asm_output (name)
 			       ASM_COMMENT_START, " ", "\n");
 	  /* Add a blank line here so it appears in assembler output but not
 	     screen output.  */
+#ifdef TARGET_MVS
+	  fprintf (asm_out_file, "%s\n", ASM_COMMENT_START);
+#else
 	  fprintf (asm_out_file, "\n");
+#endif
 	}
 #endif
     }
@@ -4601,6 +4628,7 @@ general_init (argv0)
 
   gcc_init_libintl ();
 
+#ifdef USE_SIGNALS
   /* Install handler for SIGFPE, which may be received while we do
      compile-time floating point arithmetic.  */
   signal (SIGFPE, float_signal);
@@ -4622,6 +4650,7 @@ general_init (argv0)
   signal (SIGIOT, crash_signal);
 #endif
 
+#endif /* USE_SIGNALS */
   /* Initialize the diagnostics reporting machinery, so option parsing
      can give warnings and errors.  */
   diagnostic_initialize (global_dc);

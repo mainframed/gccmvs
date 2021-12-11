@@ -59,11 +59,15 @@ enum bb_flags
     BB_FORWARDER_BLOCK = 2
 };
 
-#define BB_FLAGS(BB) (enum bb_flags) (BB)->aux
+/* I've no idea why they're mucking around converting
+   between enums and pointers, but it is generating
+   a lot of warnings, and I'm not surprised.  I added
+   a (long) cast to shut it up. */
+#define BB_FLAGS(BB) (enum bb_flags) (long) (BB)->aux
 #define BB_SET_FLAG(BB, FLAG) \
-  (BB)->aux = (void *) (long) ((enum bb_flags) (BB)->aux | (FLAG))
+  (BB)->aux = (void *) (long) ((enum bb_flags) (long) (BB)->aux | (FLAG))
 #define BB_CLEAR_FLAG(BB, FLAG) \
-  (BB)->aux = (void *) (long) ((enum bb_flags) (BB)->aux & ~(FLAG))
+  (BB)->aux = (void *) (long) ((enum bb_flags) (long) (BB)->aux & ~(FLAG))
 
 #define FORWARDER_BLOCK_P(BB) (BB_FLAGS (BB) & BB_FORWARDER_BLOCK)
 

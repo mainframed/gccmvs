@@ -551,6 +551,46 @@ find_include_file (pfile, header, type)
   struct include_file *file;
   char *name, *n;
 
+#ifdef __CMS__
+    {
+        char *p;
+        const char *q;
+        char buf[FILENAME_MAX];
+
+        q = strrchr(fname, '/');
+        q = (q != NULL) ? q + 1 : fname;
+        if (header->type != CPP_HEADER_NAME)
+        {
+            char name[FILENAME_MAX];
+
+            if (CPP_OPTION (pfile, remap))
+            {
+                path = search_from (pfile, type);
+                if (path != NULL)
+                {
+                    memcpy(name, path->name, path->len);
+                    name[path->len] = '\0';
+                    strcat(name, "/");
+                    strcat(name, q);
+                    p = remap_filename (pfile, name, path);
+                    p = strrchr(p, '/') + 1;
+                    q = p;
+                }
+            }
+        }
+        strcpy(buf, q);
+        return (open_file(pfile, buf));
+    }
+#endif
+
+
+/* we don't expect MVS to have any include files defined,
+   at least for the standard includes. If there is, then it's
+   probably an environment like PDOS, so let it search the
+   current directory if they specified one */
+#if defined(__MVS__) || defined(__VSE__)
+    path = CPP_OPTION (pfile, bracket_include);
+#else
   if (IS_ABSOLUTE_PATHNAME (fname))
     return open_file (pfile, fname);
 
@@ -563,6 +603,81 @@ find_include_file (pfile, header, type)
     path = CPP_OPTION (pfile, bracket_include);
   else
     path = search_from (pfile, type);
+#endif
+
+
+#if defined(__MVS__) || defined(__VSE__)
+    if (path == NULL)
+    {
+        char *p;
+        const char *q;
+        char buf[FILENAME_MAX];
+        
+        strcpy(buf, "dd:");
+        strcat(buf, (header->type == CPP_HEADER_NAME) ? "sysincl" : "include");
+        strcat(buf, "(");
+        q = strrchr(fname, '/');
+        q = (q != NULL) ? q + 1 : fname;
+        if (header->type != CPP_HEADER_NAME)
+        {
+            char name[FILENAME_MAX];
+            
+            if (CPP_OPTION (pfile, remap))
+            {
+                path = search_from (pfile, type);
+                if (path != NULL)
+                {
+                    memcpy(name, path->name, path->len);
+                    name[path->len] = '\0';
+                    strcat(name, "/");
+                    strcat(name, q);
+                    p = remap_filename (pfile, name, path);
+                    p = strrchr(p, '/') + 1;
+                    q = p;
+                }
+            }
+        }
+        p = buf + strlen(buf);
+        strcat(buf, q);
+        p[8] = '\0';
+        p = strchr(buf, '.');
+        if (p != NULL)
+        {
+            *p = '\0';
+        }        
+        strcat(buf, ")");
+#if defined(MUSIC)
+        /* on MUSIC, if the filename can't be found in a
+           MVS-like search, then as a fallback, look locally.
+           This is because the PDS routines don't cope with
+           the fact that the member is being truncated to
+           8 characters. */
+        {
+            FILE *fp;
+            
+            fp = fopen(buf, "r");
+            if (fp == NULL)
+            {
+                strcpy(buf, q);
+            }
+            else
+            {
+                fclose(fp);
+            }
+        }
+#else
+        p = buf;   
+        while (*p != '\0')
+        {
+            if (*p == '-') *p = '@';
+            if (*p == '_') *p = '@';
+            p++;
+        }
+#endif
+        return (open_file(pfile, buf));
+    }
+#endif
+
 
   if (path == NULL)
     {
@@ -866,7 +981,13 @@ struct file_name_map
   char *map_to;
 };
 
+#if defined(MUSIC)
+#define FILE_NAME_MAP_FILE "dd:include(__header)"
+#elif defined(__MVS__) || defined(__VSE__)
+#define FILE_NAME_MAP_FILE "dd:include(@@header)"
+#else
 #define FILE_NAME_MAP_FILE "header.gcc"
+#endif
 
 /* Read a space delimited string of unlimited length from a stdio
    file F.  */
@@ -935,6 +1056,9 @@ read_name_map (pfile, dirname)
   if (*dirname)
     strcat (name, "/");
   strcat (name, FILE_NAME_MAP_FILE);
+#if (defined(__MVS__) || defined(__CMS__) || defined(__VSE__))
+  strcpy (name, FILE_NAME_MAP_FILE);
+#endif
   f = fopen (name, "r");
 
   /* Silently return NULL if we cannot open.  */

@@ -26,6 +26,12 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "cpplib.h"
 #include "intl.h"
 
+#ifdef SINGLE_EXECUTABLE
+#define main(a,b) cpp(a,b)
+#define progname cpmprog
+#endif
+
+
 /* Encapsulates state used to convert the stream of tokens coming from
    cpp_get_token back into a text file.  */
 struct printer

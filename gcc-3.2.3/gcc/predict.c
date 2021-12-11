@@ -626,7 +626,7 @@ typedef struct block_info_def
   basic_block next;
 
   /* True if block needs to be visited in prop_freqency.  */
-  int tovisit:1;
+  unsigned int tovisit:1;
 
   /* Number of predecessors we need to visit first.  */
   int npredecessors;
@@ -643,7 +643,7 @@ typedef struct edge_info_def
      builds on machines where FP registers are wider than double.  */
   volatile double back_edge_prob;
   /* True if the edge is an loopback edge in the natural loop.  */
-  int back_edge:1;
+  unsigned int back_edge:1;
 } *edge_info;
 
 #define BLOCK_INFO(B)	((block_info) (B)->aux)

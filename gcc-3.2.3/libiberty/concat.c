@@ -49,7 +49,9 @@ NOTES
 #endif
 #include "ansidecl.h"
 #include "libiberty.h"
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>		/* size_t */
+#endif
 
 #ifdef ANSI_PROTOTYPES
 #include <stdarg.h>

@@ -131,41 +131,53 @@ ffesrc_init_1 ()
 
   if (!ffesrc_ok_match_init_upper_)
     for (i = 'A'; i <= 'Z'; ++i)
-      ffesrc_char_match_init_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
+      if (ISUPPER(i))
+        ffesrc_char_match_init_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
 
-  if (ffesrc_ok_match_init_lower_)
+  if (ffesrc_ok_match_init_lower_) {
     for (i = 'a'; i <= 'z'; ++i)
-      ffesrc_char_match_init_[i] = TOUPPER (i);
-  else
+      if (ISLOWER(i))
+        ffesrc_char_match_init_[i] = TOUPPER (i);
+  } else {
     for (i = 'a'; i <= 'z'; ++i)
-      ffesrc_char_match_init_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
+      if (ISLOWER(i))
+        ffesrc_char_match_init_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
+  }
 
   if (!ffesrc_ok_match_noninit_upper_)
     for (i = 'A'; i <= 'Z'; ++i)
-      ffesrc_char_match_noninit_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
+      if (ISUPPER(i))
+        ffesrc_char_match_noninit_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
 
-  if (ffesrc_ok_match_noninit_lower_)
+  if (ffesrc_ok_match_noninit_lower_) {
     for (i = 'a'; i <= 'z'; ++i)
-      ffesrc_char_match_noninit_[i] = TOUPPER (i);
-  else
+      if (ISLOWER(i))
+        ffesrc_char_match_noninit_[i] = TOUPPER (i);
+  } else {
     for (i = 'a'; i <= 'z'; ++i)
-      ffesrc_char_match_noninit_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
+      if (ISLOWER(i))
+        ffesrc_char_match_noninit_[i] = FFESRC_INVALID_SYMBOL_CHAR_;
+  }
 
-  if (ffe_case_source () == FFE_caseLOWER)
+  if (ffe_case_source () == FFE_caseLOWER) {
     for (i = 'A'; i <= 'Z'; ++i)
-      ffesrc_char_source_[i] = TOLOWER (i);
+      if (ISUPPER(i))
+        ffesrc_char_source_[i] = TOLOWER (i);
+  }
   else if (ffe_case_source () == FFE_caseUPPER)
     for (i = 'a'; i <= 'z'; ++i)
-      ffesrc_char_source_[i] = TOUPPER (i);
+      if (ISLOWER(i))
+        ffesrc_char_source_[i] = TOUPPER (i);
 
   if (ffe_case_match () == FFE_caseLOWER)
     for (i = 'A'; i <= 'Z'; ++i)
-      ffesrc_char_internal_init_[i] = TOLOWER (i);
+      if (ISUPPER(i))
+        ffesrc_char_internal_init_[i] = TOLOWER (i);
 
   switch (ffe_case_symbol ())
     {
     case FFE_caseLOWER:
-      for (i = 'A'; i <= 'Z'; ++i)
+      for (i = 'A'; i <= 'Z'; ++i) if (ISUPPER(i))
 	{
 	  ffesrc_bad_symbol_init_[i] = FFEBAD_SYMBOL_UPPER_CASE;
 	  ffesrc_bad_symbol_noninit_[i] = FFEBAD_SYMBOL_UPPER_CASE;
@@ -173,7 +185,7 @@ ffesrc_init_1 ()
       break;
 
     case FFE_caseUPPER:
-      for (i = 'a'; i <= 'z'; ++i)
+      for (i = 'a'; i <= 'z'; ++i) if (ISLOWER(i))
 	{
 	  ffesrc_bad_symbol_init_[i] = FFEBAD_SYMBOL_LOWER_CASE;
 	  ffesrc_bad_symbol_noninit_[i] = FFEBAD_SYMBOL_LOWER_CASE;
@@ -183,7 +195,7 @@ ffesrc_init_1 ()
     case FFE_caseINITCAP:
       for (i = 0; i < 256; ++i)
 	ffesrc_bad_symbol_noninit_[i] = FFEBAD_SYMBOL_NOLOWER_INITCAP;
-      for (i = 'a'; i <= 'z'; ++i)
+      for (i = 'a'; i <= 'z'; ++i) if (ISLOWER(i))
 	{
 	  ffesrc_bad_symbol_init_[i] = FFEBAD_SYMBOL_LOWER_INITCAP;
 	  ffesrc_bad_symbol_noninit_[i] = FFEBAD;
