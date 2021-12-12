@@ -1,0 +1,32 @@
+CC=wcl
+COPTS=-q -w -c -I. -ml -zl -D__MSDOS__ -fpi87 -s -zdp -zu
+
+pdptest.exe: watcom.lib
+	wlink File pdptest.obj Name $@ Form dos Library $< Option quiet
+
+watcom.lib: dosstart.obj pdptest.obj stdio.obj string.obj stdlib.obj start.obj time.obj errno.obj assert.obj signal.obj locale.obj ctype.obj setjmp.obj math.obj dossupc.obj dossupa.obj
+	if exist $@ rm -rf $@
+	wlib -b -q $* +dosstart.obj
+	wlib -b -q $* +stdio.obj
+	wlib -b -q $* +string.obj
+	wlib -b -q $* +stdlib.obj
+	wlib -b -q $* +start.obj
+	wlib -b -q $* +time.obj
+	wlib -b -q $* +errno.obj
+	wlib -b -q $* +assert.obj
+	wlib -b -q $* +signal.obj
+	wlib -b -q $* +locale.obj
+	wlib -b -q $* +ctype.obj
+	wlib -b -q $* +setjmp.obj
+	wlib -b -q $* +math.obj
+	wlib -b -q $* +dossupc.obj
+	wlib -b -q $* +dossupa.obj
+
+dosstart.obj: dosstart.asm
+	wasm -q -DWATCOM -fo=.obj $<
+
+dossupa.obj: dossupa.asm
+	wasm -q -DWATCOM -fo=.obj $<
+
+.c.obj:
+	$(CC) $(COPTS) -fo=.obj $<

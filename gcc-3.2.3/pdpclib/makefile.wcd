@@ -1,0 +1,37 @@
+# Produce MSDOS executable using Watcom C
+# Build with wmake -u -f makefile.wcd or pdmake -f makefile.wcd
+
+CC=wcl
+COPTS=-q -w -c -I. -ml -zl -D__MSDOS__ -fpi87 -s -zdp -zu
+
+pdptest.exe: dosstart.obj pdptest.obj stdio.obj string.obj stdlib.obj \
+       start.obj time.obj errno.obj assert.obj signal.obj locale.obj \
+       ctype.obj setjmp.obj math.obj dossupc.obj dossupa.obj
+  if exist watcom.lib del watcom.lib
+  wlib -b -q watcom +dosstart.obj
+  wlib -b -q watcom +stdio.obj
+  wlib -b -q watcom +string.obj
+  wlib -b -q watcom +stdlib.obj
+  wlib -b -q watcom +start.obj
+  wlib -b -q watcom +time.obj
+  wlib -b -q watcom +errno.obj
+  wlib -b -q watcom +assert.obj
+  wlib -b -q watcom +signal.obj
+  wlib -b -q watcom +locale.obj
+  wlib -b -q watcom +ctype.obj
+  wlib -b -q watcom +setjmp.obj
+  wlib -b -q watcom +math.obj
+  wlib -b -q watcom +dossupc.obj
+  wlib -b -q watcom +dossupa.obj
+  wlink File pdptest.obj Name pdptest.exe Form dos Library watcom.lib Option quiet
+
+.c.obj:
+  $(CC) $(COPTS) $<
+
+dosstart.obj: dosstart.asm
+  wasm -q -DWATCOM dosstart.asm
+
+dossupa.obj: dossupa.asm
+  wasm -q -DWATCOM dossupa.asm
+
+

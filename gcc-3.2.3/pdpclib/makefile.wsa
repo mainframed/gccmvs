@@ -1,0 +1,39 @@
+# This builds stand-alone windows files for PDOS386, on Windows
+# For the 32-bit version of PDOS we define __PDOS386__
+# I haven't worked out how to get relocatable executables yet.
+
+CC=gccwin
+COPTS=-S -Os -fno-common -D__PDOS386__ -D__32BIT__ -U__WIN32__ -I. -I../src
+
+pdptest.exe: pdosst32.o pdptest.o stdio.o string.o stdlib.o \
+       start.o time.o errno.o assert.o signal.o locale.o \
+       ctype.o setjmp.o math.o pos.o support.o pdossupc.o bos.o \
+       liballoc.o
+  rm -f pdos.a
+  arwin r pdos.a pdosst32.o stdio.o string.o stdlib.o
+  arwin r pdos.a start.o time.o errno.o assert.o signal.o
+  arwin r pdos.a locale.o ctype.o setjmp.o math.o
+  arwin r pdos.a pos.o support.o pdossupc.o bos.o liballoc.o
+  ldwin -s -e ___pdosst32 -o pdptest.exe pdosst32.o pdptest.o pdos.a
+  stripwin --strip-unneeded pdptest.exe
+
+bos.o: ../src/bos.c
+  $(CC) $(COPTS) -o $*.s ../src/bos.c
+  aswin -o $@ $*.s
+  rm -f $*.s
+
+pos.o: ../src/pos.c
+  $(CC) $(COPTS) -o $*.s ../src/pos.c
+  aswin -o $@ $*.s
+  rm -f $*.s
+
+support.o: ../src/support.s
+  aswin -o $@ ../src/support.s
+
+.c.o:
+  $(CC) $(COPTS) -o $*.s $<
+  aswin -o $@ $*.s
+  rm -f $*.s
+
+.s.o:
+  aswin -o $@ $<
