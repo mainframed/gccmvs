@@ -38,8 +38,8 @@ diff -c gcc/config.sub:1.1.1.1 gcc/config.sub:1.6
   		os=-mvs
   		;;
 Index: gcc/gcc/__header.h
-diff -c nul gcc/gcc/__header.h:1.2
-*** nul	Tue Oct 01 16:28:41 2019
+diff -c /dev/null gcc/gcc/__header.h:1.2
+*** /dev/null	Tue Oct 01 16:28:41 2019
 --- gcc/gcc/__header.h	Tue Oct 31 17:08:38 2006
 ***************
 *** 0 ****
@@ -59,8 +59,8 @@ diff -c nul gcc/gcc/__header.h:1.2
 + insn-constants.h i-constants.h
 + langhooks-def.h langhdef.h
 Index: gcc/gcc/allcms.bat
-diff -c nul gcc/gcc/allcms.bat:1.14
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/allcms.bat:1.14
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/allcms.bat	Tue Apr 24 18:07:31 2018
 ***************
 *** 0 ****
@@ -90,8 +90,8 @@ diff -c nul gcc/gcc/allcms.bat:1.14
 + rem mvsendec encb all.zip all.dat
 + rem loc2ebc all.dat xfer.card
 Index: gcc/gcc/allcms.exec
-diff -c nul gcc/gcc/allcms.exec:1.41
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/allcms.exec:1.41
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/allcms.exec	Mon Apr 06 15:19:36 2015
 ***************
 *** 0 ****
@@ -132,8 +132,8 @@ diff -c nul gcc/gcc/allcms.exec:1.41
 + 
 + VMARC PACK * * &EXE (TAP2 BLOCK 80
 Index: gcc/gcc/allmus.bat
-diff -c nul gcc/gcc/allmus.bat:1.10
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/allmus.bat:1.10
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/allmus.bat	Mon Sep 30 16:33:41 2019
 ***************
 *** 0 ****
@@ -170,8 +170,8 @@ diff -c nul gcc/gcc/allmus.bat:1.10
 + call runmus compmus.job output.txt all.zip gccmus.mfarc
 + grep "Files are different" output.txt
 Index: gcc/gcc/allmvs.bat
-diff -c nul gcc/gcc/allmvs.bat:1.7
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/allmvs.bat:1.7
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/allmvs.bat	Mon Apr 03 00:14:58 2017
 ***************
 *** 0 ****
@@ -194,8 +194,8 @@ diff -c nul gcc/gcc/allmvs.bat:1.7
 + call zipmvs
 + call subjobs
 Index: gcc/gcc/allpdos.bat
-diff -c nul gcc/gcc/allpdos.bat:1.8
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/allpdos.bat:1.8
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/allpdos.bat	Mon Apr 03 00:14:58 2017
 ***************
 *** 0 ****
@@ -227,8 +227,8 @@ diff -c nul gcc/gcc/allpdos.bat:1.8
 + rem with what we had on the PC via cross-compile
 + call runpdos comppdos.bat output.txt all.zip
 Index: gcc/gcc/allvse.bat
-diff -c nul gcc/gcc/allvse.bat:1.20
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/allvse.bat:1.20
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/allvse.bat	Mon Sep 30 16:33:11 2019
 ***************
 *** 0 ****
@@ -252,8 +252,8 @@ diff -c nul gcc/gcc/allvse.bat:1.20
 + m4 -I . -I ..\..\pdos\pdpclib compvse.m4 >alljcl.jcl
 + call runvse alljcl.jcl output.txt all.zip gccvse-exe.obj
 Index: gcc/gcc/auto-host.h
-diff -c nul gcc/gcc/auto-host.h:1.1
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/auto-host.h:1.1
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/auto-host.h	Wed Feb 15 21:25:41 2006
 ***************
 *** 0 ****
@@ -564,8 +564,8 @@ diff -c nul gcc/gcc/auto-host.h:1.1
 + #endif
 + #endif
 Index: gcc/gcc/bootstrap.bat
-diff -c nul gcc/gcc/bootstrap.bat:1.3
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/bootstrap.bat:1.3
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/bootstrap.bat	Fri Nov 27 07:05:35 2009
 ***************
 *** 0 ****
@@ -901,8 +901,8 @@ diff -c gcc/gcc/cfgcleanup.c:1.1.1.1 gcc/gcc/cfgcleanup.c:1.4
   #define FORWARDER_BLOCK_P(BB) (BB_FLAGS (BB) & BB_FORWARDER_BLOCK)
   
 Index: gcc/gcc/checkgen.bat
-diff -c nul gcc/gcc/checkgen.bat:1.3
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/checkgen.bat:1.3
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/checkgen.bat	Mon May 25 19:22:18 2009
 ***************
 *** 0 ****
@@ -912,8 +912,8 @@ diff -c nul gcc/gcc/checkgen.bat:1.3
 + type checkgen.jcl >>alljcl.jcl
 + call runmvs alljcl.jcl output.txt
 Index: gcc/gcc/checkgen.jcl
-diff -c nul gcc/gcc/checkgen.jcl:1.3
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/checkgen.jcl:1.3
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/checkgen.jcl	Sat May 02 15:38:21 2009
 ***************
 *** 0 ****
@@ -952,8 +952,8 @@ diff -c nul gcc/gcc/checkgen.jcl:1.3
 + //*
 + //
 Index: gcc/gcc/cload.exec
-diff -c nul gcc/gcc/cload.exec:1.6
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/cload.exec:1.6
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/cload.exec	Thu Jan 22 09:19:01 2009
 ***************
 *** 0 ****
@@ -966,8 +966,8 @@ diff -c nul gcc/gcc/cload.exec:1.6
 + FI SYSPRINT CLEAR
 + &EXIT
 Index: gcc/gcc/cmsutil.bat
-diff -c nul gcc/gcc/cmsutil.bat:1.5
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/cmsutil.bat:1.5
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/cmsutil.bat	Fri Nov 27 07:05:35 2009
 ***************
 *** 0 ****
@@ -987,8 +987,8 @@ diff -c nul gcc/gcc/cmsutil.bat:1.5
 + del backup.mac
 + cd ..\..\gcc\gcc
 Index: gcc/gcc/cmsutil.exec
-diff -c nul gcc/gcc/cmsutil.exec:1.13
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/cmsutil.exec:1.13
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/cmsutil.exec	Fri Feb 16 02:54:19 2018
 ***************
 *** 0 ****
@@ -1108,8 +1108,8 @@ diff -c nul gcc/gcc/cmsutil.exec:1.13
 + ERASE * LISTING A
 + ERASE * TEXT A
 Index: gcc/gcc/cmsutil.m4
-diff -c nul gcc/gcc/cmsutil.m4:1.9
-*** nul	Tue Oct 01 16:28:42 2019
+diff -c /dev/null gcc/gcc/cmsutil.m4:1.9
+*** /dev/null	Tue Oct 01 16:28:42 2019
 --- gcc/gcc/cmsutil.m4	Tue Dec 29 19:59:00 2015
 ***************
 *** 0 ****
@@ -1228,8 +1228,8 @@ diff -c gcc/gcc/combine.c:1.1.1.1 gcc/gcc/combine.c:1.2
     if (oldval == newval)
       return;
 Index: gcc/gcc/comp386.bat
-diff -c nul gcc/gcc/comp386.bat:1.14
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/comp386.bat:1.14
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/comp386.bat	Tue Sep 10 18:02:31 2019
 ***************
 *** 0 ****
@@ -1761,8 +1761,8 @@ diff -c nul gcc/gcc/comp386.bat:1.14
 + ld386 -r -s -e ___pdosst32 -o gcc-pdos.exe pdosst32.o temp.a
 + strip386 --strip-unneeded gcc-pdos.exe
 Index: gcc/gcc/compile
-diff -c nul gcc/gcc/compile:1.7
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compile:1.7
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compile	Fri Jun 26 08:07:53 2009
 ***************
 *** 0 ****
@@ -1930,8 +1930,8 @@ diff -c nul gcc/gcc/compile:1.7
 + 
 + exit
 Index: gcc/gcc/compile.bat
-diff -c nul gcc/gcc/compile.bat:1.8
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compile.bat:1.8
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compile.bat	Mon Feb 11 21:09:43 2019
 ***************
 *** 0 ****
@@ -2093,8 +2093,8 @@ diff -c nul gcc/gcc/compile.bat:1.8
 + rem gcc -s -o gccmvs.exe *.o
 + gcc -s -nostdlib -o gccmvs.exe *.o ../../pdos/pdpclib/pdpwin32.a -lkernel32
 Index: gcc/gcc/compile.exec
-diff -c nul gcc/gcc/compile.exec:1.13
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compile.exec:1.13
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compile.exec	Sat May 26 17:23:36 2018
 ***************
 *** 0 ****
@@ -2269,8 +2269,8 @@ diff -c nul gcc/gcc/compile.exec:1.13
 + * Build 380 version of C library post-build
 + * EXEC MAKE380 &SRC
 Index: gcc/gcc/compilei.bat
-diff -c nul gcc/gcc/compilei.bat:1.3
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compilei.bat:1.3
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compilei.bat	Thu Jul 04 16:20:16 2019
 ***************
 *** 0 ****
@@ -2443,8 +2443,8 @@ diff -c nul gcc/gcc/compilei.bat:1.3
 + rem gcc -s -o gcc386.exe *.o
 + gcc -s -nostdlib -o gcc386.exe *.o ../../pdos/pdpclib/pdpwin32.a -lkernel32 -lgcc
 Index: gcc/gcc/compiles.bat
-diff -c nul gcc/gcc/compiles.bat:1.1
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compiles.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compiles.bat	Tue Nov 07 18:58:12 2017
 ***************
 *** 0 ****
@@ -2610,8 +2610,8 @@ diff -c nul gcc/gcc/compiles.bat:1.1
 + rem gcc -s -o gccmvs.exe *.o
 + gcc -s -nostdlib -o gccmvs.exe *.o ../../pdos/pdpclib/pdpwin32.a -lkernel32 -lgcc
 Index: gcc/gcc/compmus.exec
-diff -c nul gcc/gcc/compmus.exec:1.3
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compmus.exec:1.3
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compmus.exec	Sun Nov 22 14:40:30 2009
 ***************
 *** 0 ****
@@ -2777,8 +2777,8 @@ diff -c nul gcc/gcc/compmus.exec:1.3
 + 'musaone musstart'
 + 'musaone mussupa'
 Index: gcc/gcc/compmus.job
-diff -c nul gcc/gcc/compmus.job:1.37
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compmus.job:1.37
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compmus.job	Wed Jul 01 14:44:26 2015
 ***************
 *** 0 ****
@@ -5698,8 +5698,8 @@ diff -c nul gcc/gcc/compmus.job:1.37
 + @BLD000:EXE\*
 + /END
 Index: gcc/gcc/compmvs
-diff -c nul gcc/gcc/compmvs:1.18
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compmvs:1.18
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compmvs	Sat Sep 26 14:38:04 2009
 ***************
 *** 0 ****
@@ -5881,8 +5881,8 @@ diff -c nul gcc/gcc/compmvs:1.18
 + 
 + exit
 Index: gcc/gcc/compmvs.bat
-diff -c nul gcc/gcc/compmvs.bat:1.25
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compmvs.bat:1.25
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compmvs.bat	Sun Dec 26 09:10:28 2010
 ***************
 *** 0 ****
@@ -6057,8 +6057,8 @@ diff -c nul gcc/gcc/compmvs.bat:1.25
 + call stdcompm ../../pdos/pdpclib/vsemanip.c %1 %2 %3 %4 %5 %6 %7 %8 %9
 + 
 Index: gcc/gcc/comppdos.bat
-diff -c nul gcc/gcc/comppdos.bat:1.9
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/comppdos.bat:1.9
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/comppdos.bat	Fri Jun 15 23:13:33 2018
 ***************
 *** 0 ****
@@ -6384,8 +6384,8 @@ diff -c nul gcc/gcc/comppdos.bat:1.9
 + diff start.s1 start.s
 + diff __memmgr.s1 __memmgr.s
 Index: gcc/gcc/compvse.m4
-diff -c nul gcc/gcc/compvse.m4:1.94
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compvse.m4:1.94
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compvse.m4	Tue Dec 29 20:55:59 2015
 ***************
 *** 0 ****
@@ -7642,8 +7642,8 @@ diff -c nul gcc/gcc/compvse.m4:1.94
 + /&
 + * $$ EOJ
 Index: gcc/gcc/compwin.bat
-diff -c nul gcc/gcc/compwin.bat:1.1
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/compwin.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/compwin.bat	Thu Jul 04 16:18:05 2019
 ***************
 *** 0 ****
@@ -8301,8 +8301,8 @@ diff -c gcc/gcc/config.gcc:1.1.1.1 gcc/gcc/config.gcc:1.6
   	md_file=s390/s390.md
   	out_file=s390/s390.c
 Index: gcc/gcc/config.h
-diff -c nul gcc/gcc/config.h:1.16
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/config.h:1.16
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/config.h	Tue Sep 10 22:21:52 2019
 ***************
 *** 0 ****
@@ -8998,8 +8998,8 @@ diff -c nul gcc/gcc/config.h:1.16
 + 
 + #endif
 Index: gcc/gcc/configargs.h
-diff -c nul gcc/gcc/configargs.h:1.4
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/configargs.h:1.4
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/configargs.h	Wed Nov 01 19:49:24 2006
 ***************
 *** 0 ****
@@ -9139,8 +9139,8 @@ diff -c gcc/gcc/configure:1.1.1.1 gcc/gcc/configure:1.2
   
       ;;
 Index: gcc/gcc/copygcc.exec
-diff -c nul gcc/gcc/copygcc.exec:1.11
-*** nul	Tue Oct 01 16:28:43 2019
+diff -c /dev/null gcc/gcc/copygcc.exec:1.11
+*** /dev/null	Tue Oct 01 16:28:43 2019
 --- gcc/gcc/copygcc.exec	Sat May 26 17:20:56 2018
 ***************
 *** 0 ****
@@ -9981,8 +9981,8 @@ diff -c gcc/gcc/cppspec.c:1.1.1.1 gcc/gcc/cppspec.c:1.2
      is a customized version of the gcc driver.  It forces -E; -S and -c
      are errors.  It defaults to -x c for files with unrecognized
 Index: gcc/gcc/cygwin.bat
-diff -c nul gcc/gcc/cygwin.bat:1.7
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/cygwin.bat:1.7
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/cygwin.bat	Fri Nov 27 07:05:35 2009
 ***************
 *** 0 ****
@@ -10078,16 +10078,16 @@ diff -c gcc/gcc/debug.c:1.1.1.1 gcc/gcc/debug.c:1.2
     debug_nothing_int,		/* end_prologue */
     debug_nothing_void,		/* end_epilogue */
 Index: gcc/gcc/diffcms.exec
-diff -c nul gcc/gcc/diffcms.exec:1.6
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/diffcms.exec:1.6
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/diffcms.exec	Sat Sep 27 01:47:44 2008
 ***************
 *** 0 ****
 --- 1 ----
 + COMPARE &1 S &2 &1 S &3
 Index: gcc/gcc/example.jcl
-diff -c nul gcc/gcc/example.jcl:1.29
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/example.jcl:1.29
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/example.jcl	Sun Jun 14 12:54:59 2015
 ***************
 *** 0 ****
@@ -10163,8 +10163,8 @@ diff -c nul gcc/gcc/example.jcl:1.29
 + //*
 + //
 Index: gcc/gcc/example2.jcl
-diff -c nul gcc/gcc/example2.jcl:1.5
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/example2.jcl:1.5
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/example2.jcl	Mon Sep 30 12:42:45 2019
 ***************
 *** 0 ****
@@ -10297,8 +10297,8 @@ diff -c gcc/gcc/final.c:1.1.1.1 gcc/gcc/final.c:1.5
   		     ASM_COMMENT_START, NOTE_BASIC_BLOCK (insn)->index);
   	  break;
 Index: gcc/gcc/fixcsect.exec
-diff -c nul gcc/gcc/fixcsect.exec:1.1
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fixcsect.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fixcsect.exec	Sat Jan 17 21:38:25 2009
 ***************
 *** 0 ****
@@ -10327,8 +10327,8 @@ diff -c nul gcc/gcc/fixcsect.exec:1.1
 + ERASE &FILE LISTING
 + &EXIT
 Index: gcc/gcc/fixifox.bat
-diff -c nul gcc/gcc/fixifox.bat:1.2
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fixifox.bat:1.2
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fixifox.bat	Fri Nov 16 14:54:22 2007
 ***************
 *** 0 ****
@@ -10339,8 +10339,8 @@ diff -c nul gcc/gcc/fixifox.bat:1.2
 + ren ifox.tmp pureiso.h
 + cd ..\..
 Index: gcc/gcc/fixjcl.bat
-diff -c nul gcc/gcc/fixjcl.bat:1.6
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fixjcl.bat:1.6
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fixjcl.bat	Thu Apr 23 23:06:10 2009
 ***************
 *** 0 ****
@@ -10502,8 +10502,8 @@ diff -c gcc/gcc/fold-const.c:1.1.1.1 gcc/gcc/fold-const.c:1.2
   	  }
   #else
 Index: gcc/gcc/fudge.bat
-diff -c nul gcc/gcc/fudge.bat:1.1
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fudge.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fudge.bat	Sat Dec 15 19:29:28 2007
 ***************
 *** 0 ****
@@ -10528,8 +10528,8 @@ diff -c nul gcc/gcc/fudge.bat:1.1
 + ren temp.zzz stage2c.jcl
 + 
 Index: gcc/gcc/fullcms.bat
-diff -c nul gcc/gcc/fullcms.bat:1.1
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fullcms.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fullcms.bat	Thu May 21 21:58:05 2009
 ***************
 *** 0 ****
@@ -10539,8 +10539,8 @@ diff -c nul gcc/gcc/fullcms.bat:1.1
 + call restmini gcccms-exe.vmarc 191
 + call withbis2
 Index: gcc/gcc/fullcms1.exec
-diff -c nul gcc/gcc/fullcms1.exec:1.2
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fullcms1.exec:1.2
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fullcms1.exec	Fri May 22 10:09:14 2009
 ***************
 *** 0 ****
@@ -10581,8 +10581,8 @@ diff -c nul gcc/gcc/fullcms1.exec:1.2
 + 
 + VMARC PACK * * &EXE (TAP2 BLOCK 80
 Index: gcc/gcc/fullcms2.exec
-diff -c nul gcc/gcc/fullcms2.exec:1.2
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fullcms2.exec:1.2
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fullcms2.exec	Fri May 22 10:09:14 2009
 ***************
 *** 0 ****
@@ -10623,8 +10623,8 @@ diff -c nul gcc/gcc/fullcms2.exec:1.2
 + 
 + VMARC PACK * * &EXE (TAP2 BLOCK 80
 Index: gcc/gcc/fullmvs.bat
-diff -c nul gcc/gcc/fullmvs.bat:1.7
-*** nul	Tue Oct 01 16:28:44 2019
+diff -c /dev/null gcc/gcc/fullmvs.bat:1.7
+*** /dev/null	Tue Oct 01 16:28:44 2019
 --- gcc/gcc/fullmvs.bat	Sat Aug 22 10:53:52 2009
 ***************
 *** 0 ****
@@ -10996,16 +10996,16 @@ diff -c gcc/gcc/gcc.h:1.1.1.1 gcc/gcc/gcc.h:1.2
   extern void set_input PARAMS ((const char *));
   
 Index: gcc/gcc/gcc.parm
-diff -c nul gcc/gcc/gcc.parm:1.4
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcc.parm:1.4
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcc.parm	Tue Jun 02 14:21:18 2009
 ***************
 *** 0 ****
 --- 1 ----
 + -o dd:out - -S -ansi
 Index: gcc/gcc/gccaall.exec
-diff -c nul gcc/gcc/gccaall.exec:1.8
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccaall.exec:1.8
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccaall.exec	Thu Aug 20 19:01:53 2009
 ***************
 *** 0 ****
@@ -11030,8 +11030,8 @@ diff -c nul gcc/gcc/gccaall.exec:1.8
 + 
 + EXEC ITERGCC GCCAONE Y Y Y Y &DISK &ASMNAME
 Index: gcc/gcc/gccaone.exec
-diff -c nul gcc/gcc/gccaone.exec:1.6
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccaone.exec:1.6
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccaone.exec	Thu Aug 20 19:01:53 2009
 ***************
 *** 0 ****
@@ -11064,8 +11064,8 @@ diff -c nul gcc/gcc/gccaone.exec:1.6
 + * Delete temporary file
 + ERASE &FILE ASSEMBLE &DISK
 Index: gcc/gcc/gccc.prc
-diff -c nul gcc/gcc/gccc.prc:1.5
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccc.prc:1.5
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccc.prc	Thu Oct 29 23:59:22 2009
 ***************
 *** 0 ****
@@ -11089,8 +11089,8 @@ diff -c nul gcc/gcc/gccc.prc:1.5
 + //SYSTERM  DD SYSOUT=*
 + //*
 Index: gcc/gcc/gcccall.exec
-diff -c nul gcc/gcc/gcccall.exec:1.4
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcccall.exec:1.4
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcccall.exec	Sat Sep 27 01:47:45 2008
 ***************
 *** 0 ****
@@ -11108,8 +11108,8 @@ diff -c nul gcc/gcc/gcccall.exec:1.4
 + 
 +  EXEC ITERGCC GCCCONE Y Y N Y &DISK
 Index: gcc/gcc/gcccl.prc
-diff -c nul gcc/gcc/gcccl.prc:1.19
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcccl.prc:1.19
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcccl.prc	Sat Sep 14 03:50:58 2019
 ***************
 *** 0 ****
@@ -11159,8 +11159,8 @@ diff -c nul gcc/gcc/gcccl.prc:1.19
 + //SYSUT1   DD UNIT=SYSALLDA,SPACE=(CYL,(2,1))
 + //SYSPRINT DD SYSOUT=*
 Index: gcc/gcc/gccclg.prc
-diff -c nul gcc/gcc/gccclg.prc:1.15
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccclg.prc:1.15
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccclg.prc	Sat Sep 14 03:50:58 2019
 ***************
 *** 0 ****
@@ -11216,8 +11216,8 @@ diff -c nul gcc/gcc/gccclg.prc:1.15
 + //SYSTERM  DD SYSOUT=*
 + //SYSIN    DD DUMMY
 Index: gcc/gcc/gcccms.txt
-diff -c nul gcc/gcc/gcccms.txt:1.19
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcccms.txt:1.19
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcccms.txt	Fri Aug 21 00:25:40 2009
 ***************
 *** 0 ****
@@ -11644,8 +11644,8 @@ diff -c nul gcc/gcc/gcccms.txt:1.19
 + you don't lose your drive letter changes and end up
 + with a disaster).
 Index: gcc/gcc/gcccone.exec
-diff -c nul gcc/gcc/gcccone.exec:1.10
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcccone.exec:1.10
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcccone.exec	Sat May 26 17:20:39 2018
 ***************
 *** 0 ****
@@ -11681,8 +11681,8 @@ diff -c nul gcc/gcc/gcccone.exec:1.10
 + FILEDEF OUT CLEAR
 + FILEDEF SYSIN CLEAR
 Index: gcc/gcc/gccdos.txt
-diff -c nul gcc/gcc/gccdos.txt:1.9
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccdos.txt:1.9
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccdos.txt	Wed Sep 18 07:32:34 2019
 ***************
 *** 0 ****
@@ -11711,8 +11711,8 @@ diff -c nul gcc/gcc/gccdos.txt:1.9
 + should be nearly identical to gccwin.exe, and
 + you can rename gcc-pdos.exe to gccwin.exe
 Index: gcc/gcc/gcce.exec
-diff -c nul gcc/gcc/gcce.exec:1.3
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcce.exec:1.3
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcce.exec	Thu Aug 20 19:01:53 2009
 ***************
 *** 0 ****
@@ -11861,8 +11861,8 @@ diff -c nul gcc/gcc/gcce.exec:1.3
 + &TYPE SOURCE FILE  ' &FN &FT &FM ' NOT FOUND
 + &EXIT 4
 Index: gcc/gcc/gcclink.exec
-diff -c nul gcc/gcc/gcclink.exec:1.6
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gcclink.exec:1.6
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gcclink.exec	Thu May 21 21:56:59 2009
 ***************
 *** 0 ****
@@ -12069,8 +12069,8 @@ diff -c nul gcc/gcc/gcclink.exec:1.6
 + &ENDTYPE
 + &EXIT 4
 Index: gcc/gcc/gccmus.txt
-diff -c nul gcc/gcc/gccmus.txt:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccmus.txt:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccmus.txt	Wed Apr 28 00:40:02 2010
 ***************
 *** 0 ****
@@ -12199,8 +12199,8 @@ diff -c nul gcc/gcc/gccmus.txt:1.1
 + http://tech.groups.yahoo.com/group/musicspdemo/
 + 
 Index: gcc/gcc/gccmvs.txt
-diff -c nul gcc/gcc/gccmvs.txt:1.178
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccmvs.txt:1.178
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccmvs.txt	Tue Jan 08 20:28:58 2019
 ***************
 *** 0 ****
@@ -13231,8 +13231,8 @@ diff -c nul gcc/gcc/gccmvs.txt:1.178
 + inconsistent behavior (ie sometimes ABEND, sometimes an
 + error return code to the application).
 Index: gcc/gcc/gccr.exec
-diff -c nul gcc/gcc/gccr.exec:1.2
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccr.exec:1.2
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccr.exec	Thu Aug 20 19:01:54 2009
 ***************
 *** 0 ****
@@ -13359,16 +13359,16 @@ diff -c nul gcc/gcc/gccr.exec:1.2
 +    return -8
 + end
 Index: gcc/gcc/gccver.parm
-diff -c nul gcc/gcc/gccver.parm:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccver.parm:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccver.parm	Mon Jul 28 21:57:43 2008
 ***************
 *** 0 ****
 --- 1 ----
 + --version
 Index: gcc/gcc/gccvse.txt
-diff -c nul gcc/gcc/gccvse.txt:1.22
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccvse.txt:1.22
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccvse.txt	Sat Jan 01 11:45:37 2011
 ***************
 *** 0 ****
@@ -13792,8 +13792,8 @@ diff -c nul gcc/gcc/gccvse.txt:1.22
 + * Produce a 24-bit executable.
 + 
 Index: gcc/gcc/gccxat.exec
-diff -c nul gcc/gcc/gccxat.exec:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gccxat.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gccxat.exec	Mon Nov 20 10:48:30 2006
 ***************
 *** 0 ****
@@ -13849,16 +13849,16 @@ diff -c gcc/gcc/gcov-io.h:1.1.1.1 gcc/gcc/gcov-io.h:1.3
   static int __fetch_long	PARAMS ((long *, char *, size_t)) ATTRIBUTE_UNUSED;
   static int __read_long  PARAMS ((long *, FILE *, size_t)) ATTRIBUTE_UNUSED;
 Index: gcc/gcc/gencheck.h
-diff -c nul gcc/gcc/gencheck.h:1.3
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gencheck.h:1.3
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gencheck.h	Wed Nov 01 19:45:52 2006
 ***************
 *** 0 ****
 --- 1 ----
 + /* empty file */
 Index: gcc/gcc/gencomp.bat
-diff -c nul gcc/gcc/gencomp.bat:1.21
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gencomp.bat:1.21
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gencomp.bat	Mon Jun 18 04:17:51 2018
 ***************
 *** 0 ****
@@ -13999,8 +13999,8 @@ diff -c nul gcc/gcc/gencomp.bat:1.21
 + 
 + genrecog %mdfile% >insn-recog.c
 Index: gcc/gcc/gencomp.exec
-diff -c nul gcc/gcc/gencomp.exec:1.13
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gencomp.exec:1.13
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gencomp.exec	Thu Aug 20 19:01:54 2009
 ***************
 *** 0 ****
@@ -14611,8 +14611,8 @@ diff -c nul gcc/gcc/gencomp.exec:1.13
 + ERASE * TEXT &SRC
 + ERASE * MODULE &SRC
 Index: gcc/gcc/gencomp.jcl
-diff -c nul gcc/gcc/gencomp.jcl:1.48
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gencomp.jcl:1.48
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gencomp.jcl	Sun Jun 14 12:54:59 2015
 ***************
 *** 0 ****
@@ -15529,16 +15529,16 @@ diff -c nul gcc/gcc/gencomp.jcl:1.48
 + //*
 + //
 Index: gcc/gcc/gencomp.parm
-diff -c nul gcc/gcc/gencomp.parm:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gencomp.parm:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gencomp.parm	Sun Oct 26 16:01:28 2008
 ***************
 *** 0 ****
 --- 1 ----
 + -Os -S -ansi -pedantic-errors -remap -DHAVE_CONFIG_H -DGENFILES -o dd:out -
 Index: gcc/gcc/genfiles.txt
-diff -c nul gcc/gcc/genfiles.txt:1.4
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/genfiles.txt:1.4
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/genfiles.txt	Tue Nov 07 21:46:41 2006
 ***************
 *** 0 ****
@@ -15590,8 +15590,8 @@ diff -c gcc/gcc/genoutput.c:1.1.1.1 gcc/gcc/genoutput.c:1.2
   	default:
   	  abort ();
 Index: gcc/gcc/genrtl.c
-diff -c nul gcc/gcc/genrtl.c:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/genrtl.c:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/genrtl.c	Wed Feb 15 21:25:41 2006
 ***************
 *** 0 ****
@@ -16499,8 +16499,8 @@ diff -c nul gcc/gcc/genrtl.c:1.1
 + }
 + 
 Index: gcc/gcc/genrtl.h
-diff -c nul gcc/gcc/genrtl.h:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/genrtl.h:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/genrtl.h	Wed Feb 15 21:25:41 2006
 ***************
 *** 0 ****
@@ -16911,16 +16911,16 @@ diff -c nul gcc/gcc/genrtl.h:1.1
 + 
 + #endif /* GCC_GENRTL_H */
 Index: gcc/gcc/gensed.parm
-diff -c nul gcc/gcc/gensed.parm:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/gensed.parm:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/gensed.parm	Mon Oct 27 02:17:58 2008
 ***************
 *** 0 ****
 --- 1 ----
 + -e "/^ifobjc$/,/^end ifobjc$/d" -e "/^ifc$/d" -e "/^end ifc$/d"
 Index: gcc/gcc/hconfig.h
-diff -c nul gcc/gcc/hconfig.h:1.6
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/hconfig.h:1.6
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/hconfig.h	Mon Jun 18 04:16:33 2018
 ***************
 *** 0 ****
@@ -16965,8 +16965,8 @@ diff -c nul gcc/gcc/hconfig.h:1.6
 + # define POSIX
 + #endif
 Index: gcc/gcc/insn-attr.h
-diff -c nul gcc/gcc/insn-attr.h:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/insn-attr.h:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/insn-attr.h	Wed Feb 15 21:25:41 2006
 ***************
 *** 0 ****
@@ -16998,8 +16998,8 @@ diff -c nul gcc/gcc/insn-attr.h:1.1
 + 
 + #endif /* GCC_INSN_ATTR_H */
 Index: gcc/gcc/insn-attrtab.c
-diff -c nul gcc/gcc/insn-attrtab.c:1.6
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/insn-attrtab.c:1.6
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/insn-attrtab.c	Sat Sep 26 12:58:26 2009
 ***************
 *** 0 ****
@@ -17182,8 +17182,8 @@ diff -c nul gcc/gcc/insn-attrtab.c:1.6
 + 
 + int length_unit_log = 1;
 Index: gcc/gcc/insn-codes.h
-diff -c nul gcc/gcc/insn-codes.h:1.10
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/insn-codes.h:1.10
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/insn-codes.h	Sat Sep 26 12:58:27 2009
 ***************
 *** 0 ****
@@ -17304,8 +17304,8 @@ diff -c nul gcc/gcc/insn-codes.h:1.10
 + 
 + #endif /* GCC_INSN_CODES_H */
 Index: gcc/gcc/insn-config.h
-diff -c nul gcc/gcc/insn-config.h:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/insn-config.h:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/insn-config.h	Wed Feb 15 21:25:41 2006
 ***************
 *** 0 ****
@@ -17325,8 +17325,8 @@ diff -c nul gcc/gcc/insn-config.h:1.1
 + 
 + #endif /* GCC_INSN_CONFIG_H */
 Index: gcc/gcc/insn-constants.h
-diff -c nul gcc/gcc/insn-constants.h:1.1
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/insn-constants.h:1.1
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/insn-constants.h	Wed Feb 15 21:25:41 2006
 ***************
 *** 0 ****
@@ -17340,8 +17340,8 @@ diff -c nul gcc/gcc/insn-constants.h:1.1
 + 
 + #endif /* GCC_INSN_CONSTANTS_H */
 Index: gcc/gcc/insn-emit.c
-diff -c nul gcc/gcc/insn-emit.c:1.19
-*** nul	Tue Oct 01 16:28:45 2019
+diff -c /dev/null gcc/gcc/insn-emit.c:1.19
+*** /dev/null	Tue Oct 01 16:28:45 2019
 --- gcc/gcc/insn-emit.c	Thu Jan 14 15:53:03 2016
 ***************
 *** 0 ****
@@ -19302,8 +19302,8 @@ diff -c nul gcc/gcc/insn-emit.c:1.19
 +     }
 + }
 Index: gcc/gcc/insn-extract.c
-diff -c nul gcc/gcc/insn-extract.c:1.31
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/insn-extract.c:1.31
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/insn-extract.c	Mon Nov 06 20:44:09 2017
 ***************
 *** 0 ****
@@ -19580,8 +19580,8 @@ diff -c nul gcc/gcc/insn-extract.c:1.31
 +     }
 + }
 Index: gcc/gcc/insn-flags.h
-diff -c nul gcc/gcc/insn-flags.h:1.8
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/insn-flags.h:1.8
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/insn-flags.h	Sat Sep 26 12:58:27 2009
 ***************
 *** 0 ****
@@ -19806,8 +19806,8 @@ diff -c nul gcc/gcc/insn-flags.h:1.8
 + 
 + #endif /* GCC_INSN_FLAGS_H */
 Index: gcc/gcc/insn-opinit.c
-diff -c nul gcc/gcc/insn-opinit.c:1.4
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/insn-opinit.c:1.4
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/insn-opinit.c	Sat Sep 26 12:58:26 2009
 ***************
 *** 0 ****
@@ -19932,8 +19932,8 @@ diff -c nul gcc/gcc/insn-opinit.c:1.4
 +   umod_optab->handlers[(int) SImode].insn_code = CODE_FOR_umodsi3;
 + }
 Index: gcc/gcc/insn-output.c
-diff -c nul gcc/gcc/insn-output.c:1.71
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/insn-output.c:1.71
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/insn-output.c	Mon Nov 06 20:44:09 2017
 ***************
 *** 0 ****
@@ -26249,8 +26249,8 @@ diff -c nul gcc/gcc/insn-output.c:1.71
 +   return insn_data[code].name;
 + }
 Index: gcc/gcc/insn-peep.c
-diff -c nul gcc/gcc/insn-peep.c:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/insn-peep.c:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/insn-peep.c	Tue Nov 07 21:43:19 2006
 ***************
 *** 0 ****
@@ -26292,8 +26292,8 @@ diff -c nul gcc/gcc/insn-peep.c:1.1
 + rtx peep_operand[2];
 + #endif
 Index: gcc/gcc/insn-recog.c
-diff -c nul gcc/gcc/insn-recog.c:1.39
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/insn-recog.c:1.39
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/insn-recog.c	Sun Sep 25 20:18:18 2016
 ***************
 *** 0 ****
@@ -29958,16 +29958,16 @@ diff -c nul gcc/gcc/insn-recog.c:1.39
 + }
 + 
 Index: gcc/gcc/instvse.bat
-diff -c nul gcc/gcc/instvse.bat:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/instvse.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/instvse.bat	Fri Dec 31 22:49:44 2010
 ***************
 *** 0 ****
 --- 1 ----
 + call runvse instvse.jcl outputi.txt gccvse-exe.obj
 Index: gcc/gcc/instvse.jcl
-diff -c nul gcc/gcc/instvse.jcl:1.4
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/instvse.jcl:1.4
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/instvse.jcl	Sat Jan 01 02:19:15 2011
 ***************
 *** 0 ****
@@ -30130,8 +30130,8 @@ diff -c nul gcc/gcc/instvse.jcl:1.4
 + /&
 + * $$ EOJ
 Index: gcc/gcc/itergcc.exec
-diff -c nul gcc/gcc/itergcc.exec:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/itergcc.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/itergcc.exec	Thu Oct 23 17:05:04 2008
 ***************
 *** 0 ****
@@ -30415,8 +30415,8 @@ diff -c gcc/gcc/longlong.h:1.1.1.1 gcc/gcc/longlong.h:1.6
     } while (0)
   #endif
 Index: gcc/gcc/make380.exec
-diff -c nul gcc/gcc/make380.exec:1.3
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/make380.exec:1.3
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/make380.exec	Sat May 26 17:24:39 2018
 ***************
 *** 0 ****
@@ -30452,8 +30452,8 @@ diff -c nul gcc/gcc/make380.exec:1.3
 + * Quick test using pdptest
 + PDPTEST PaulEdwards was Here
 Index: gcc/gcc/makeutil.bat
-diff -c nul gcc/gcc/makeutil.bat:1.6
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/makeutil.bat:1.6
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/makeutil.bat	Sun Sep 29 17:14:21 2019
 ***************
 *** 0 ****
@@ -30471,8 +30471,8 @@ diff -c nul gcc/gcc/makeutil.bat:1.6
 + 
 + m4 -I ../../pdos/pdpclib -I ../../zlib/contrib/minizip makeutil.m4 >makeutil.jcl
 Index: gcc/gcc/makeutil.m4
-diff -c nul gcc/gcc/makeutil.m4:1.30
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/makeutil.m4:1.30
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/makeutil.m4	Sun Sep 29 17:23:28 2019
 ***************
 *** 0 ****
@@ -30966,8 +30966,8 @@ diff -c nul gcc/gcc/makeutil.m4:1.30
 + //*
 + //
 Index: gcc/gcc/makexmit.bat
-diff -c nul gcc/gcc/makexmit.bat:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/makexmit.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/makexmit.bat	Mon Sep 30 07:39:24 2019
 ***************
 *** 0 ****
@@ -30980,8 +30980,8 @@ diff -c nul gcc/gcc/makexmit.bat:1.1
 + zip -9X gccmvs-xmit xmit1.jcl xmit2.jcl xmit3.jcl xmit4.jcl xmit5.jcl xmitrecv.bat
 + rd xxx
 Index: gcc/gcc/mkclib.exec
-diff -c nul gcc/gcc/mkclib.exec:1.4
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/mkclib.exec:1.4
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/mkclib.exec	Fri Sep 26 21:58:39 2008
 ***************
 *** 0 ****
@@ -31008,8 +31008,8 @@ diff -c nul gcc/gcc/mkclib.exec:1.4
 +  COPY __MEMMGR TEXT &DISK CLIB TEXT &DISK (APP                       
 + 
 Index: gcc/gcc/mkpdpc.exec
-diff -c nul gcc/gcc/mkpdpc.exec:1.3
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/mkpdpc.exec:1.3
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/mkpdpc.exec	Sat May 26 17:16:28 2018
 ***************
 *** 0 ****
@@ -31088,8 +31088,8 @@ diff -c nul gcc/gcc/mkpdpc.exec:1.3
 + COPY NEWCLIB TXTLIB A PDPCLIB = &DISK (REPLACE
 + ERASE NEWCLIB TXTLIB A
 Index: gcc/gcc/multilib.h
-diff -c nul gcc/gcc/multilib.h:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/multilib.h:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/multilib.h	Wed Feb 15 21:25:42 2006
 ***************
 *** 0 ****
@@ -31111,8 +31111,8 @@ diff -c nul gcc/gcc/multilib.h:1.1
 + 
 + static const char *multilib_options = "";
 Index: gcc/gcc/musaall.exec
-diff -c nul gcc/gcc/musaall.exec:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/musaall.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/musaall.exec	Sun Nov 22 17:22:45 2009
 ***************
 *** 0 ****
@@ -31277,8 +31277,8 @@ diff -c nul gcc/gcc/musaall.exec:1.1
 + 'musaone musstart'
 + 'musaone mussupa'
 Index: gcc/gcc/musaone.exec
-diff -c nul gcc/gcc/musaone.exec:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/musaone.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/musaone.exec	Sun Nov 22 12:43:40 2009
 ***************
 *** 0 ****
@@ -31295,8 +31295,8 @@ diff -c nul gcc/gcc/musaone.exec:1.1
 + 
 + exit rc
 Index: gcc/gcc/musdall.exec
-diff -c nul gcc/gcc/musdall.exec:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/musdall.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/musdall.exec	Tue Nov 24 09:02:38 2009
 ***************
 *** 0 ****
@@ -31461,8 +31461,8 @@ diff -c nul gcc/gcc/musdall.exec:1.1
 + 'musdone musstart'
 + 'musdone mussupa'
 Index: gcc/gcc/musdone.exec
-diff -c nul gcc/gcc/musdone.exec:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/musdone.exec:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/musdone.exec	Tue Nov 24 09:00:45 2009
 ***************
 *** 0 ****
@@ -31473,8 +31473,8 @@ diff -c nul gcc/gcc/musdone.exec:1.1
 + "comp old\"name".s new\"name".s"
 + exit rc
 Index: gcc/gcc/musutil.bat
-diff -c nul gcc/gcc/musutil.bat:1.3
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/musutil.bat:1.3
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/musutil.bat	Sun Nov 01 14:08:14 2009
 ***************
 *** 0 ****
@@ -31495,8 +31495,8 @@ diff -c nul gcc/gcc/musutil.bat:1.3
 + 
 + call runmus musutil.job output.txt
 Index: gcc/gcc/musutil.m4
-diff -c nul gcc/gcc/musutil.m4:1.3
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/musutil.m4:1.3
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/musutil.m4	Tue Dec 29 20:14:51 2015
 ***************
 *** 0 ****
@@ -31827,16 +31827,16 @@ diff -c nul gcc/gcc/musutil.m4:1.3
 + mvsunzip n(mvsunzip.lmod) lcparm v(256)
 + /END
 Index: gcc/gcc/mvstest.bat
-diff -c nul gcc/gcc/mvstest.bat:1.2
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/mvstest.bat:1.2
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/mvstest.bat	Tue Oct 31 18:26:20 2006
 ***************
 *** 0 ****
 --- 1 ----
 + gccmvs -S -o - mvstest.c
 Index: gcc/gcc/mvstest.c
-diff -c nul gcc/gcc/mvstest.c:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/mvstest.c:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/mvstest.c	Wed Feb 15 21:25:42 2006
 ***************
 *** 0 ****
@@ -31849,8 +31849,8 @@ diff -c nul gcc/gcc/mvstest.c:1.1
 +     return (0);
 + }
 Index: gcc/gcc/mvstest.h
-diff -c nul gcc/gcc/mvstest.h:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/mvstest.h:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/mvstest.h	Wed Feb 15 21:25:42 2006
 ***************
 *** 0 ****
@@ -31877,16 +31877,16 @@ diff -c gcc/gcc/optabs.h:1.1.1.1 gcc/gcc/optabs.h:1.4
   enum optab_index
   {
 Index: gcc/gcc/options.h
-diff -c nul gcc/gcc/options.h:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/options.h:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/options.h	Wed Feb 15 21:25:42 2006
 ***************
 *** 0 ****
 --- 1 ----
 + /* empty file, don't know what it is for */
 Index: gcc/gcc/pdpone.exec
-diff -c nul gcc/gcc/pdpone.exec:1.2
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/pdpone.exec:1.2
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/pdpone.exec	Sat May 26 17:20:39 2018
 ***************
 *** 0 ****
@@ -31923,8 +31923,8 @@ diff -c nul gcc/gcc/pdpone.exec:1.2
 + FILEDEF OUT CLEAR
 + FILEDEF SYSIN CLEAR
 Index: gcc/gcc/postgen.jcl
-diff -c nul gcc/gcc/postgen.jcl:1.8
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/postgen.jcl:1.8
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/postgen.jcl	Tue Aug 18 22:22:56 2009
 ***************
 *** 0 ****
@@ -32022,8 +32022,8 @@ diff -c gcc/gcc/predict.c:1.1.1.1 gcc/gcc/predict.c:1.4
   
   #define BLOCK_INFO(B)	((block_info) (B)->aux)
 Index: gcc/gcc/pregen.jcl
-diff -c nul gcc/gcc/pregen.jcl:1.1
-*** nul	Tue Oct 01 16:28:46 2019
+diff -c /dev/null gcc/gcc/pregen.jcl:1.1
+*** /dev/null	Tue Oct 01 16:28:46 2019
 --- gcc/gcc/pregen.jcl	Mon Feb 25 00:22:43 2008
 ***************
 *** 0 ****
@@ -32067,8 +32067,8 @@ diff -c gcc/gcc/read-rtl.c:1.1.1.1 gcc/gcc/read-rtl.c:1.3
   
   /* Dump code after printing a message.  Used when read_rtx finds
 Index: gcc/gcc/readme.txt
-diff -c nul gcc/gcc/readme.txt:1.2
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/readme.txt:1.2
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/readme.txt	Tue Apr 27 21:53:43 2010
 ***************
 *** 0 ****
@@ -32078,8 +32078,8 @@ diff -c nul gcc/gcc/readme.txt:1.2
 + and gccmus.txt for MUSIC/SP installation instructions.
 + and gccvse.txt for DOS/VSE installation instructions.
 Index: gcc/gcc/runsed.bat
-diff -c nul gcc/gcc/runsed.bat:1.10
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/runsed.bat:1.10
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/runsed.bat	Sat Jan 05 00:39:14 2008
 ***************
 *** 0 ****
@@ -32088,8 +32088,8 @@ diff -c nul gcc/gcc/runsed.bat:1.10
 + del %1
 + ren sed.tmp %1
 Index: gcc/gcc/runspool.exec
-diff -c nul gcc/gcc/runspool.exec:1.7
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/runspool.exec:1.7
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/runspool.exec	Wed Nov 12 22:22:50 2008
 ***************
 *** 0 ****
@@ -32190,16 +32190,16 @@ diff -c gcc/gcc/simplify-rtx.c:1.1.1.1 gcc/gcc/simplify-rtx.c:1.4
         value = f0 / f1;
         break;
 Index: gcc/gcc/specs.h
-diff -c nul gcc/gcc/specs.h:1.3
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/specs.h:1.3
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/specs.h	Tue Oct 31 19:15:25 2006
 ***************
 *** 0 ****
 --- 1 ----
 + /* list of extensions and which compiler to run */
 Index: gcc/gcc/stage0a.jcl
-diff -c nul gcc/gcc/stage0a.jcl:1.22
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage0a.jcl:1.22
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage0a.jcl	Sun Apr 26 15:37:54 2009
 ***************
 *** 0 ****
@@ -32220,8 +32220,8 @@ diff -c nul gcc/gcc/stage0a.jcl:1.22
 + /*
 + //
 Index: gcc/gcc/stage0b.jcl
-diff -c nul gcc/gcc/stage0b.jcl:1.35
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage0b.jcl:1.35
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage0b.jcl	Thu Sep 12 21:24:42 2019
 ***************
 *** 0 ****
@@ -32317,8 +32317,8 @@ diff -c nul gcc/gcc/stage0b.jcl:1.35
 + //S1 EXEC CREATE
 + //
 Index: gcc/gcc/stage0c.jcl
-diff -c nul gcc/gcc/stage0c.jcl:1.9
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage0c.jcl:1.9
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage0c.jcl	Sat Apr 01 20:00:31 2017
 ***************
 *** 0 ****
@@ -32345,8 +32345,8 @@ diff -c nul gcc/gcc/stage0c.jcl:1.9
 + //S1 EXEC TRANSFER
 + //
 Index: gcc/gcc/stage0d.jcl
-diff -c nul gcc/gcc/stage0d.jcl:1.11
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage0d.jcl:1.11
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage0d.jcl	Thu Oct 29 23:59:22 2009
 ***************
 *** 0 ****
@@ -32408,8 +32408,8 @@ diff -c nul gcc/gcc/stage0d.jcl:1.11
 + //S11 EXEC CLEAN
 + //
 Index: gcc/gcc/stage1.jcl
-diff -c nul gcc/gcc/stage1.jcl:1.1
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage1.jcl:1.1
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage1.jcl	Thu Sep 12 07:25:49 2019
 ***************
 *** 0 ****
@@ -32613,8 +32613,8 @@ diff -c nul gcc/gcc/stage1.jcl:1.1
 + //*
 + //
 Index: gcc/gcc/stage2a.jcl
-diff -c nul gcc/gcc/stage2a.jcl:1.59
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage2a.jcl:1.59
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage2a.jcl	Thu Sep 12 19:18:09 2019
 ***************
 *** 0 ****
@@ -32749,8 +32749,8 @@ diff -c nul gcc/gcc/stage2a.jcl:1.59
 + //IFCVT    EXEC ST2CMP,MEMBER=IFCVT
 + //
 Index: gcc/gcc/stage2b.jcl
-diff -c nul gcc/gcc/stage2b.jcl:1.51
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage2b.jcl:1.51
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage2b.jcl	Thu Sep 12 21:22:54 2019
 ***************
 *** 0 ****
@@ -32933,8 +32933,8 @@ diff -c nul gcc/gcc/stage2b.jcl:1.51
 + //DOLINK   EXEC LINK,COND=(4,LT),MODULE='STAGE2'
 + //
 Index: gcc/gcc/stage2c.jcl
-diff -c nul gcc/gcc/stage2c.jcl:1.70
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage2c.jcl:1.70
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage2c.jcl	Thu Sep 12 21:23:00 2019
 ***************
 *** 0 ****
@@ -32971,8 +32971,8 @@ diff -c nul gcc/gcc/stage2c.jcl:1.70
 + /*
 + //
 Index: gcc/gcc/stage3a.jcl
-diff -c nul gcc/gcc/stage3a.jcl:1.52
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage3a.jcl:1.52
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage3a.jcl	Thu Sep 12 19:18:09 2019
 ***************
 *** 0 ****
@@ -33107,8 +33107,8 @@ diff -c nul gcc/gcc/stage3a.jcl:1.52
 + //IFCVT    EXEC ST3CMP,MEMBER=IFCVT
 + //
 Index: gcc/gcc/stage3b.jcl
-diff -c nul gcc/gcc/stage3b.jcl:1.49
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage3b.jcl:1.49
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage3b.jcl	Thu Sep 12 21:23:33 2019
 ***************
 *** 0 ****
@@ -33308,8 +33308,8 @@ diff -c nul gcc/gcc/stage3b.jcl:1.49
 + //DOLINK   EXEC LINK,COND=(4,LT),MODULE='GCC'
 + //
 Index: gcc/gcc/stage4.jcl
-diff -c nul gcc/gcc/stage4.jcl:1.44
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage4.jcl:1.44
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage4.jcl	Wed Sep 11 01:42:20 2019
 ***************
 *** 0 ****
@@ -33600,8 +33600,8 @@ diff -c nul gcc/gcc/stage4.jcl:1.44
 + //*
 + //
 Index: gcc/gcc/stage4z.jcl
-diff -c nul gcc/gcc/stage4z.jcl:1.50
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage4z.jcl:1.50
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage4z.jcl	Wed Sep 11 01:42:20 2019
 ***************
 *** 0 ****
@@ -33922,8 +33922,8 @@ diff -c nul gcc/gcc/stage4z.jcl:1.50
 + //*
 + //
 Index: gcc/gcc/stage5a.jcl
-diff -c nul gcc/gcc/stage5a.jcl:1.9
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage5a.jcl:1.9
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage5a.jcl	Thu Sep 12 19:18:09 2019
 ***************
 *** 0 ****
@@ -33952,8 +33952,8 @@ diff -c nul gcc/gcc/stage5a.jcl:1.9
 + //*
 + //
 Index: gcc/gcc/stage5b.jcl
-diff -c nul gcc/gcc/stage5b.jcl:1.23
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage5b.jcl:1.23
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage5b.jcl	Sun Jun 14 12:54:59 2015
 ***************
 *** 0 ****
@@ -34016,8 +34016,8 @@ diff -c nul gcc/gcc/stage5b.jcl:1.23
 + //S5 EXEC GCCCL,MEMBER=DSSRENAM
 + //
 Index: gcc/gcc/stage5c.jcl
-diff -c nul gcc/gcc/stage5c.jcl:1.4
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage5c.jcl:1.4
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage5c.jcl	Wed Mar 05 19:44:43 2008
 ***************
 *** 0 ****
@@ -34040,8 +34040,8 @@ diff -c nul gcc/gcc/stage5c.jcl:1.4
 + //*
 + //
 Index: gcc/gcc/stage6.jcl
-diff -c nul gcc/gcc/stage6.jcl:1.20
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stage6.jcl:1.20
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stage6.jcl	Thu Sep 12 21:24:43 2019
 ***************
 *** 0 ****
@@ -34128,80 +34128,80 @@ diff -c nul gcc/gcc/stage6.jcl:1.20
 + //S1 EXEC CREATE
 + //
 Index: gcc/gcc/std380.parm
-diff -c nul gcc/gcc/std380.parm:1.1
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/std380.parm:1.1
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/std380.parm	Sat May 26 17:15:23 2018
 ***************
 *** 0 ****
 --- 1 ----
 + -Os -DUSE_MEMMGR -o dd:out - -S -ansi -pedantic-errors
 Index: gcc/gcc/stdcomp.bat
-diff -c nul gcc/gcc/stdcomp.bat:1.2
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcomp.bat:1.2
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcomp.bat	Sun Nov 19 00:01:04 2006
 ***************
 *** 0 ****
 --- 1 ----
 + call stdcompp %2 %3 %4 %5 %6 %7 %8 %9 %1
 Index: gcc/gcc/stdcomp.parm
-diff -c nul gcc/gcc/stdcomp.parm:1.3
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcomp.parm:1.3
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcomp.parm	Tue Jun 02 14:21:18 2009
 ***************
 *** 0 ****
 --- 1 ----
 + -Os -o dd:out - -S -ansi -pedantic-errors -remap -DUSE_MEMMGR -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -DTARGET_CMS
 Index: gcc/gcc/stdcompb.bat
-diff -c nul gcc/gcc/stdcompb.bat:1.1
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompb.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompb.bat	Wed Feb 15 21:25:43 2006
 ***************
 *** 0 ****
 --- 1 ----
 + bcc32 -w- -A -c -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I. -Iconfig\i370 -I..\include %1 %2 %3 %4 %5 %6 %7 %8 %9
 Index: gcc/gcc/stdcompc.bat
-diff -c nul gcc/gcc/stdcompc.bat:1.11
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompc.bat:1.11
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompc.bat	Fri Aug 01 20:31:40 2008
 ***************
 *** 0 ****
 --- 1 ----
 + gccmvs -DUSE_MEMMGR -Os -S -ansi -pedantic-errors -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -DTARGET_CMS -I ../../pdos/pdpclib -I . -I config/i370 -I ../include %2 %3 %4 %5 %6 %7 %8 %9 %1
 Index: gcc/gcc/stdcompg.bat
-diff -c nul gcc/gcc/stdcompg.bat:1.5
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompg.bat:1.5
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompg.bat	Thu Aug 20 19:09:30 2009
 ***************
 *** 0 ****
 --- 1 ----
 + gcc -O2 -c -ansi -pedantic -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I . -I config/i370 -I ../include %1 %2 %3 %4 %5 %6 %7 %8 %9
 Index: gcc/gcc/stdcompi.bat
-diff -c nul gcc/gcc/stdcompi.bat:1.6
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompi.bat:1.6
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompi.bat	Tue Sep 10 17:57:08 2019
 ***************
 *** 0 ****
 --- 1 ----
 + gcc386 -fno-common -O2 -S -D__32BIT__ -D__PDOS386__ -DI386 -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I ../../pdos/pdpclib -I ../../pdos/src -I . -I config/i386 -I config -I ../include %2 %3 %4 %5 %6 %7 %8 %9 %1
 Index: gcc/gcc/stdcompj.bat
-diff -c nul gcc/gcc/stdcompj.bat:1.1
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompj.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompj.bat	Thu Jul 04 16:18:06 2019
 ***************
 *** 0 ****
 --- 1 ----
 + gccwin -fno-common -O2 -S -D__WIN32__ -D__STATIC__ -D__NOBIVA__ -DI386 -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I ../../pdos/pdpclib -I ../../pdos/src -I . -I config/i386 -I config -I ../include %2 %3 %4 %5 %6 %7 %8 %9 %1
 Index: gcc/gcc/stdcompm.bat
-diff -c nul gcc/gcc/stdcompm.bat:1.17
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompm.bat:1.17
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompm.bat	Tue Apr 24 18:06:38 2018
 ***************
 *** 0 ****
 --- 1 ----
 + gccmvs -DXXX_MEMMGR -Os -S -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I ../../pdos/pdpclib -I . -I config/i370 -I ../include %2 %3 %4 %5 %6 %7 %8 %9 %1
 Index: gcc/gcc/stdcompp.bat
-diff -c nul gcc/gcc/stdcompp.bat:1.13
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompp.bat:1.13
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompp.bat	Fri Jun 14 09:28:36 2019
 ***************
 *** 0 ****
@@ -34211,16 +34211,16 @@ diff -c nul gcc/gcc/stdcompp.bat:1.13
 + @set EXTRA=-pedantic -I config/i370 -D__WIN32__ -D__STATIC__
 + gcc -O2 -c -ansi -nostdinc -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I ../../pdos/pdpclib -I . %EXTRA% -I ../include %1 %2 %3 %4 %5 %6 %7 %8 %9
 Index: gcc/gcc/stdcompv.bat
-diff -c nul gcc/gcc/stdcompv.bat:1.1
-*** nul	Tue Oct 01 16:28:47 2019
+diff -c /dev/null gcc/gcc/stdcompv.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:47 2019
 --- gcc/gcc/stdcompv.bat	Wed Feb 15 21:25:43 2006
 ***************
 *** 0 ****
 --- 1 ----
 + cl /w /c /Za /DHAVE_CONFIG_H /DIN_GCC /DPUREISO /I . /I config/i370 /I ..\include %1 %2 %3 %4 %5 %6 %7 %8 %9
 Index: gcc/gcc/stdcompw.bat
-diff -c nul gcc/gcc/stdcompw.bat:1.3
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/stdcompw.bat:1.3
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/stdcompw.bat	Fri Jun 22 21:54:42 2007
 ***************
 *** 0 ****
@@ -34231,24 +34231,24 @@ diff -c nul gcc/gcc/stdcompw.bat:1.3
 + rem open to xxopen
 + wcl386 -3s -zq -e=1 -za -w- -c -Dopen=xxopen -DVALIST_NOT_PTR -DHAVE_CONFIG_H -DIN_GCC -DPUREISO -I. -Iconfig\i370 -I..\include %1 %2 %3 %4 %5 %6 %7 %8 %9
 Index: gcc/gcc/stdcompz.bat
-diff -c nul gcc/gcc/stdcompz.bat:1.4
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/stdcompz.bat:1.4
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/stdcompz.bat	Tue Nov 28 05:32:46 2006
 ***************
 *** 0 ****
 --- 1 ----
 + call stdcompp -DNO_DETAB -DGENERATOR_FILE %2 %3 %4 %5 %6 %7 %8 %9 %1
 Index: gcc/gcc/stdpdp.parm
-diff -c nul gcc/gcc/stdpdp.parm:1.5
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/stdpdp.parm:1.5
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/stdpdp.parm	Tue Jun 02 14:21:18 2009
 ***************
 *** 0 ****
 --- 1 ----
 + -Os -DXXX_MEMMGR -o dd:out - -S -ansi -pedantic-errors
 Index: gcc/gcc/subjobs.bat
-diff -c nul gcc/gcc/subjobs.bat:1.21
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/subjobs.bat:1.21
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/subjobs.bat	Thu Sep 12 21:24:21 2019
 ***************
 *** 0 ****
@@ -34328,8 +34328,8 @@ diff -c gcc/gcc/system.h:1.1.1.1 gcc/gcc/system.h:1.6
   /* Old target macros that have moved to the target hooks structure.  */
    #pragma GCC poison ASM_OPEN_PAREN ASM_CLOSE_PAREN			\
 Index: gcc/gcc/tape.tdf
-diff -c nul gcc/gcc/tape.tdf:1.1
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/tape.tdf:1.1
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/tape.tdf	Wed Feb 15 21:25:43 2006
 ***************
 *** 0 ****
@@ -34350,8 +34350,8 @@ diff -c nul gcc/gcc/tape.tdf:1.1
 + EOT
 + 
 Index: gcc/gcc/tapeall.bat
-diff -c nul gcc/gcc/tapeall.bat:1.4
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/tapeall.bat:1.4
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/tapeall.bat	Sat Nov 25 17:23:01 2006
 ***************
 *** 0 ****
@@ -34415,8 +34415,8 @@ diff -c nul gcc/gcc/tapeall.bat:1.4
 + 
 + 
 Index: gcc/gcc/tm-preds.h
-diff -c nul gcc/gcc/tm-preds.h:1.2
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/tm-preds.h:1.2
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/tm-preds.h	Fri Jun 26 09:31:10 2009
 ***************
 *** 0 ****
@@ -34435,8 +34435,8 @@ diff -c nul gcc/gcc/tm-preds.h:1.2
 + 
 + #endif /* GCC_TM_PREDS_H */
 Index: gcc/gcc/tm_p.h
-diff -c nul gcc/gcc/tm_p.h:1.3
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/tm_p.h:1.3
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/tm_p.h	Mon Jun 18 04:21:43 2018
 ***************
 *** 0 ****
@@ -34656,8 +34656,8 @@ diff -c gcc/gcc/tradcpp.c:1.1.1.1 gcc/gcc/tradcpp.c:1.3
     } else {
       /* Search directory path, trying to open the file.
 Index: gcc/gcc/tree-check.h
-diff -c nul gcc/gcc/tree-check.h:1.1
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/tree-check.h:1.1
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/tree-check.h	Wed Feb 15 21:25:44 2006
 ***************
 *** 0 ****
@@ -34841,8 +34841,8 @@ diff -c nul gcc/gcc/tree-check.h:1.1
 + 
 + #endif /* GCC_TREE_CHECK_H */
 Index: gcc/gcc/unixio.c
-diff -c nul gcc/gcc/unixio.c:1.5
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/unixio.c:1.5
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/unixio.c	Fri Jun 26 08:08:42 2009
 ***************
 *** 0 ****
@@ -35072,8 +35072,8 @@ diff -c nul gcc/gcc/unixio.c:1.5
 +     return (0);
 + }
 Index: gcc/gcc/unixio.h
-diff -c nul gcc/gcc/unixio.h:1.4
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/unixio.h:1.4
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/unixio.h	Sun Nov 26 19:11:08 2006
 ***************
 *** 0 ****
@@ -35199,8 +35199,8 @@ diff -c gcc/gcc/version.c:1.1.1.1 gcc/gcc/version.c:1.24
   
 ! const char *const version_string = "3.2.3 MVS V9.0";
 Index: gcc/gcc/vseutil.bat
-diff -c nul gcc/gcc/vseutil.bat:1.13
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/vseutil.bat:1.13
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/vseutil.bat	Thu Dec 30 23:22:36 2010
 ***************
 *** 0 ****
@@ -35220,8 +35220,8 @@ diff -c nul gcc/gcc/vseutil.bat:1.13
 + del backup.mac
 + cd ..\..\gcc\gcc
 Index: gcc/gcc/vseutil.m4
-diff -c nul gcc/gcc/vseutil.m4:1.50
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/vseutil.m4:1.50
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/vseutil.m4	Tue Dec 29 19:49:08 2015
 ***************
 *** 0 ****
@@ -35702,8 +35702,8 @@ diff -c nul gcc/gcc/vseutil.m4:1.50
 + /&
 + * $$ EOJ
 Index: gcc/gcc/withbis.bat
-diff -c nul gcc/gcc/withbis.bat:1.3
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/withbis.bat:1.3
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/withbis.bat	Tue Jun 02 14:23:11 2009
 ***************
 *** 0 ****
@@ -35713,8 +35713,8 @@ diff -c nul gcc/gcc/withbis.bat:1.3
 + sed 's/subjobs/subjobs2/g' allmvs.bat | sed 's/zipmvs/zipmvs2/g' >allmvs2.bat
 + call allmvs2
 Index: gcc/gcc/withbis1.bat
-diff -c nul gcc/gcc/withbis1.bat:1.9
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/withbis1.bat:1.9
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/withbis1.bat	Fri Nov 27 07:05:36 2009
 ***************
 *** 0 ****
@@ -35769,8 +35769,8 @@ diff -c nul gcc/gcc/withbis1.bat:1.9
 + rem mvsendec encb all.zip all.dat
 + rem loc2ebc all.dat xfer.card
 Index: gcc/gcc/withbis1.exec
-diff -c nul gcc/gcc/withbis1.exec:1.4
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/withbis1.exec:1.4
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/withbis1.exec	Thu May 21 21:57:39 2009
 ***************
 *** 0 ****
@@ -35823,8 +35823,8 @@ diff -c nul gcc/gcc/withbis1.exec:1.4
 + * Save the generated assembler ourselves
 + COPY * S &SRC = = &WORK (REPL
 Index: gcc/gcc/withbis2.bat
-diff -c nul gcc/gcc/withbis2.bat:1.6
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/withbis2.bat:1.6
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/withbis2.bat	Fri Nov 27 07:05:36 2009
 ***************
 *** 0 ****
@@ -35883,8 +35883,8 @@ diff -c nul gcc/gcc/withbis2.bat:1.6
 + rem mvsendec encb all.zip all.dat
 + rem loc2ebc all.dat xfer.card
 Index: gcc/gcc/withbis2.exec
-diff -c nul gcc/gcc/withbis2.exec:1.3
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/withbis2.exec:1.3
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/withbis2.exec	Fri May 22 10:08:55 2009
 ***************
 *** 0 ****
@@ -35957,8 +35957,8 @@ diff -c nul gcc/gcc/withbis2.exec:1.3
 + COPY TM-PREDS H &SRC = = &EXE (REPL
 + COPY TREE-CHE H &SRC = = &EXE (REPL
 Index: gcc/gcc/xmit1.jcl
-diff -c nul gcc/gcc/xmit1.jcl:1.1
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/xmit1.jcl:1.1
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/xmit1.jcl	Sun Apr 26 15:37:35 2009
 ***************
 *** 0 ****
@@ -35979,8 +35979,8 @@ diff -c nul gcc/gcc/xmit1.jcl:1.1
 + /*
 + //
 Index: gcc/gcc/xmit2.jcl
-diff -c nul gcc/gcc/xmit2.jcl:1.4
-*** nul	Tue Oct 01 16:28:48 2019
+diff -c /dev/null gcc/gcc/xmit2.jcl:1.4
+*** /dev/null	Tue Oct 01 16:28:48 2019
 --- gcc/gcc/xmit2.jcl	Sun Jul 19 10:36:56 2009
 ***************
 *** 0 ****
@@ -36013,8 +36013,8 @@ diff -c nul gcc/gcc/xmit2.jcl:1.4
 + //*
 + //
 Index: gcc/gcc/xmit3.jcl
-diff -c nul gcc/gcc/xmit3.jcl:1.5
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmit3.jcl:1.5
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmit3.jcl	Thu Oct 29 23:59:24 2009
 ***************
 *** 0 ****
@@ -36052,8 +36052,8 @@ diff -c nul gcc/gcc/xmit3.jcl:1.5
 + //S1 EXEC TRANSFER
 + //
 Index: gcc/gcc/xmit4.jcl
-diff -c nul gcc/gcc/xmit4.jcl:1.7
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmit4.jcl:1.7
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmit4.jcl	Mon Sep 30 12:56:17 2019
 ***************
 *** 0 ****
@@ -36085,8 +36085,8 @@ diff -c nul gcc/gcc/xmit4.jcl:1.7
 + //*
 + //
 Index: gcc/gcc/xmit5.jcl
-diff -c nul gcc/gcc/xmit5.jcl:1.4
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmit5.jcl:1.4
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmit5.jcl	Fri May 01 06:41:11 2009
 ***************
 *** 0 ****
@@ -36115,8 +36115,8 @@ diff -c nul gcc/gcc/xmit5.jcl:1.4
 + //*
 + //
 Index: gcc/gcc/xmit6.jcl
-diff -c nul gcc/gcc/xmit6.jcl:1.15
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmit6.jcl:1.15
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmit6.jcl	Mon Sep 30 12:56:17 2019
 ***************
 *** 0 ****
@@ -36297,8 +36297,8 @@ diff -c nul gcc/gcc/xmit6.jcl:1.15
 + //*
 + //
 Index: gcc/gcc/xmit7.jcl
-diff -c nul gcc/gcc/xmit7.jcl:1.1
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmit7.jcl:1.1
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmit7.jcl	Thu Jun 04 19:54:19 2009
 ***************
 *** 0 ****
@@ -36321,8 +36321,8 @@ diff -c nul gcc/gcc/xmit7.jcl:1.1
 + //*
 + //
 Index: gcc/gcc/xmit8.jcl
-diff -c nul gcc/gcc/xmit8.jcl:1.2
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmit8.jcl:1.2
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmit8.jcl	Sat May 02 15:38:24 2009
 ***************
 *** 0 ****
@@ -36344,8 +36344,8 @@ diff -c nul gcc/gcc/xmit8.jcl:1.2
 + //*
 + //
 Index: gcc/gcc/xmitdoc.txt
-diff -c nul gcc/gcc/xmitdoc.txt:1.9
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmitdoc.txt:1.9
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmitdoc.txt	Sat May 02 17:41:02 2009
 ***************
 *** 0 ****
@@ -36384,8 +36384,8 @@ diff -c nul gcc/gcc/xmitdoc.txt:1.9
 + then after installation read GCC.DOC(GCCMVS) where
 + there are instructions for running STAGE4.
 Index: gcc/gcc/xmitgcc.jcl
-diff -c nul gcc/gcc/xmitgcc.jcl:1.18
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmitgcc.jcl:1.18
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmitgcc.jcl	Fri Oct 30 00:11:39 2009
 ***************
 *** 0 ****
@@ -36516,8 +36516,8 @@ diff -c nul gcc/gcc/xmitgcc.jcl:1.18
 + //*
 + //
 Index: gcc/gcc/xmitread.txt
-diff -c nul gcc/gcc/xmitread.txt:1.7
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmitread.txt:1.7
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmitread.txt	Mon Sep 30 11:08:45 2019
 ***************
 *** 0 ****
@@ -36579,8 +36579,8 @@ diff -c nul gcc/gcc/xmitread.txt:1.7
 + all these steps for an MVS/380 user with a similar
 + setup. It is provided purely as an example.
 Index: gcc/gcc/xmitrecv.bat
-diff -c nul gcc/gcc/xmitrecv.bat:1.2
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmitrecv.bat:1.2
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmitrecv.bat	Mon May 25 19:22:19 2009
 ***************
 *** 0 ****
@@ -36593,8 +36593,8 @@ diff -c nul gcc/gcc/xmitrecv.bat:1.2
 + type xmit5.jcl >>alljcl.jcl
 + call runmvs alljcl.jcl output.txt gccmvs.xmi
 Index: gcc/gcc/xmittape.jcl
-diff -c nul gcc/gcc/xmittape.jcl:1.1
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/xmittape.jcl:1.1
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/xmittape.jcl	Thu Apr 23 22:52:05 2009
 ***************
 *** 0 ****
@@ -36614,8 +36614,8 @@ diff -c nul gcc/gcc/xmittape.jcl:1.1
 + //*
 + //
 Index: gcc/gcc/zipmvs
-diff -c nul gcc/gcc/zipmvs:1.3
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/zipmvs:1.3
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/zipmvs	Sat May 22 19:32:10 2010
 ***************
 *** 0 ****
@@ -36702,8 +36702,8 @@ diff -c nul gcc/gcc/zipmvs:1.3
 + #zip -d gcci.zip tm-preds.h
 + #zip -d gcci.zip tree-check.h
 Index: gcc/gcc/zipmvs.bat
-diff -c nul gcc/gcc/zipmvs.bat:1.5
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/zipmvs.bat:1.5
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/zipmvs.bat	Mon Jan 11 15:23:10 2016
 ***************
 *** 0 ****
@@ -36795,8 +36795,8 @@ diff -c nul gcc/gcc/zipmvs.bat:1.5
 + 
 + zip -9 -X all *.zip
 Index: gcc/gcc/zippdos.bat
-diff -c nul gcc/gcc/zippdos.bat:1.9
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/zippdos.bat:1.9
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/zippdos.bat	Mon Jan 11 16:37:41 2016
 ***************
 *** 0 ****
@@ -36876,8 +36876,8 @@ diff -c nul gcc/gcc/zippdos.bat:1.9
 + zip -0mX ..\gcc\all *
 + cd ..\gcc
 Index: gcc/gcc/zipvse.bat
-diff -c nul gcc/gcc/zipvse.bat:1.4
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/zipvse.bat:1.4
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/zipvse.bat	Mon Dec 20 09:25:48 2010
 ***************
 *** 0 ****
@@ -36899,8 +36899,8 @@ diff -c nul gcc/gcc/zipvse.bat:1.4
 + 
 + zip -0 -X all pdp*.zip
 Index: gcc/gcc/config/i370/cms.h
-diff -c nul gcc/gcc/config/i370/cms.h:1.4
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/config/i370/cms.h:1.4
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/config/i370/cms.h	Sat Oct 15 17:41:46 2016
 ***************
 *** 0 ****
@@ -36957,8 +36957,8 @@ diff -c nul gcc/gcc/config/i370/cms.h:1.4
 + #include "pureiso.h"
 + #endif
 Index: gcc/gcc/config/i370/doconly.bat
-diff -c nul gcc/gcc/config/i370/doconly.bat:1.1
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/config/i370/doconly.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/config/i370/doconly.bat	Sat Apr 01 02:30:50 2017
 ***************
 *** 0 ****
@@ -37419,8 +37419,8 @@ diff -c nul gcc/gcc/config/i370/doconly.bat:1.1
 + call oneconly widechar-1.c
 + call oneconly zero-strct-1.c
 Index: gcc/gcc/config/i370/dotests.bat
-diff -c nul gcc/gcc/config/i370/dotests.bat:1.1
-*** nul	Tue Oct 01 16:28:49 2019
+diff -c /dev/null gcc/gcc/config/i370/dotests.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:49 2019
 --- gcc/gcc/config/i370/dotests.bat	Fri Mar 31 19:51:35 2017
 ***************
 *** 0 ****
@@ -45547,8 +45547,8 @@ diff -c gcc/gcc/config/i370/linux.h:1.1.1.1 gcc/gcc/config/i370/linux.h:1.2
   #undef CPP_PREDEFINES
 --- 37,42 ----
 Index: gcc/gcc/config/i370/mshort.h
-diff -c nul gcc/gcc/config/i370/mshort.h:1.13
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/mshort.h:1.13
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/mshort.h	Sun Oct 12 11:39:07 2008
 ***************
 *** 0 ****
@@ -46891,8 +46891,8 @@ diff -c gcc/gcc/config/i370/mvs.h:1.1.1.1 gcc/gcc/config/i370/mvs.h:1.3
   /* Specify that we're generating code for the Language Environment */
   
 Index: gcc/gcc/config/i370/mvs38_dignus.h
-diff -c nul gcc/gcc/config/i370/mvs38_dignus.h:1.1.3.1
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/mvs38_dignus.h:1.1.3.1
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/mvs38_dignus.h	Fri Nov 03 11:47:12 2006
 ***************
 *** 0 ****
@@ -46946,8 +46946,8 @@ diff -c nul gcc/gcc/config/i370/mvs38_dignus.h:1.1.3.1
 + 
 + 
 Index: gcc/gcc/config/i370/mvsdignus.h
-diff -c nul gcc/gcc/config/i370/mvsdignus.h:1.3
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/mvsdignus.h:1.3
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/mvsdignus.h	Fri Nov 03 16:15:23 2006
 ***************
 *** 0 ****
@@ -47002,8 +47002,8 @@ diff -c nul gcc/gcc/config/i370/mvsdignus.h:1.3
 + 
 + 
 Index: gcc/gcc/config/i370/mvsle.h
-diff -c nul gcc/gcc/config/i370/mvsle.h:1.1
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/mvsle.h:1.1
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/mvsle.h	Wed Feb 15 21:25:44 2006
 ***************
 *** 0 ****
@@ -47058,8 +47058,8 @@ diff -c nul gcc/gcc/config/i370/mvsle.h:1.1
 + 
 + 
 Index: gcc/gcc/config/i370/mvspdp.h
-diff -c nul gcc/gcc/config/i370/mvspdp.h:1.3
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/mvspdp.h:1.3
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/mvspdp.h	Sat Oct 15 17:41:46 2016
 ***************
 *** 0 ****
@@ -47177,8 +47177,8 @@ diff -c gcc/gcc/config/i370/oe.h:1.1.1.1 gcc/gcc/config/i370/oe.h:1.2
 ! #define CPP_PREDEFINES "-DGCC -Dgcc -DUNIX -Dunix -Dopenedition -D__i370__ -DLE370 -Asystem=openedition -Asystem=unix -Acpu=i370 -Amachine=i370"
   
 Index: gcc/gcc/config/i370/onecomp.bat
-diff -c nul gcc/gcc/config/i370/onecomp.bat:1.1
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/onecomp.bat:1.1
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/onecomp.bat	Fri Mar 31 19:51:35 2017
 ***************
 *** 0 ****
@@ -47194,8 +47194,8 @@ diff -c nul gcc/gcc/config/i370/onecomp.bat:1.1
 + echo %1 failed >>results.txt
 + :exit
 Index: gcc/gcc/config/i370/oneconly.bat
-diff -c nul gcc/gcc/config/i370/oneconly.bat:1.2
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/oneconly.bat:1.2
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/oneconly.bat	Sat Apr 01 19:08:19 2017
 ***************
 *** 0 ****
@@ -47220,8 +47220,8 @@ diff -c nul gcc/gcc/config/i370/oneconly.bat:1.2
 + 
 + :exit
 Index: gcc/gcc/config/i370/pureiso.h
-diff -c nul gcc/gcc/config/i370/pureiso.h:1.17
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/pureiso.h:1.17
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/pureiso.h	Tue Dec 14 01:38:52 2010
 ***************
 *** 0 ****
@@ -47401,8 +47401,8 @@ diff -c nul gcc/gcc/config/i370/pureiso.h:1.17
 + 
 + #define getpwd() ""
 Index: gcc/gcc/config/i370/showres.bat
-diff -c nul gcc/gcc/config/i370/showres.bat:1.2
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/showres.bat:1.2
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/showres.bat	Sat Apr 01 02:31:05 2017
 ***************
 *** 0 ****
@@ -47413,8 +47413,8 @@ diff -c nul gcc/gcc/config/i370/showres.bat:1.2
 + grep passed resconly.txt | wc
 + grep failed resconly.txt | wc
 Index: gcc/gcc/config/i370/t-mvs
-diff -c nul gcc/gcc/config/i370/t-mvs:1.1
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/t-mvs:1.1
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/t-mvs	Wed Feb 15 21:25:44 2006
 ***************
 *** 0 ****
@@ -47448,8 +47448,8 @@ diff -c gcc/gcc/config/i370/t-oe:1.1.1.1 gcc/gcc/config/i370/t-oe:1.3
 + LIBGCC =
 + INSTALL_LIBGCC =
 Index: gcc/gcc/config/i370/vse.h
-diff -c nul gcc/gcc/config/i370/vse.h:1.2
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/vse.h:1.2
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/vse.h	Sat Oct 15 17:41:47 2016
 ***************
 *** 0 ****
@@ -47506,8 +47506,8 @@ diff -c nul gcc/gcc/config/i370/vse.h:1.2
 + #include "pureiso.h"
 + #endif
 Index: gcc/gcc/config/i370/xm-mvs.h
-diff -c nul gcc/gcc/config/i370/xm-mvs.h:1.4
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/xm-mvs.h:1.4
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/xm-mvs.h	Sat Nov 10 09:05:20 2007
 ***************
 *** 0 ****
@@ -47552,8 +47552,8 @@ diff -c nul gcc/gcc/config/i370/xm-mvs.h:1.4
 + #define NO_DBX_FORMAT
 + 
 Index: gcc/gcc/config/i370/xm-oe.h
-diff -c nul gcc/gcc/config/i370/xm-oe.h:1.1
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i370/xm-oe.h:1.1
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i370/xm-oe.h	Wed Feb 15 21:25:44 2006
 ***************
 *** 0 ****
@@ -47661,8 +47661,8 @@ diff -c gcc/gcc/config/i386/i386.h:1.1.1.1 gcc/gcc/config/i386/i386.h:1.2
   /*
   Local variables:
 Index: gcc/gcc/config/i386/pdos386.h
-diff -c nul gcc/gcc/config/i386/pdos386.h:1.9
-*** nul	Tue Oct 01 16:28:50 2019
+diff -c /dev/null gcc/gcc/config/i386/pdos386.h:1.9
+*** /dev/null	Tue Oct 01 16:28:50 2019
 --- gcc/gcc/config/i386/pdos386.h	Wed Jul 03 16:27:31 2019
 ***************
 *** 0 ****
