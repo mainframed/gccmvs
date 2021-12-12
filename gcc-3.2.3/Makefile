@@ -1,11 +1,11 @@
 
 # common definitions
 DEFINES = -DIN_GCC -DHAVE_CONFIG_H -DPUREISO -DTARGET_MVS
-INCLUDES = -I include -I gcc -I gcc/config/i370 -I pdpclib
+INCLUDES = -I include -I gcc -I gcc/config/i370 -I pdpclib -g
 PROGRAM_NAME := gccmvs
 # definitions for building cross tools
 CC = gcc
-CFLAGS = -std=c99 -fno-stack-protector -fno-builtin -fno-pie -m32 -nostdinc -O2 -ansi $(INCLUDES) -DMVSGCC_CROSS $(DEFINES)
+CFLAGS = -std=c99 -fno-stack-protector -fno-builtin -fno-pie -m32 -nostdinc -O2 -ansi -Wall $(INCLUDES) -DMVSGCC_CROSS $(DEFINES)
 
 # sources for the compiler
 GCC_SRCS= \
